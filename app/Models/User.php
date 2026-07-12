@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Concerns\HasTeams;
+use App\Enums\AccountPermission;
+use App\Enums\AccountRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -51,17 +53,42 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === self::ROLE_ADMIN;
+        return $this->hasRole(AccountRole::Admin);
     }
 
     public function isVendor(): bool
     {
-        return $this->role === self::ROLE_VENDOR;
+        return $this->hasRole(AccountRole::Vendor);
     }
 
     public function isCustomer(): bool
     {
-        return $this->role === self::ROLE_CUSTOMER;
+        return $this->hasRole(AccountRole::Customer);
+    }
+
+    public function accountRole(): ?AccountRole
+    {
+        return AccountRole::tryFrom($this->role);
+    }
+
+    public function hasRole(AccountRole|string $role): bool
+    {
+        $role = is_string($role) ? AccountRole::tryFrom($role) : $role;
+
+        return $role !== null && $this->accountRole() === $role;
+    }
+
+    /** @return list<AccountPermission> */
+    public function permissions(): array
+    {
+        return $this->accountRole()?->permissions() ?? [];
+    }
+
+    public function hasPermission(AccountPermission|string $permission): bool
+    {
+        $permission = is_string($permission) ? AccountPermission::tryFrom($permission) : $permission;
+
+        return $permission !== null && $this->accountRole()?->hasPermission($permission) === true;
     }
 
     public function isActive(): bool

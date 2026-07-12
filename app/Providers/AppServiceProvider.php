@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Enums\AccountPermission;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configurePermissions();
     }
 
     /**
@@ -46,5 +50,18 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+
+    /**
+     * Register application-level account permissions as Laravel Gates.
+     */
+    protected function configurePermissions(): void
+    {
+        foreach (AccountPermission::cases() as $permission) {
+            Gate::define(
+                $permission->value,
+                fn (User $user): bool => $user->hasPermission($permission),
+            );
+        }
     }
 }

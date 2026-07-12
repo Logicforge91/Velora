@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\AccountPermission;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,7 @@ class EnsureUserIsAdmin
             return redirect()->route('login');
         }
 
-        if (! $user->isAdmin()) {
+        if (! $user->hasPermission(AccountPermission::AccessAdminDashboard)) {
             abort(403, 'You are not authorized to access the admin panel.');
         }
 
