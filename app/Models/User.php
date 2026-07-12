@@ -32,6 +32,7 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
+        'current_team_id',
     ];
 
     protected $hidden = [
