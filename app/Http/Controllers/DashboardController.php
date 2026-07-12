@@ -3,14 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\TeamInvitation;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request): Response|RedirectResponse
     {
+        if ($request->user()->isAdmin()) {
+            return to_route('admin.dashboard');
+        }
+
         $email = strtolower($request->user()->email);
 
         $pendingInvitations = TeamInvitation::query()

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasTeams;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -9,12 +10,17 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use HasFactory;
+    use HasTeams;
     use Notifiable;
 
     public const ROLE_ADMIN = 'admin';
+
     public const ROLE_VENDOR = 'vendor';
+
     public const ROLE_CUSTOMER = 'customer';
+
     public const ROLE_DELIVERY_AGENT = 'delivery_agent';
+
     public const ROLE_SUPPORT_AGENT = 'support_agent';
 
     protected $fillable = [

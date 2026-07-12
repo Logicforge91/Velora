@@ -1,66 +1,74 @@
 <?php
 
-namespace Tests\Feature\Admin;
-
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Inertia\Testing\AssertableInertia as Assert;
 
-class AdminDashboardTest extends TestCase
-{
-    use RefreshDatabase;
+test('guests are redirected to login from the admin dashboard', function () {
+    $this->get(route('admin.dashboard'))
+        ->assertRedirect(route('login'));
+});
 
-    public function test_guest_is_redirected_to_login(): void
-    {
-        $response = $this->get('/admin/dashboard');
+test('admins can access the admin dashboard', function () {
+    $this->withoutVite();
 
-        $response->assertRedirect('/login');
-    }
+    $admin = User::factory()->create([
+        'role' => User::ROLE_ADMIN,
+        'status' => true,
+    ]);
 
-    public function test_admin_can_access_admin_dashboard(): void
-    {
-        $admin = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
-            'status' => true,
-        ]);
+    $this->actingAs($admin)
+        ->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertViewIs('admin.dashboard')
+        ->assertSee('Dashboard Overview');
+});
 
-        $response = $this
-            ->actingAs($admin)
-            ->get('/admin/dashboard');
+test('customers cannot access the admin dashboard', function () {
+    $customer = User::factory()->create([
+        'role' => User::ROLE_CUSTOMER,
+        'status' => true,
+    ]);
 
-        $response
-            ->assertOk()
-            ->assertViewIs('admin.dashboard')
-            ->assertSee('Dashboard Overview');
-    }
+    $this->actingAs($customer)
+        ->get(route('admin.dashboard'))
+        ->assertForbidden();
+});
 
-    public function test_customer_cannot_access_admin_dashboard(): void
-    {
-        $customer = User::factory()->create([
-            'role' => User::ROLE_CUSTOMER,
-            'status' => true,
-        ]);
+test('inactive admins cannot access the dashboard', function () {
+    $admin = User::factory()->create([
+        'role' => User::ROLE_ADMIN,
+        'status' => false,
+    ]);
 
-        $response = $this
-            ->actingAs($customer)
-            ->get('/admin/dashboard');
+    $this->actingAs($admin)
+        ->get(route('admin.dashboard'))
+        ->assertRedirect(route('login'));
 
-        $response->assertForbidden();
-    }
+    $this->assertGuest();
+});
 
-    public function test_inactive_admin_cannot_access_dashboard(): void
-    {
-        $admin = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
-            'status' => false,
-        ]);
+test('admins are redirected from the standard dashboard to the admin dashboard', function () {
+    $admin = User::factory()->create([
+        'role' => User::ROLE_ADMIN,
+        'status' => true,
+    ]);
 
-        $response = $this
-            ->actingAs($admin)
-            ->get('/admin/dashboard');
+    $this->actingAs($admin)
+        ->get(route('dashboard'))
+        ->assertRedirect(route('admin.dashboard'));
+});
 
-        $response->assertRedirect('/login');
+test('customers can access the standard dashboard', function () {
+    $customer = User::factory()->create([
+        'role' => User::ROLE_CUSTOMER,
+        'status' => true,
+    ]);
 
-        $this->assertGuest();
-    }
-}
+    $this->actingAs($customer)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('dashboard')
+            ->has('pendingInvitations')
+        );
+});

@@ -13,7 +13,7 @@
         {{ config('app.name', 'Vendora') }}
     </title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite('resources/css/app.css')
 </head>
 
 <body class="bg-slate-100 text-slate-900">

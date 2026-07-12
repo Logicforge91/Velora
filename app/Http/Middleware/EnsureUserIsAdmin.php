@@ -14,15 +14,15 @@ class EnsureUserIsAdmin
     ): Response {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             abort(403, 'You are not authorized to access the admin panel.');
         }
 
-        if (!$user->isActive()) {
+        if (! $user->isActive()) {
             auth()->logout();
 
             $request->session()->invalidate();

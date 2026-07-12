@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Collection;
 
 class AdminDashboardService
 {
+    /**
+     * @return array{
+     *     total_users: int,
+     *     total_admins: int,
+     *     total_vendors: int,
+     *     total_customers: int,
+     *     active_users: int,
+     *     inactive_users: int
+     * }
+     */
     public function getStatistics(): array
     {
         $roleCounts = User::query()
@@ -42,6 +52,7 @@ class AdminDashboardService
         ];
     }
 
+    /** @return Collection<int, User> */
     public function getRecentUsers(int $limit = 8): Collection
     {
         return User::query()
