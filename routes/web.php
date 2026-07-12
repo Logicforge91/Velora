@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\CategoryController;
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -45,6 +46,13 @@ Route::prefix('admin')
             '/vendors/{vendor}/reject',
             [VendorController::class, 'reject']
         )->name('vendors.reject');
+
+            Route::resource(
+            'categories',
+            CategoryController::class
+        )->except([
+            'show',
+        ]);
     });
 
 

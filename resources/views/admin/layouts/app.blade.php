@@ -22,6 +22,7 @@
     <script>
         (() => {
             const savedTheme = localStorage.getItem('theme');
+
             const prefersDark = window.matchMedia(
                 '(prefers-color-scheme: dark)'
             ).matches;
@@ -168,7 +169,9 @@
                     </svg>
                 </span>
 
-                <span class="flex-1">Dashboard</span>
+                <span class="flex-1">
+                    Dashboard
+                </span>
             </a>
 
             <p
@@ -236,6 +239,76 @@
                     @endif
                 </a>
 
+                {{-- Category Management --}}
+                <a
+                    href="{{ route('admin.categories.index') }}"
+                    @class([
+                        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                        'bg-white/10 text-white ring-1 ring-inset ring-white/10'
+                            => request()->routeIs('admin.categories.*'),
+                        'text-slate-400 hover:bg-white/5 hover:text-white'
+                            => !request()->routeIs('admin.categories.*'),
+                    ])
+                    @if (request()->routeIs('admin.categories.*'))
+                        aria-current="page"
+                    @endif
+                >
+                    <span
+                        @class([
+                            'grid size-9 shrink-0 place-items-center rounded-lg transition',
+                            'bg-indigo-500 text-white shadow-lg shadow-indigo-950/50'
+                                => request()->routeIs('admin.categories.*'),
+                            'bg-white/5 text-slate-400'
+                                => !request()->routeIs('admin.categories.*'),
+                        ])
+                    >
+                        <svg
+                            class="size-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            aria-hidden="true"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="7"
+                                height="7"
+                                rx="1.5"
+                            />
+
+                            <rect
+                                x="14"
+                                y="3"
+                                width="7"
+                                height="7"
+                                rx="1.5"
+                            />
+
+                            <rect
+                                x="3"
+                                y="14"
+                                width="7"
+                                height="7"
+                                rx="1.5"
+                            />
+
+                            <rect
+                                x="14"
+                                y="14"
+                                width="7"
+                                height="7"
+                                rx="1.5"
+                            />
+                        </svg>
+                    </span>
+
+                    <span class="flex-1">
+                        Categories
+                    </span>
+                </a>
+
                 {{-- Users --}}
                 <span
                     class="flex cursor-not-allowed items-center gap-3
@@ -255,6 +328,7 @@
                             aria-hidden="true"
                         >
                             <path d="M5 20a7 7 0 0 1 14 0"/>
+
                             <path
                                 d="M12 12a4 4 0 1 0 0-8
                                    4 4 0 0 0 0 8Z"
@@ -262,7 +336,9 @@
                         </svg>
                     </span>
 
-                    <span class="flex-1">Users</span>
+                    <span class="flex-1">
+                        Users
+                    </span>
 
                     <span
                         class="rounded-full bg-white/5 px-2 py-0.5
@@ -273,7 +349,7 @@
                     </span>
                 </span>
 
-                {{-- Catalogue --}}
+                {{-- Products --}}
                 <span
                     class="flex cursor-not-allowed items-center gap-3
                            rounded-xl px-3 py-2.5 text-sm text-slate-500"
@@ -291,13 +367,15 @@
                             stroke-width="1.8"
                             aria-hidden="true"
                         >
-                            <path d="M4 5h16v14H4z"/>
-                            <path d="M4 9h16"/>
-                            <path d="M9 9v10"/>
+                            <path d="M5 7.5 12 3l7 4.5v9L12 21l-7-4.5v-9Z"/>
+                            <path d="m5 7.5 7 4.5 7-4.5"/>
+                            <path d="M12 12v9"/>
                         </svg>
                     </span>
 
-                    <span class="flex-1">Catalogue</span>
+                    <span class="flex-1">
+                        Products
+                    </span>
 
                     <span
                         class="rounded-full bg-white/5 px-2 py-0.5
@@ -331,7 +409,9 @@
                         </svg>
                     </span>
 
-                    <span class="flex-1">Orders</span>
+                    <span class="flex-1">
+                        Orders
+                    </span>
 
                     <span
                         class="rounded-full bg-white/5 px-2 py-0.5
@@ -367,7 +447,9 @@
                         </svg>
                     </span>
 
-                    <span class="flex-1">Analytics</span>
+                    <span class="flex-1">
+                        Analytics
+                    </span>
 
                     <span
                         class="rounded-full bg-white/5 px-2 py-0.5
@@ -429,6 +511,7 @@
                         >
                             <path d="M10 17l5-5-5-5"/>
                             <path d="M15 12H3"/>
+
                             <path
                                 d="M15 4h4a2 2 0 0 1 2 2v12
                                    a2 2 0 0 1-2 2h-4"
@@ -537,6 +620,7 @@
                                M18.36 5.64l1.42-1.42
                                M4.22 19.78l1.42-1.42"
                         />
+
                         <circle cx="12" cy="12" r="4"/>
                     </svg>
 
@@ -571,10 +655,14 @@
                            dark:bg-emerald-500/10
                            dark:text-emerald-300"
                 >
-                    <span class="size-2 shrink-0 rounded-full bg-emerald-500">
-                    </span>
+                    <span
+                        class="size-2 shrink-0 rounded-full
+                               bg-emerald-500"
+                    ></span>
 
-                    <span>{{ session('success') }}</span>
+                    <span>
+                        {{ session('success') }}
+                    </span>
                 </div>
             @endif
 
@@ -588,10 +676,13 @@
                            dark:border-red-500/20 dark:bg-red-500/10
                            dark:text-red-300"
                 >
-                    <span class="size-2 shrink-0 rounded-full bg-red-500">
-                    </span>
+                    <span
+                        class="size-2 shrink-0 rounded-full bg-red-500"
+                    ></span>
 
-                    <span>{{ session('error') }}</span>
+                    <span>
+                        {{ session('error') }}
+                    </span>
                 </div>
             @endif
 
@@ -617,7 +708,9 @@
 
                             <ul class="mt-2 list-inside list-disc space-y-1">
                                 @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
+                                    <li>
+                                        {{ $error }}
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -633,19 +726,42 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const sidebar = document.querySelector('[data-sidebar]');
-        const overlay = document.querySelector('[data-sidebar-overlay]');
-        const openButton = document.querySelector('[data-sidebar-open]');
-        const closeButton = document.querySelector('[data-sidebar-close]');
-        const themeButton = document.querySelector('[data-theme-toggle]');
+
+        const overlay = document.querySelector(
+            '[data-sidebar-overlay]'
+        );
+
+        const openButton = document.querySelector(
+            '[data-sidebar-open]'
+        );
+
+        const closeButton = document.querySelector(
+            '[data-sidebar-close]'
+        );
+
+        const themeButton = document.querySelector(
+            '[data-theme-toggle]'
+        );
 
         const setSidebar = (open) => {
             if (!sidebar || !overlay) {
                 return;
             }
 
-            sidebar.classList.toggle('-translate-x-full', !open);
-            overlay.classList.toggle('hidden', !open);
-            document.body.classList.toggle('overflow-hidden', open);
+            sidebar.classList.toggle(
+                '-translate-x-full',
+                !open
+            );
+
+            overlay.classList.toggle(
+                'hidden',
+                !open
+            );
+
+            document.body.classList.toggle(
+                'overflow-hidden',
+                open
+            );
 
             overlay.setAttribute(
                 'aria-hidden',
@@ -673,15 +789,17 @@
 
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024) {
-                document.body.classList.remove('overflow-hidden');
+                document.body.classList.remove(
+                    'overflow-hidden'
+                );
+
                 overlay?.classList.add('hidden');
             }
         });
 
         themeButton?.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle(
-                'dark'
-            );
+            const isDark =
+                document.documentElement.classList.toggle('dark');
 
             localStorage.setItem(
                 'theme',
