@@ -1,135 +1,66 @@
 <?php
 
-use App\Enums\TeamRole;
-use App\Models\Team;
-use App\Models\TeamInvitation;
+namespace Tests\Feature\Admin;
+
 use App\Models\User;
-use Inertia\Testing\AssertableInertia as Assert;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-test('guests are redirected to the login page', function () {
-    $user = User::factory()->create();
-    $team = $user->currentTeam;
+class AdminDashboardTest extends TestCase
+{
+    use RefreshDatabase;
 
-    $response = $this->get(route('dashboard'));
-    $response->assertRedirect(route('login'));
-});
+    public function test_guest_is_redirected_to_login(): void
+    {
+        $response = $this->get('/admin/dashboard');
 
-test('authenticated users can visit the dashboard', function () {
-    $user = User::factory()->create();
-    $team = $user->currentTeam;
+        $response->assertRedirect('/login');
+    }
 
-    $response = $this
-        ->actingAs($user)
-        ->get(route('dashboard'));
+    public function test_admin_can_access_admin_dashboard(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'status' => true,
+        ]);
 
-    $response->assertOk();
-});
+        $response = $this
+            ->actingAs($admin)
+            ->get('/admin/dashboard');
 
-test('dashboard includes pending invitations for the authenticated user', function () {
-    $owner = User::factory()->create(['name' => 'Taylor Otwell']);
-    $invitedUser = User::factory()->create(['email' => 'invited@example.com']);
-    $team = Team::factory()->create(['name' => 'Laravel Team']);
+        $response
+            ->assertOk()
+            ->assertViewIs('admin.dashboard')
+            ->assertSee('Dashboard Overview');
+    }
 
-    $team->members()->attach($owner, ['role' => TeamRole::Owner->value]);
+    public function test_customer_cannot_access_admin_dashboard(): void
+    {
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'status' => true,
+        ]);
 
-    $invitation = TeamInvitation::factory()->create([
-        'team_id' => $team->id,
-        'email' => 'invited@example.com',
-        'invited_by' => $owner->id,
-    ]);
+        $response = $this
+            ->actingAs($customer)
+            ->get('/admin/dashboard');
 
-    $response = $this
-        ->actingAs($invitedUser)
-        ->get(route('dashboard'));
+        $response->assertForbidden();
+    }
 
-    $response->assertOk();
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
-        ->has('pendingInvitations', 1)
-        ->where('pendingInvitations.0.code', $invitation->code)
-        ->where('pendingInvitations.0.inviterName', 'Taylor Otwell')
-        ->where('pendingInvitations.0.team.name', 'Laravel Team')
-        ->where('pendingInvitations.0.team.slug', $team->slug)
-        ->missing('pendingInvitations.0.teamName'),
-    );
-});
+    public function test_inactive_admin_cannot_access_dashboard(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'status' => false,
+        ]);
 
-test('dashboard does not include accepted invitations', function () {
-    $owner = User::factory()->create();
-    $invitedUser = User::factory()->create(['email' => 'invited@example.com']);
-    $team = Team::factory()->create();
+        $response = $this
+            ->actingAs($admin)
+            ->get('/admin/dashboard');
 
-    $team->members()->attach($owner, ['role' => TeamRole::Owner->value]);
+        $response->assertRedirect('/login');
 
-    TeamInvitation::factory()->accepted()->create([
-        'team_id' => $team->id,
-        'email' => 'invited@example.com',
-        'invited_by' => $owner->id,
-    ]);
-
-    $response = $this
-        ->actingAs($invitedUser)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
-        ->has('pendingInvitations', 0),
-    );
-});
-
-test('dashboard excludes expired invitations without deleting them', function () {
-    $owner = User::factory()->create();
-    $invitedUser = User::factory()->create(['email' => 'invited@example.com']);
-    $team = Team::factory()->create();
-
-    $team->members()->attach($owner, ['role' => TeamRole::Owner->value]);
-
-    $invitation = TeamInvitation::factory()->expired()->create([
-        'team_id' => $team->id,
-        'email' => 'invited@example.com',
-        'invited_by' => $owner->id,
-    ]);
-
-    $response = $this
-        ->actingAs($invitedUser)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
-        ->has('pendingInvitations', 0),
-    );
-
-    $this->assertDatabaseHas('team_invitations', [
-        'id' => $invitation->id,
-    ]);
-});
-
-test('dashboard does not include or delete other users invitations', function () {
-    $owner = User::factory()->create();
-    $invitedUser = User::factory()->create(['email' => 'invited@example.com']);
-    $team = Team::factory()->create();
-
-    $team->members()->attach($owner, ['role' => TeamRole::Owner->value]);
-
-    $invitation = TeamInvitation::factory()->expired()->create([
-        'team_id' => $team->id,
-        'email' => 'someone@example.com',
-        'invited_by' => $owner->id,
-    ]);
-
-    $response = $this
-        ->actingAs($invitedUser)
-        ->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
-        ->has('pendingInvitations', 0),
-    );
-
-    $this->assertDatabaseHas('team_invitations', [
-        'id' => $invitation->id,
-    ]);
-});
+        $this->assertGuest();
+    }
+}
