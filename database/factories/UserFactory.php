@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AccountRole;
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\User;
@@ -64,6 +65,31 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn () => ['role' => AccountRole::Admin->value]);
+    }
+
+    public function vendor(): static
+    {
+        return $this->state(fn () => ['role' => AccountRole::Vendor->value]);
+    }
+
+    public function customer(): static
+    {
+        return $this->state(fn () => ['role' => AccountRole::Customer->value]);
+    }
+
+    public function deliveryAgent(): static
+    {
+        return $this->state(fn () => ['role' => AccountRole::DeliveryAgent->value]);
+    }
+
+    public function supportAgent(): static
+    {
+        return $this->state(fn () => ['role' => AccountRole::SupportAgent->value]);
     }
 
     /**
