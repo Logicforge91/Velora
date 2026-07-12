@@ -11,9 +11,17 @@
     "require": {
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^3.0",
+        "laravel/ai": "^0.9.0",
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
+        "laravel/octane": "^2.17",
+        "laravel/pennant": "^1.24",
+        "laravel/pulse": "^1.7",
+        "laravel/reverb": "^1.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/scout": "^11.3",
+        "laravel/socialite": "^5.28",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14"
     },
