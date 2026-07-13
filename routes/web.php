@@ -3,9 +3,13 @@
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\DashboardController;
@@ -49,6 +53,18 @@ Route::prefix('admin')
 
         Route::resource('orders', OrderController::class)
             ->only(['index', 'show', 'update']);
+
+        Route::resource('coupons', CouponController::class)
+            ->except('show');
+
+        Route::resource('reviews', AdminReviewController::class)
+            ->only(['index', 'update']);
+
+        Route::resource('payments', AdminPaymentController::class)
+            ->only(['index', 'update']);
+
+        Route::resource('shipments', AdminShipmentController::class)
+            ->only(['index', 'update']);
 
         Route::get('users/{user}/history', [UserController::class, 'history'])
             ->name('users.history');
