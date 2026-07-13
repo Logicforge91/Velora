@@ -47,6 +47,13 @@ export type Vendor = {
     status: string;
     rejection_reason: string | null;
     approved_at: string | null;
+    kyc_status: 'pending' | 'in_review' | 'verified' | 'rejected';
+    onboarding_stage: string;
+    risk_level: 'unassessed' | 'low' | 'medium' | 'high';
+    risk_score: number;
+    risk_flags: string[] | null;
+    submitted_at: string | null;
+    kyc_verified_at: string | null;
     created_at: string;
     updated_at: string;
     user: {
@@ -57,6 +64,38 @@ export type Vendor = {
         status: boolean;
     };
     approved_by?: { id: number; name: string; email: string } | null;
+    kyc_verified_by?: { id: number; name: string; email: string } | null;
+    kyc_documents_count?: number;
+    verified_documents_count?: number;
+    kyc_documents?: VendorKycDocument[];
+    review_events?: VendorReviewEvent[];
+};
+
+export type VendorKycDocument = {
+    id: number;
+    vendor_id: number;
+    type: string;
+    original_name: string;
+    mime_type: string;
+    size: number;
+    status: 'pending' | 'verified' | 'rejected';
+    rejection_reason: string | null;
+    expires_on: string | null;
+    reviewed_at: string | null;
+    created_at: string;
+    uploader?: { id: number; name: string; email: string } | null;
+    reviewer?: { id: number; name: string; email: string } | null;
+};
+
+export type VendorReviewEvent = {
+    id: number;
+    action: string;
+    from_status: string | null;
+    to_status: string | null;
+    notes: string | null;
+    metadata: Record<string, unknown> | null;
+    created_at: string;
+    actor?: { id: number; name: string; email: string } | null;
 };
 
 export type AccountRoleOption = { value: string; label: string };

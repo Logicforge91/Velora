@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\VendorKycDocument;
 use Illuminate\Database\Seeder;
 
 class VendorKycDocumentSeeder extends Seeder
@@ -12,6 +12,6 @@ class VendorKycDocumentSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        VendorKycDocument::factory()->count(10)->create();
     }
 }

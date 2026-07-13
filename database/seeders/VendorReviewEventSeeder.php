@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\VendorReviewEvent;
 use Illuminate\Database\Seeder;
 
 class VendorReviewEventSeeder extends Seeder
@@ -12,6 +12,6 @@ class VendorReviewEventSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        VendorReviewEvent::factory()->count(10)->create();
     }
 }
