@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CatalogImportController;
@@ -40,19 +41,24 @@ Route::prefix('admin')
             ->name('dashboard');
 
         Route::get('analytics', AnalyticsController::class)
+            ->middleware('permission:reports.view')
             ->name('analytics');
 
-        Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show']);
+        Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show'])->middleware('permission:reports.view');
+
+        Route::resource('admin-roles', AdminRoleController::class)->except(['show'])->middleware('permission:roles.manage');
 
         Route::resource('brands', BrandController::class)
-            ->except('show');
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
 
-        Route::get('catalog-imports/template', [CatalogImportController::class, 'template'])->name('catalog-imports.template');
-        Route::resource('catalog-imports', CatalogImportController::class)->only(['index', 'create', 'store', 'show']);
+        Route::get('catalog-imports/template', [CatalogImportController::class, 'template'])->middleware('permission:catalogue.manage')->name('catalog-imports.template');
+        Route::resource('catalog-imports', CatalogImportController::class)->only(['index', 'create', 'store', 'show'])->middleware('permission:catalogue.manage');
 
         Route::controller(VendorController::class)
             ->prefix('vendors')
             ->name('vendors.')
+            ->middleware('permission:vendors.manage')
             ->group(function (): void {
                 Route::get('/', 'index')->name('index');
                 Route::get('{vendor}', 'show')->name('show');
@@ -65,45 +71,56 @@ Route::prefix('admin')
             });
 
         Route::resource('categories', CategoryController::class)
-            ->except('show');
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
 
         Route::resource('products', AdminProductController::class)
-            ->except('show');
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
 
         Route::resource('orders', OrderController::class)
-            ->only(['index', 'show', 'update']);
+            ->only(['index', 'show', 'update'])
+            ->middleware('permission:orders.manage');
 
         Route::resource('coupons', CouponController::class)
-            ->except('show');
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
 
         Route::resource('reviews', AdminReviewController::class)
-            ->only(['index', 'update']);
+            ->only(['index', 'update'])
+            ->middleware('permission:catalogue.manage');
 
         Route::resource('payments', AdminPaymentController::class)
-            ->only(['index', 'update']);
+            ->only(['index', 'update'])
+            ->middleware('permission:payments.manage');
 
         Route::resource('shipments', AdminShipmentController::class)
-            ->only(['index', 'update']);
+            ->only(['index', 'update'])
+            ->middleware('permission:orders.manage');
 
         Route::resource('returns', AdminReturnController::class)
-            ->only(['index', 'create', 'store', 'show', 'update']);
+            ->only(['index', 'create', 'store', 'show', 'update'])
+            ->middleware('permission:orders.manage');
 
         Route::resource('settlements', SettlementController::class)
-            ->only(['index', 'create', 'store', 'show', 'update']);
+            ->only(['index', 'create', 'store', 'show', 'update'])
+            ->middleware('permission:payments.manage');
 
-        Route::post('support/{support}/messages', SupportMessageController::class)->name('support.messages.store');
-        Route::resource('support', SupportTicketController::class)->only(['index', 'create', 'store', 'show', 'update']);
+        Route::post('support/{support}/messages', SupportMessageController::class)->middleware('permission:support.requests.manage')->name('support.messages.store');
+        Route::resource('support', SupportTicketController::class)->only(['index', 'create', 'store', 'show', 'update'])->middleware('permission:support.requests.manage');
 
-        Route::resource('tax-invoices', TaxInvoiceController::class)->only(['index', 'create', 'store', 'show', 'update']);
+        Route::resource('tax-invoices', TaxInvoiceController::class)->only(['index', 'create', 'store', 'show', 'update'])->middleware('permission:payments.manage');
 
         Route::put('warehouses/{warehouse}/inventory', WarehouseInventoryController::class)
+            ->middleware('permission:catalogue.manage')
             ->name('warehouses.inventory.update');
-        Route::resource('warehouses', WarehouseController::class);
+        Route::resource('warehouses', WarehouseController::class)->middleware('permission:catalogue.manage');
 
         Route::get('users/{user}/history', [UserController::class, 'history'])
+            ->middleware('permission:users.manage')
             ->name('users.history');
 
-        Route::resource('users', UserController::class);
+        Route::resource('users', UserController::class)->middleware('permission:users.manage');
     });
 
 Route::middleware('auth')->group(function () {
