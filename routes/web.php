@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\UserController;
@@ -65,6 +66,9 @@ Route::prefix('admin')
 
         Route::resource('shipments', AdminShipmentController::class)
             ->only(['index', 'update']);
+
+        Route::resource('returns', AdminReturnController::class)
+            ->only(['index', 'create', 'store', 'show', 'update']);
 
         Route::get('users/{user}/history', [UserController::class, 'history'])
             ->name('users.history');

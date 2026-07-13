@@ -187,3 +187,39 @@ export type Shipment = {
     notes: string | null;
     order: Order;
 };
+
+export type ReturnStatus =
+    | 'requested'
+    | 'approved'
+    | 'pickup_scheduled'
+    | 'in_transit'
+    | 'received'
+    | 'refunded'
+    | 'rejected';
+
+export type ReturnCase = {
+    id: number;
+    order_id: number;
+    order_item_id: number | null;
+    number: string;
+    type: 'return' | 'rto';
+    reason_code: string;
+    reason_details: string | null;
+    status: ReturnStatus;
+    requested_quantity: number;
+    refund_amount: string;
+    resolution: string | null;
+    reverse_carrier: string | null;
+    tracking_number: string | null;
+    requested_at: string;
+    approved_at: string | null;
+    received_at: string | null;
+    completed_at: string | null;
+    order: Order & {
+        payment?: Omit<Payment, 'order'> | null;
+        shipment?: Omit<Shipment, 'order'> | null;
+    };
+    order_item?: OrderItem | null;
+    customer: { id: number; name: string; email: string };
+    processor?: { id: number; name: string; email: string } | null;
+};
