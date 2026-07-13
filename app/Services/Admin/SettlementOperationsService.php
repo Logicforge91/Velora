@@ -16,7 +16,10 @@ use Illuminate\Validation\ValidationException;
 
 class SettlementOperationsService
 {
-    /** @param array<string, mixed> $filters @return LengthAwarePaginator<int, Settlement> */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Settlement>
+     */
     public function paginate(array $filters): LengthAwarePaginator
     {
         $search = trim((string) ($filters['search'] ?? ''));
