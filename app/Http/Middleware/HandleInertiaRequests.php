@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,6 +37,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $isAdminRoute = $request->routeIs('admin.*');
 
         return [
             ...parent::share($request),
@@ -48,8 +50,19 @@ class HandleInertiaRequests extends Middleware
                 ),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'currentTeam' => fn () => $user?->currentTeam ? $user->toUserTeam($user->currentTeam) : null,
-            'teams' => fn () => $user?->toUserTeams(includeCurrent: true) ?? [],
+            'currentTeam' => fn () => ! $isAdminRoute && $user?->currentTeam
+                ? $user->toUserTeam($user->currentTeam)
+                : null,
+            'teams' => fn () => ! $isAdminRoute
+                ? $user?->toUserTeams(includeCurrent: true) ?? []
+                : [],
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
+            'pendingVendorCount' => fn () => $isAdminRoute
+                ? Vendor::query()->where('status', Vendor::STATUS_PENDING)->count()
+                : 0,
         ];
     }
 }
