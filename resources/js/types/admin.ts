@@ -187,3 +187,70 @@ export type Shipment = {
     notes: string | null;
     order: Order;
 };
+
+export type ReturnStatus =
+    | 'requested'
+    | 'approved'
+    | 'pickup_scheduled'
+    | 'in_transit'
+    | 'received'
+    | 'refunded'
+    | 'rejected';
+
+export type ReturnCase = {
+    id: number;
+    order_id: number;
+    order_item_id: number | null;
+    number: string;
+    type: 'return' | 'rto';
+    reason_code: string;
+    reason_details: string | null;
+    status: ReturnStatus;
+    requested_quantity: number;
+    refund_amount: string;
+    resolution: string | null;
+    reverse_carrier: string | null;
+    tracking_number: string | null;
+    requested_at: string;
+    approved_at: string | null;
+    received_at: string | null;
+    completed_at: string | null;
+    order: Order & {
+        payment?: Omit<Payment, 'order'> | null;
+        shipment?: Omit<Shipment, 'order'> | null;
+    };
+    order_item?: OrderItem | null;
+    customer: { id: number; name: string; email: string };
+    processor?: { id: number; name: string; email: string } | null;
+};
+
+export type WarehouseInventory = {
+    id: number;
+    product_id: number;
+    on_hand: number;
+    reserved: number;
+    reorder_level: number;
+    bin_location: string | null;
+    product: { id: number; name: string; sku: string; stock: number };
+    updated_by?: { id: number; name: string } | null;
+};
+
+export type Warehouse = {
+    id: number;
+    code: string;
+    name: string;
+    type: 'warehouse' | 'fulfilment_center' | 'dark_store';
+    contact_name: string | null;
+    contact_phone: string | null;
+    address: { line_1: string; line_2?: string };
+    city: string;
+    state: string;
+    postal_code: string;
+    capacity: number;
+    priority: number;
+    status: boolean;
+    inventories_count?: number;
+    units_on_hand?: number | null;
+    units_reserved?: number | null;
+    inventories?: WarehouseInventory[];
+};

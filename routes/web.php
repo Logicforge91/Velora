@@ -8,10 +8,13 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\WarehouseController;
+use App\Http\Controllers\Admin\WarehouseInventoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +68,13 @@ Route::prefix('admin')
 
         Route::resource('shipments', AdminShipmentController::class)
             ->only(['index', 'update']);
+
+        Route::resource('returns', AdminReturnController::class)
+            ->only(['index', 'create', 'store', 'show', 'update']);
+
+        Route::put('warehouses/{warehouse}/inventory', WarehouseInventoryController::class)
+            ->name('warehouses.inventory.update');
+        Route::resource('warehouses', WarehouseController::class);
 
         Route::get('users/{user}/history', [UserController::class, 'history'])
             ->name('users.history');

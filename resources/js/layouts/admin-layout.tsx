@@ -22,8 +22,10 @@ import {
     Sun,
     Tags,
     Truck,
+    Undo2,
     Users,
     WalletCards,
+    Warehouse,
     X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -56,6 +58,12 @@ const navigation = [
     },
     { label: 'Payments', href: admin.payments.index.url(), icon: WalletCards },
     { label: 'Shipments', href: admin.shipments.index.url(), icon: Truck },
+    {
+        label: 'Warehouses',
+        href: admin.warehouses.index.url(),
+        icon: Warehouse,
+    },
+    { label: 'Returns', href: admin.returns.index.url(), icon: Undo2 },
     { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
     { label: 'Categories', href: admin.categories.index.url(), icon: Boxes },
     { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
