@@ -276,3 +276,32 @@ export type Settlement = {
     vendor: Vendor;
     approver?: { id: number; name: string } | null;
 };
+
+export type SupportMessage = {
+    id: number;
+    body: string;
+    is_internal: boolean;
+    created_at: string;
+    user: { id: number; name: string; email: string };
+};
+export type SupportTicket = {
+    id: number;
+    number: string;
+    subject: string;
+    category: string;
+    channel: string;
+    priority: string;
+    status: string;
+    description: string;
+    first_response_due_at: string | null;
+    resolution_due_at: string | null;
+    first_responded_at: string | null;
+    resolved_at: string | null;
+    closed_at: string | null;
+    created_at: string;
+    messages_count?: number;
+    customer: { id: number; name: string; email: string };
+    order?: { id: number; number: string } | null;
+    assignee?: { id: number; name: string; email: string } | null;
+    messages?: SupportMessage[];
+};
