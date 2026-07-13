@@ -1,17 +1,18 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
-
-// Route::prefix('{current_team}')
-//     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
-//     ->group(function () {
-//         Route::get('dashboard', DashboardController::class)->name('dashboard');
-//     });
 
 Route::middleware('auth')
     ->get('/dashboard', DashboardController::class)
@@ -21,8 +22,38 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'admin'])
     ->group(function (): void {
-        Route::get('/dashboard', AdminDashboardController::class)
+        Route::get('dashboard', AdminDashboardController::class)
             ->name('dashboard');
+
+        Route::get('analytics', AnalyticsController::class)
+            ->name('analytics');
+
+        Route::resource('brands', BrandController::class)
+            ->except('show');
+
+        Route::controller(VendorController::class)
+            ->prefix('vendors')
+            ->name('vendors.')
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::get('{vendor}', 'show')->name('show');
+                Route::patch('{vendor}/approve', 'approve')->name('approve');
+                Route::patch('{vendor}/reject', 'reject')->name('reject');
+            });
+
+        Route::resource('categories', CategoryController::class)
+            ->except('show');
+
+        Route::resource('products', AdminProductController::class)
+            ->except('show');
+
+        Route::resource('orders', OrderController::class)
+            ->only(['index', 'show', 'update']);
+
+        Route::get('users/{user}/history', [UserController::class, 'history'])
+            ->name('users.history');
+
+        Route::resource('users', UserController::class);
     });
 
 Route::middleware('auth')->group(function () {

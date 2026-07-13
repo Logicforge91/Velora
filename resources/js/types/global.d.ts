@@ -16,6 +16,11 @@ declare module '@inertiajs/core' {
             sidebarOpen: boolean;
             currentTeam: Team | null;
             teams: Team[];
+            flash: {
+                success: string | null;
+                error: string | null;
+            };
+            pendingVendorCount: number;
             [key: string]: unknown;
         };
     }
