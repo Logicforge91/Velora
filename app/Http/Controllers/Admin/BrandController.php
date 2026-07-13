@@ -7,35 +7,35 @@ use App\Http\Requests\Admin\StoreBrandRequest;
 use App\Http\Requests\Admin\UpdateBrandRequest;
 use App\Models\Brand;
 use App\Services\Admin\BrandManagementService;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class BrandController extends Controller
 {
     public function __construct(
         private readonly BrandManagementService $brandService
-    ) {
-    }
+    ) {}
 
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
-        return view('admin.brands.index', [
-            'brands' => $this->brandService->getBrands(
-                $request->only([
-                    'search',
-                    'status',
-                    'featured',
-                ])
-            ),
+        $brands = $this->brandService->getBrands(
+            $request->only(['search', 'status', 'featured'])
+        );
+
+        $brands->through(fn (Brand $brand): Brand => $brand->append('logo_url'));
+
+        return Inertia::render('admin/brands/index', [
+            'brands' => $brands,
 
             'counts' => $this->brandService->getCounts(),
         ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        return view('admin.brands.create', [
+        return Inertia::render('admin/brands/form', [
             'brand' => new Brand([
                 'status' => true,
                 'is_featured' => false,
@@ -59,10 +59,10 @@ class BrandController extends Controller
             );
     }
 
-    public function edit(Brand $brand): View
+    public function edit(Brand $brand): Response
     {
-        return view('admin.brands.edit', [
-            'brand' => $brand,
+        return Inertia::render('admin/brands/form', [
+            'brand' => $brand->append('logo_url'),
         ]);
     }
 

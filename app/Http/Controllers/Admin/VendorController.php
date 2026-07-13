@@ -6,20 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RejectVendorRequest;
 use App\Models\Vendor;
 use App\Services\Admin\VendorManagementService;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class VendorController extends Controller
 {
     public function __construct(
         private readonly VendorManagementService $vendorService
-    ) {
-    }
+    ) {}
 
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
-        return view('admin.vendors.index', [
+        return Inertia::render('admin/vendors/index', [
             'vendors' => $this->vendorService->getVendors(
                 $request->only([
                     'search',
@@ -31,14 +31,14 @@ class VendorController extends Controller
         ]);
     }
 
-    public function show(Vendor $vendor): View
+    public function show(Vendor $vendor): Response
     {
         $vendor->load([
             'user:id,name,email,status,role,created_at',
             'approvedBy:id,name,email',
         ]);
 
-        return view('admin.vendors.show', [
+        return Inertia::render('admin/vendors/show', [
             'vendor' => $vendor,
         ]);
     }
@@ -67,8 +67,7 @@ class VendorController extends Controller
         $this->vendorService->reject(
             vendor: $vendor,
             admin: $request->user(),
-            rejectionReason:
-                $request->validated('rejection_reason'),
+            rejectionReason: $request->validated('rejection_reason'),
         );
 
         return redirect()
