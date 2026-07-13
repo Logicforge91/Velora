@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vendor extends Model
 {
@@ -26,13 +27,31 @@ class Vendor extends Model
         'rejection_reason',
         'approved_at',
         'approved_by',
+        'commission_rate',
+        'settlement_cycle',
+        'bank_account_name',
+        'bank_account_number',
+        'bank_ifsc',
     ];
 
     protected function casts(): array
     {
         return [
             'approved_at' => 'datetime',
+            'commission_rate' => 'decimal:2',
         ];
+    }
+
+    /** @return HasMany<Product, $this> */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /** @return HasMany<Settlement, $this> */
+    public function settlements(): HasMany
+    {
+        return $this->hasMany(Settlement::class);
     }
 
     /** @return BelongsTo<User, $this> */

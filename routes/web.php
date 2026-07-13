@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
@@ -70,6 +71,9 @@ Route::prefix('admin')
             ->only(['index', 'update']);
 
         Route::resource('returns', AdminReturnController::class)
+            ->only(['index', 'create', 'store', 'show', 'update']);
+
+        Route::resource('settlements', SettlementController::class)
             ->only(['index', 'create', 'store', 'show', 'update']);
 
         Route::put('warehouses/{warehouse}/inventory', WarehouseInventoryController::class)

@@ -10,6 +10,7 @@ type Props = {
     product: Partial<Product>;
     categories: Option[];
     brands: Option[];
+    vendors: { id: number; business_name: string }[];
     statuses: string[];
 };
 const input =
@@ -19,6 +20,7 @@ export default function ProductForm({
     product,
     categories,
     brands,
+    vendors,
     statuses,
 }: Props) {
     const exists = Boolean(product.id);
@@ -28,6 +30,7 @@ export default function ProductForm({
         sku: product.sku ?? '',
         category_id: product.category_id?.toString() ?? '',
         brand_id: product.brand_id?.toString() ?? '',
+        vendor_id: product.vendor_id?.toString() ?? '',
         short_description: product.short_description ?? '',
         description: product.description ?? '',
         price: product.price ?? '',
@@ -151,6 +154,28 @@ export default function ProductForm({
                                     {brands.map((brand) => (
                                         <option key={brand.id} value={brand.id}>
                                             {brand.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </Field>
+                            <Field label="Seller" error={form.errors.vendor_id}>
+                                <select
+                                    className={input}
+                                    value={form.data.vendor_id}
+                                    onChange={(event) =>
+                                        form.setData(
+                                            'vendor_id',
+                                            event.target.value,
+                                        )
+                                    }
+                                >
+                                    <option value="">Platform owned</option>
+                                    {vendors.map((vendor) => (
+                                        <option
+                                            key={vendor.id}
+                                            value={vendor.id}
+                                        >
+                                            {vendor.business_name}
                                         </option>
                                     ))}
                                 </select>

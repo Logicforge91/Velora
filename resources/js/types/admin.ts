@@ -88,6 +88,7 @@ export type Product = {
     id: number;
     category_id: number | null;
     brand_id: number | null;
+    vendor_id: number | null;
     name: string;
     slug: string;
     sku: string;
@@ -253,4 +254,25 @@ export type Warehouse = {
     units_on_hand?: number | null;
     units_reserved?: number | null;
     inventories?: WarehouseInventory[];
+};
+
+export type Settlement = {
+    id: number;
+    number: string;
+    period_start: string;
+    period_end: string;
+    gross_sales: string;
+    commission_amount: string;
+    shipping_fee: string;
+    tax_withheld: string;
+    refund_deductions: string;
+    adjustments: string;
+    net_amount: string;
+    status: string;
+    transaction_reference: string | null;
+    notes: string | null;
+    approved_at: string | null;
+    paid_at: string | null;
+    vendor: Vendor;
+    approver?: { id: number; name: string } | null;
 };

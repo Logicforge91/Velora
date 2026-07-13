@@ -2,6 +2,7 @@ import { Form, Head, Link, usePage } from '@inertiajs/react';
 import {
     BarChart3,
     BadgePercent,
+    Banknote,
     Bell,
     Boxes,
     ChevronDown,
@@ -57,6 +58,11 @@ const navigation = [
         icon: MessageSquareText,
     },
     { label: 'Payments', href: admin.payments.index.url(), icon: WalletCards },
+    {
+        label: 'Settlements',
+        href: admin.settlements.index.url(),
+        icon: Banknote,
+    },
     { label: 'Shipments', href: admin.shipments.index.url(), icon: Truck },
     {
         label: 'Warehouses',
