@@ -140,4 +140,45 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Keep the server-rendered admin CRUD screens aligned with the shared theme. */
+    .dark [data-admin-panel] .bg-white {
+        background-color: color-mix(in oklab, white 5%, transparent);
+    }
+
+    .dark [data-admin-panel] .bg-slate-50 {
+        background-color: color-mix(in oklab, white 3%, transparent);
+    }
+
+    .dark [data-admin-panel] .border-slate-200,
+    .dark [data-admin-panel] .border-slate-300,
+    .dark [data-admin-panel] .divide-slate-100 > :not(:last-child),
+    .dark [data-admin-panel] .divide-slate-200 > :not(:last-child) {
+        border-color: color-mix(in oklab, white 10%, transparent);
+    }
+
+    .dark [data-admin-panel] .text-slate-900,
+    .dark [data-admin-panel] .text-slate-800,
+    .dark [data-admin-panel] .text-slate-700 {
+        color: var(--color-slate-100);
+    }
+
+    .dark [data-admin-panel] .text-slate-600,
+    .dark [data-admin-panel] .text-slate-500 {
+        color: var(--color-slate-400);
+    }
+
+    .dark [data-admin-panel] input,
+    .dark [data-admin-panel] select,
+    .dark [data-admin-panel] textarea {
+        border-color: color-mix(in oklab, white 12%, transparent);
+        background-color: color-mix(in oklab, white 5%, transparent);
+        color: var(--color-slate-100);
+        color-scheme: dark;
+    }
+
+    .dark [data-admin-panel] input::placeholder,
+    .dark [data-admin-panel] textarea::placeholder {
+        color: var(--color-slate-500);
+    }
 }

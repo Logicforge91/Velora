@@ -69,8 +69,7 @@ class VendorManagementService
             )
             ->when(
                 in_array($status, Vendor::statuses(), true),
-                fn (Builder $query): Builder =>
-                    $query->where('status', $status)
+                fn (Builder $query): Builder => $query->where('status', $status)
             )
             ->latest()
             ->paginate(15)
@@ -108,28 +107,31 @@ class VendorManagementService
         Vendor $vendor,
         User $admin
     ): Vendor {
-        if (!$vendor->isPending()) {
-            throw ValidationException::withMessages([
-                'vendor' =>
-                    'Only pending vendor applications can be approved.',
-            ]);
-        }
-
         return DB::transaction(
             function () use ($vendor, $admin): Vendor {
-                $vendor->update([
+                $lockedVendor = Vendor::query()
+                    ->lockForUpdate()
+                    ->findOrFail($vendor->getKey());
+
+                if (! $lockedVendor->isPending()) {
+                    throw ValidationException::withMessages([
+                        'vendor' => 'Only pending vendor applications can be approved.',
+                    ]);
+                }
+
+                $lockedVendor->update([
                     'status' => Vendor::STATUS_APPROVED,
                     'rejection_reason' => null,
                     'approved_at' => now(),
                     'approved_by' => $admin->id,
                 ]);
 
-                $vendor->user()->update([
+                $lockedVendor->user()->update([
                     'role' => User::ROLE_VENDOR,
                     'status' => true,
                 ]);
 
-                return $vendor->fresh([
+                return $lockedVendor->fresh([
                     'user',
                     'approvedBy',
                 ]);
@@ -142,31 +144,34 @@ class VendorManagementService
         User $admin,
         string $rejectionReason
     ): Vendor {
-        if (!$vendor->isPending()) {
-            throw ValidationException::withMessages([
-                'vendor' =>
-                    'Only pending vendor applications can be rejected.',
-            ]);
-        }
-
         return DB::transaction(
             function () use (
                 $vendor,
                 $admin,
                 $rejectionReason
             ): Vendor {
-                $vendor->update([
+                $lockedVendor = Vendor::query()
+                    ->lockForUpdate()
+                    ->findOrFail($vendor->getKey());
+
+                if (! $lockedVendor->isPending()) {
+                    throw ValidationException::withMessages([
+                        'vendor' => 'Only pending vendor applications can be rejected.',
+                    ]);
+                }
+
+                $lockedVendor->update([
                     'status' => Vendor::STATUS_REJECTED,
                     'rejection_reason' => trim($rejectionReason),
                     'approved_at' => null,
                     'approved_by' => $admin->id,
                 ]);
 
-                $vendor->user()->update([
+                $lockedVendor->user()->update([
                     'role' => User::ROLE_CUSTOMER,
                 ]);
 
-                return $vendor->fresh([
+                return $lockedVendor->fresh([
                     'user',
                     'approvedBy',
                 ]);

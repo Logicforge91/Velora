@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\AccountPermission;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBrandRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isAdmin() ?? false;
+        return $this->user()?->hasPermission(AccountPermission::ManageCatalogue) ?? false;
     }
 
     protected function prepareForValidation(): void
@@ -47,7 +48,7 @@ class StoreBrandRequest extends FormRequest
             'logo' => [
                 'nullable',
                 'image',
-                'mimes:jpg,jpeg,png,webp,svg',
+                'mimes:jpg,jpeg,png,webp',
                 'max:2048',
             ],
 
@@ -79,20 +80,15 @@ class StoreBrandRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' =>
-                'Please enter the brand name.',
+            'name.required' => 'Please enter the brand name.',
 
-            'website_url.url' =>
-                'Please enter a valid website URL.',
+            'website_url.url' => 'Please enter a valid website URL.',
 
-            'logo.image' =>
-                'The brand logo must be an image.',
+            'logo.image' => 'The brand logo must be an image.',
 
-            'logo.mimes' =>
-                'The logo must be a JPG, JPEG, PNG, WebP or SVG file.',
+            'logo.mimes' => 'The logo must be a JPG, JPEG, PNG or WebP file.',
 
-            'logo.max' =>
-                'The brand logo cannot exceed 2 MB.',
+            'logo.max' => 'The brand logo cannot exceed 2 MB.',
         ];
     }
 }

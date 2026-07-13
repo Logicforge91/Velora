@@ -43,6 +43,7 @@
 </head>
 
 <body
+    data-admin-panel
     class="min-h-full bg-slate-50 font-sans text-slate-950 antialiased
            dark:bg-slate-950 dark:text-slate-100"
 >
@@ -689,7 +690,7 @@
         </header>
 
         {{-- Page content --}}
-        <main class="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main class="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             {{-- Success message --}}
             @if (session('success'))
                 <div

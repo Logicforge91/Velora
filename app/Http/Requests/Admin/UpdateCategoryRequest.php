@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\AccountPermission;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCategoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isAdmin() ?? false;
+        return $this->user()?->hasPermission(AccountPermission::ManageCatalogue) ?? false;
     }
 
     protected function prepareForValidation(): void
@@ -79,20 +80,15 @@ class UpdateCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'parent_id.exists' =>
-                'The selected parent category does not exist.',
+            'parent_id.exists' => 'The selected parent category does not exist.',
 
-            'name.required' =>
-                'Please enter the category name.',
+            'name.required' => 'Please enter the category name.',
 
-            'image.image' =>
-                'The category image must be a valid image.',
+            'image.image' => 'The category image must be a valid image.',
 
-            'image.mimes' =>
-                'Only JPG, JPEG, PNG and WebP images are allowed.',
+            'image.mimes' => 'Only JPG, JPEG, PNG and WebP images are allowed.',
 
-            'image.max' =>
-                'The category image cannot exceed 2 MB.',
+            'image.max' => 'The category image cannot exceed 2 MB.',
         ];
     }
 }
