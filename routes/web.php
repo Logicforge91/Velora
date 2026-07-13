@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
@@ -36,6 +37,11 @@ Route::prefix('admin')
 
         Route::resource('categories', CategoryController::class)
             ->except('show');
+
+        Route::get('users/{user}/history', [UserController::class, 'history'])
+            ->name('users.history');
+
+        Route::resource('users', UserController::class);
     });
 
 Route::middleware('auth')->group(function () {

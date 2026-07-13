@@ -7,7 +7,9 @@ use App\Enums\AccountPermission;
 use App\Enums\AccountRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -18,6 +20,7 @@ class User extends Authenticatable
 
     use HasTeams;
     use Notifiable;
+    use SoftDeletes;
 
     public const ROLE_ADMIN = 'admin';
 
@@ -97,8 +100,15 @@ class User extends Authenticatable
         return $this->status === true;
     }
 
+    /** @return HasOne<Vendor, $this> */
     public function vendor(): HasOne
     {
         return $this->hasOne(Vendor::class);
+    }
+
+    /** @return HasMany<UserHistory, $this> */
+    public function histories(): HasMany
+    {
+        return $this->hasMany(UserHistory::class);
     }
 }
