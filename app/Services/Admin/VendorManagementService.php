@@ -5,9 +5,9 @@ namespace App\Services\Admin;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorKycDocument;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +17,10 @@ class VendorManagementService
     /** @var list<string> */
     public const REQUIRED_KYC_TYPES = ['pan', 'gst_registration', 'bank_proof', 'address_proof', 'identity_proof'];
 
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Vendor>
+     */
     public function getVendors(array $filters = []): LengthAwarePaginator
     {
         $search = trim((string) ($filters['search'] ?? ''));
@@ -87,6 +91,7 @@ class VendorManagementService
             ->withQueryString();
     }
 
+    /** @return array<string, int> */
     public function getStatusCounts(): array
     {
         $counts = Vendor::query()
@@ -122,7 +127,8 @@ class VendorManagementService
             function () use ($vendor, $admin): Vendor {
                 $lockedVendor = Vendor::query()
                     ->lockForUpdate()
-                    ->findOrFail($vendor->getKey());
+                    ->whereKey($vendor->getKey())
+                    ->firstOrFail();
 
                 if (! $lockedVendor->isPending()) {
                     throw ValidationException::withMessages([
@@ -152,7 +158,7 @@ class VendorManagementService
 
                 $this->recordEvent($lockedVendor, $admin, 'application_approved', Vendor::STATUS_PENDING, Vendor::STATUS_APPROVED);
 
-                return $lockedVendor->fresh([
+                return $lockedVendor->load([
                     'user',
                     'approvedBy',
                 ]);
@@ -173,7 +179,8 @@ class VendorManagementService
             ): Vendor {
                 $lockedVendor = Vendor::query()
                     ->lockForUpdate()
-                    ->findOrFail($vendor->getKey());
+                    ->whereKey($vendor->getKey())
+                    ->firstOrFail();
 
                 if (! $lockedVendor->isPending()) {
                     throw ValidationException::withMessages([
@@ -194,7 +201,7 @@ class VendorManagementService
 
                 $this->recordEvent($lockedVendor, $admin, 'application_rejected', Vendor::STATUS_PENDING, Vendor::STATUS_REJECTED, $rejectionReason);
 
-                return $lockedVendor->fresh([
+                return $lockedVendor->load([
                     'user',
                     'approvedBy',
                 ]);
@@ -202,9 +209,14 @@ class VendorManagementService
         );
     }
 
+    /** @param array<string, mixed> $data */
     public function storeDocument(Vendor $vendor, User $actor, UploadedFile $file, array $data): VendorKycDocument
     {
         $path = $file->store("vendor-kyc/{$vendor->id}", 'local');
+
+        if (! is_string($path)) {
+            throw ValidationException::withMessages(['document' => 'The document could not be stored. Please try again.']);
+        }
 
         try {
             return DB::transaction(function () use ($vendor, $actor, $file, $data, $path): VendorKycDocument {
@@ -221,7 +233,7 @@ class VendorManagementService
                     Storage::disk('local')->delete($oldPath);
                 }
 
-                return $document->fresh(['uploader', 'reviewer']);
+                return $document->load(['uploader', 'reviewer']);
             });
         } catch (\Throwable $exception) {
             Storage::disk('local')->delete($path);
@@ -229,6 +241,7 @@ class VendorManagementService
         }
     }
 
+    /** @param array<string, mixed> $data */
     public function reviewDocument(Vendor $vendor, VendorKycDocument $document, User $actor, array $data): VendorKycDocument
     {
         return DB::transaction(function () use ($vendor, $document, $actor, $data): VendorKycDocument {
@@ -236,10 +249,11 @@ class VendorManagementService
             $locked->update(['status' => $data['status'], 'rejection_reason' => $data['status'] === VendorKycDocument::STATUS_REJECTED ? trim((string) $data['rejection_reason']) : null, 'reviewed_by' => $actor->id, 'reviewed_at' => now()]);
             $this->refreshKycStatus($vendor, $actor, 'document_'.$data['status'], ['document_type' => $locked->type]);
 
-            return $locked->fresh(['uploader', 'reviewer']);
+            return $locked->load(['uploader', 'reviewer']);
         });
     }
 
+    /** @param array<string, mixed> $data */
     public function updateRisk(Vendor $vendor, User $actor, array $data): Vendor
     {
         return DB::transaction(function () use ($vendor, $actor, $data): Vendor {
@@ -248,10 +262,11 @@ class VendorManagementService
             $locked->update(['risk_level' => $data['risk_level'], 'risk_score' => $data['risk_score'], 'risk_flags' => $data['risk_flags']]);
             $this->recordEvent($locked, $actor, 'risk_assessed', $previous, $locked->risk_level, $data['notes'] ?? null, ['score' => $locked->risk_score, 'flags' => $locked->risk_flags]);
 
-            return $locked->fresh();
+            return $locked;
         });
     }
 
+    /** @param array<string, mixed> $metadata */
     private function refreshKycStatus(Vendor $vendor, User $actor, string $action, array $metadata): void
     {
         $documents = VendorKycDocument::query()->whereBelongsTo($vendor)->get(['type', 'status']);
@@ -264,6 +279,7 @@ class VendorManagementService
         $this->recordEvent($vendor, $actor, $action, $previous, $status, metadata: $metadata);
     }
 
+    /** @param array<string, mixed>|null $metadata */
     private function recordEvent(Vendor $vendor, User $actor, string $action, ?string $fromStatus = null, ?string $toStatus = null, ?string $notes = null, ?array $metadata = null): void
     {
         $vendor->reviewEvents()->create(['actor_id' => $actor->id, 'action' => $action, 'from_status' => $fromStatus, 'to_status' => $toStatus, 'notes' => $notes, 'metadata' => $metadata]);

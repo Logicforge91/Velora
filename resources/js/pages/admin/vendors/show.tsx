@@ -55,8 +55,9 @@ export default function VendorShow({
         });
     };
     const approveVendor = () => {
-        if (confirm(`Approve ${vendor.business_name}?`))
+        if (confirm(`Approve ${vendor.business_name}?`)) {
             approve.patch(vendorsRoutes.approve.url(vendor.id));
+        }
     };
     const submitReject = (event: FormEvent) => {
         event.preventDefault();
@@ -145,6 +146,7 @@ export default function VendorShow({
                                 const document = vendor.kyc_documents?.find(
                                     (item) => item.type === type,
                                 );
+
                                 return (
                                     <DocumentRow
                                         key={type}
@@ -480,7 +482,8 @@ function DocumentRow({
     const review = useForm({ status: 'verified', rejection_reason: '' });
     const submit = (event: FormEvent) => {
         event.preventDefault();
-        if (document)
+
+        if (document) {
             review.patch(
                 vendorsRoutes.kycDocuments.update.url({
                     vendor: vendorId,
@@ -488,7 +491,9 @@ function DocumentRow({
                 }),
                 { preserveScroll: true },
             );
+        }
     };
+
     return (
         <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10">
             <div className="flex flex-wrap items-start justify-between gap-3">
