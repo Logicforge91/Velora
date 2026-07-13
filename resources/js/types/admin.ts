@@ -133,3 +133,57 @@ export type Order = {
     user: { id: number; name: string; email: string };
     items?: OrderItem[];
 };
+
+export type Coupon = {
+    id: number;
+    code: string;
+    name: string;
+    description: string | null;
+    type: 'percentage' | 'fixed';
+    value: string;
+    minimum_order_amount: string;
+    maximum_discount_amount: string | null;
+    usage_limit: number | null;
+    used_count: number;
+    starts_at: string | null;
+    expires_at: string | null;
+    status: boolean;
+};
+export type Review = {
+    id: number;
+    rating: number;
+    title: string | null;
+    body: string;
+    status: 'pending' | 'approved' | 'rejected';
+    created_at: string;
+    product: { id: number; name: string; sku: string };
+    user: { id: number; name: string; email: string };
+    moderator?: { id: number; name: string } | null;
+};
+export type Payment = {
+    id: number;
+    transaction_id: string | null;
+    provider: string;
+    amount: string;
+    status: 'pending' | 'paid' | 'failed' | 'partially_refunded' | 'refunded';
+    refunded_amount: string;
+    paid_at: string | null;
+    order: Order;
+};
+export type Shipment = {
+    id: number;
+    carrier: string | null;
+    tracking_number: string | null;
+    status:
+        | 'pending'
+        | 'packed'
+        | 'shipped'
+        | 'in_transit'
+        | 'delivered'
+        | 'returned';
+    estimated_delivery_at: string | null;
+    shipped_at: string | null;
+    delivered_at: string | null;
+    notes: string | null;
+    order: Order;
+};
