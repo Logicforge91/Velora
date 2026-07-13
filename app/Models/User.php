@@ -32,6 +32,11 @@ class User extends Authenticatable
 
     public const ROLE_SUPPORT_AGENT = 'support_agent';
 
+    protected $attributes = [
+        'role' => self::ROLE_CUSTOMER,
+        'status' => true,
+    ];
+
     protected $fillable = [
         'name',
         'email',
