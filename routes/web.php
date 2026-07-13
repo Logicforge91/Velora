@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
@@ -32,13 +33,15 @@ Route::middleware('auth')
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'admin'])
+    ->middleware(['auth', 'admin', 'admin.audit'])
     ->group(function (): void {
         Route::get('dashboard', AdminDashboardController::class)
             ->name('dashboard');
 
         Route::get('analytics', AnalyticsController::class)
             ->name('analytics');
+
+        Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show']);
 
         Route::resource('brands', BrandController::class)
             ->except('show');

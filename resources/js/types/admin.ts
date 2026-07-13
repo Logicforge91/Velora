@@ -12,6 +12,32 @@ export type Paginated<T> = {
 };
 export type Counts = Record<string, number>;
 
+export type AdminAuditLog = {
+    id: number;
+    event_uuid: string;
+    actor_id: number | null;
+    category: string;
+    action: string;
+    severity: 'info' | 'notice' | 'warning' | 'critical';
+    description: string;
+    auditable_type: string | null;
+    auditable_id: number | null;
+    route_name: string | null;
+    method: string;
+    path: string;
+    response_status: number;
+    succeeded: boolean;
+    duration_ms: number;
+    ip_address: string | null;
+    user_agent: string | null;
+    before_values: Record<string, unknown> | null;
+    after_values: Record<string, unknown> | null;
+    metadata: Record<string, unknown> | null;
+    record_hash: string;
+    occurred_at: string;
+    actor?: { id: number; name: string; email: string } | null;
+};
+
 export type Brand = {
     id: number;
     name: string;

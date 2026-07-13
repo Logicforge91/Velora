@@ -20,6 +20,7 @@ import {
     PanelLeftOpen,
     ReceiptText,
     Search,
+    ScrollText,
     ShoppingBag,
     Store,
     Sun,
@@ -44,43 +45,111 @@ import {
 import { logout } from '@/routes';
 import admin from '@/routes/admin';
 
-const navigation = [
-    { label: 'Overview', href: admin.dashboard.url(), icon: LayoutDashboard },
-    { label: 'Products', href: admin.products.index.url(), icon: Package },
-    { label: 'Orders', href: admin.orders.index.url(), icon: ShoppingBag },
-    { label: 'Analytics', href: admin.analytics.url(), icon: BarChart3 },
+const navigationSections = [
     {
-        label: 'Promotions',
-        href: admin.coupons.index.url(),
-        icon: BadgePercent,
+        label: 'Overview',
+        items: [
+            {
+                label: 'Dashboard',
+                href: admin.dashboard.url(),
+                icon: LayoutDashboard,
+            },
+            {
+                label: 'Analytics',
+                href: admin.analytics.url(),
+                icon: BarChart3,
+            },
+        ],
     },
     {
-        label: 'Reviews',
-        href: admin.reviews.index.url(),
-        icon: MessageSquareText,
+        label: 'Catalog',
+        items: [
+            {
+                label: 'Products',
+                href: admin.products.index.url(),
+                icon: Package,
+            },
+            {
+                label: 'Categories',
+                href: admin.categories.index.url(),
+                icon: Boxes,
+            },
+            { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
+        ],
     },
-    { label: 'Payments', href: admin.payments.index.url(), icon: WalletCards },
     {
-        label: 'GST Invoices',
-        href: admin.taxInvoices.index.url(),
-        icon: ReceiptText,
+        label: 'Sales',
+        items: [
+            {
+                label: 'Orders',
+                href: admin.orders.index.url(),
+                icon: ShoppingBag,
+            },
+            {
+                label: 'Promotions',
+                href: admin.coupons.index.url(),
+                icon: BadgePercent,
+            },
+            {
+                label: 'Reviews',
+                href: admin.reviews.index.url(),
+                icon: MessageSquareText,
+            },
+        ],
     },
     {
-        label: 'Settlements',
-        href: admin.settlements.index.url(),
-        icon: Banknote,
+        label: 'Operations',
+        items: [
+            {
+                label: 'Shipments',
+                href: admin.shipments.index.url(),
+                icon: Truck,
+            },
+            {
+                label: 'Warehouses',
+                href: admin.warehouses.index.url(),
+                icon: Warehouse,
+            },
+            { label: 'Returns', href: admin.returns.index.url(), icon: Undo2 },
+            {
+                label: 'Support',
+                href: admin.support.index.url(),
+                icon: Headphones,
+            },
+        ],
     },
-    { label: 'Shipments', href: admin.shipments.index.url(), icon: Truck },
     {
-        label: 'Warehouses',
-        href: admin.warehouses.index.url(),
-        icon: Warehouse,
+        label: 'Finance',
+        items: [
+            {
+                label: 'Payments',
+                href: admin.payments.index.url(),
+                icon: WalletCards,
+            },
+            {
+                label: 'GST Invoices',
+                href: admin.taxInvoices.index.url(),
+                icon: ReceiptText,
+            },
+            {
+                label: 'Settlements',
+                href: admin.settlements.index.url(),
+                icon: Banknote,
+            },
+        ],
     },
-    { label: 'Returns', href: admin.returns.index.url(), icon: Undo2 },
-    { label: 'Support', href: admin.support.index.url(), icon: Headphones },
-    { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
-    { label: 'Categories', href: admin.categories.index.url(), icon: Boxes },
-    { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
+    {
+        label: 'Accounts',
+        items: [
+            { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
+            { label: 'Customers', href: admin.users.index.url(), icon: Users },
+            {
+                label: 'Audit Logs',
+                href: admin.auditLogs.index.url(),
+                icon: ScrollText,
+            },
+        ],
+    },
 ];
 
 type Props = PropsWithChildren<{
@@ -205,92 +274,79 @@ export default function AdminLayout({
                 </div>
 
                 <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                    {!sidebarCollapsed && (
-                        <p className="px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                            Workspace
-                        </p>
-                    )}
-                    <div className="mt-2 grid gap-1">
-                        {navigation.map((item) => {
-                            const active =
-                                currentPath === item.href ||
-                                (item.href !== admin.dashboard.url() &&
-                                    currentPath.startsWith(item.href));
-                            const Icon = item.icon;
-
-                            return (
-                                <Link
-                                    key={item.label}
-                                    href={item.href}
-                                    prefetch
-                                    onClick={() => setSidebarOpen(false)}
-                                    title={
-                                        sidebarCollapsed
-                                            ? item.label
-                                            : undefined
-                                    }
-                                    className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''} ${active ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
-                                >
-                                    <span
-                                        className={`grid size-8 place-items-center rounded-lg transition ${active ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
-                                    >
-                                        <Icon className="size-[18px]" />
-                                    </span>
-                                    <span
-                                        className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
-                                    >
-                                        {item.label}
-                                    </span>
-                                    {item.label === 'Vendors' &&
-                                    pendingCount > 0 &&
-                                    !sidebarCollapsed ? (
-                                        <span
-                                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${active ? 'bg-white text-orange-600' : 'bg-amber-400 text-slate-950'}`}
-                                        >
-                                            {pendingCount > 99
-                                                ? '99+'
-                                                : pendingCount}
-                                        </span>
-                                    ) : (
-                                        active &&
-                                        !sidebarCollapsed && (
-                                            <ChevronRight className="size-4 text-orange-100" />
-                                        )
-                                    )}
-                                </Link>
-                            );
-                        })}
-                    </div>
-
-                    {!sidebarCollapsed && (
-                        <p className="mt-7 px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                            Settings
-                        </p>
-                    )}
-                    <div className="mt-2 grid gap-1">
-                        <Link
-                            href={admin.users.index.url()}
-                            prefetch
-                            onClick={() => setSidebarOpen(false)}
-                            title={sidebarCollapsed ? 'Customers' : undefined}
-                            className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''} ${currentPath.startsWith(admin.users.index.url()) ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                    {navigationSections.map((section, sectionIndex) => (
+                        <div
+                            key={section.label}
+                            className={
+                                sectionIndex === 0
+                                    ? ''
+                                    : sidebarCollapsed
+                                      ? 'mt-3 border-t border-white/6 pt-3'
+                                      : 'mt-6'
+                            }
                         >
-                            <span
-                                className={`grid size-8 place-items-center rounded-lg transition ${currentPath.startsWith(admin.users.index.url()) ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
+                            {!sidebarCollapsed && (
+                                <p className="px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
+                                    {section.label}
+                                </p>
+                            )}
+                            <div
+                                className={`${sidebarCollapsed ? '' : 'mt-2'} grid gap-1`}
                             >
-                                <Users className="size-[18px]" />
-                            </span>
-                            <span
-                                className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
-                            >
-                                Customers
-                            </span>
-                            {currentPath.startsWith(admin.users.index.url()) &&
-                                !sidebarCollapsed && (
-                                    <ChevronRight className="size-4 text-orange-100" />
-                                )}
-                        </Link>
-                    </div>
+                                {section.items.map((item) => {
+                                    const active =
+                                        currentPath === item.href ||
+                                        (item.href !== admin.dashboard.url() &&
+                                            currentPath.startsWith(item.href));
+                                    const Icon = item.icon;
+
+                                    return (
+                                        <Link
+                                            key={item.label}
+                                            href={item.href}
+                                            prefetch
+                                            onClick={() =>
+                                                setSidebarOpen(false)
+                                            }
+                                            title={
+                                                sidebarCollapsed
+                                                    ? item.label
+                                                    : undefined
+                                            }
+                                            className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''} ${active ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                        >
+                                            <span
+                                                className={`grid size-8 place-items-center rounded-lg transition ${active ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
+                                            >
+                                                <Icon className="size-[18px]" />
+                                            </span>
+                                            <span
+                                                className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
+                                            >
+                                                {item.label}
+                                            </span>
+                                            {item.label === 'Vendors' &&
+                                            pendingCount > 0 &&
+                                            !sidebarCollapsed ? (
+                                                <span
+                                                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${active ? 'bg-white text-orange-600' : 'bg-amber-400 text-slate-950'}`}
+                                                >
+                                                    {pendingCount > 99
+                                                        ? '99+'
+                                                        : pendingCount}
+                                                </span>
+                                            ) : (
+                                                active &&
+                                                !sidebarCollapsed && (
+                                                    <ChevronRight className="size-4 text-orange-100" />
+                                                )
+                                            )}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </nav>
 
                 <div
