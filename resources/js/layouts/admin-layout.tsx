@@ -169,7 +169,7 @@ export default function AdminLayout({
                     </div>
                 </div>
 
-                <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-5">
+                <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {!sidebarCollapsed && (
                         <p className="px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
                             Workspace
