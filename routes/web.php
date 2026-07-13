@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SupportTicketController;
 use App\Http\Controllers\Admin\TaxInvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\VendorKycDocumentController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\WarehouseInventoryController;
 use App\Http\Controllers\DashboardController;
@@ -50,6 +51,10 @@ Route::prefix('admin')
                 Route::get('{vendor}', 'show')->name('show');
                 Route::patch('{vendor}/approve', 'approve')->name('approve');
                 Route::patch('{vendor}/reject', 'reject')->name('reject');
+                Route::patch('{vendor}/risk', 'updateRisk')->name('risk.update');
+                Route::post('{vendor}/kyc-documents', [VendorKycDocumentController::class, 'store'])->name('kyc-documents.store');
+                Route::patch('{vendor}/kyc-documents/{kycDocument}', [VendorKycDocumentController::class, 'update'])->scopeBindings()->name('kyc-documents.update');
+                Route::get('{vendor}/kyc-documents/{kycDocument}/download', [VendorKycDocumentController::class, 'download'])->scopeBindings()->name('kyc-documents.download');
             });
 
         Route::resource('categories', CategoryController::class)
