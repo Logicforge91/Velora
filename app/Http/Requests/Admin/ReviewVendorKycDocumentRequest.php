@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\AccountPermission;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ReviewVendorKycDocumentRequest extends FormRequest
 {
@@ -12,7 +14,7 @@ class ReviewVendorKycDocumentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()?->hasPermission(AccountPermission::ManageVendors) ?? false;
     }
 
     /**
@@ -23,7 +25,8 @@ class ReviewVendorKycDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'status' => ['required', Rule::in(['verified', 'rejected'])],
+            'rejection_reason' => ['nullable', 'required_if:status,rejected', 'string', 'min:10', 'max:1000'],
         ];
     }
 }

@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\AccountPermission;
+use App\Models\VendorKycDocument;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreVendorKycDocumentRequest extends FormRequest
 {
@@ -12,7 +15,7 @@ class StoreVendorKycDocumentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()?->hasPermission(AccountPermission::ManageVendors) ?? false;
     }
 
     /**
@@ -23,7 +26,10 @@ class StoreVendorKycDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'type' => ['required', 'string', Rule::in(VendorKycDocument::types())],
+            'document_number' => ['nullable', 'string', 'max:100'],
+            'document' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'mimetypes:application/pdf,image/jpeg,image/png,image/webp', 'max:10240'],
+            'expires_on' => ['nullable', 'date', 'after:today'],
         ];
     }
 }

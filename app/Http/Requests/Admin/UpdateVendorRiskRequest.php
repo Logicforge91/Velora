@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\AccountPermission;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateVendorRiskRequest extends FormRequest
 {
@@ -12,7 +14,7 @@ class UpdateVendorRiskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()?->hasPermission(AccountPermission::ManageVendors) ?? false;
     }
 
     /**
@@ -23,7 +25,11 @@ class UpdateVendorRiskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'risk_level' => ['required', Rule::in(['low', 'medium', 'high'])],
+            'risk_score' => ['required', 'integer', 'between:0,100'],
+            'risk_flags' => ['present', 'array', 'max:10'],
+            'risk_flags.*' => ['string', 'max:100'],
+            'notes' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }
