@@ -4,7 +4,6 @@ import {
     ArrowUpRight,
     Boxes,
     Check,
-    CheckCircle2,
     ChevronRight,
     CircleUserRound,
     Clock3,
@@ -14,7 +13,6 @@ import {
     Store,
     Tags,
     TrendingUp,
-    Users,
 } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import admin from '@/routes/admin';
@@ -30,6 +28,11 @@ type Statistics = {
     inactive_users: number;
     new_users_30_days: number;
     active_rate: number;
+    total_products: number;
+    low_stock_products: number;
+    total_orders: number;
+    pending_orders: number;
+    gross_revenue: number;
 };
 
 type RecentUser = {
@@ -68,38 +71,43 @@ export default function AdminDashboard({
     statistics,
     recentUsers,
 }: DashboardProps) {
+    const money = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0,
+    });
     const cards = [
         {
-            label: 'Total customers',
-            value: statistics.total_customers,
-            note: `${statistics.new_users_30_days} joined this month`,
-            icon: Users,
+            label: 'Gross order value',
+            value: money.format(statistics.gross_revenue),
+            note: `${statistics.total_orders} marketplace orders`,
+            icon: TrendingUp,
             iconStyle:
                 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-300',
             trendStyle: 'text-emerald-600 dark:text-emerald-400',
         },
         {
-            label: 'Active accounts',
-            value: statistics.active_users,
-            note: `${statistics.active_rate}% platform health`,
-            icon: CheckCircle2,
+            label: 'Product catalogue',
+            value: statistics.total_products,
+            note: `${statistics.low_stock_products} stock alerts`,
+            icon: Boxes,
             iconStyle:
                 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300',
             trendStyle: 'text-emerald-600 dark:text-emerald-400',
         },
         {
-            label: 'Vendor partners',
-            value: statistics.total_vendors,
-            note: 'Across your marketplace',
-            icon: Store,
+            label: 'Orders requiring action',
+            value: statistics.pending_orders,
+            note: 'Awaiting fulfilment review',
+            icon: PackageCheck,
             iconStyle:
                 'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300',
             trendStyle: 'text-violet-600 dark:text-violet-400',
         },
         {
-            label: 'Needs attention',
-            value: statistics.inactive_users,
-            note: 'Inactive user accounts',
+            label: 'Marketplace network',
+            value: statistics.total_vendors,
+            note: `${statistics.total_customers} registered customers`,
             icon: Clock3,
             iconStyle:
                 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300',
@@ -156,10 +164,10 @@ export default function AdminDashboard({
                                 <ArrowRight className="size-4" />
                             </Link>
                             <Link
-                                href={admin.categories.index.url()}
+                                href={admin.products.index.url()}
                                 className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
                             >
-                                Manage catalogue
+                                Manage products
                             </Link>
                         </div>
                     </div>

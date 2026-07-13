@@ -50,6 +50,12 @@ class Category extends Model
             ->orderBy('name');
     }
 
+    /** @return HasMany<Product, $this> */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', true);
@@ -62,7 +68,7 @@ class Category extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image) {
+        if (! $this->image) {
             return null;
         }
 

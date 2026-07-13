@@ -37,16 +37,12 @@ import admin from '@/routes/admin';
 
 const navigation = [
     { label: 'Overview', href: admin.dashboard.url(), icon: LayoutDashboard },
+    { label: 'Products', href: admin.products.index.url(), icon: Package },
+    { label: 'Orders', href: admin.orders.index.url(), icon: ShoppingBag },
+    { label: 'Analytics', href: admin.analytics.url(), icon: BarChart3 },
     { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
     { label: 'Categories', href: admin.categories.index.url(), icon: Boxes },
     { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
-];
-
-const upcoming = [
-    { label: 'Products', icon: Package },
-    { label: 'Orders', icon: ShoppingBag },
-    { label: 'Customers', icon: Users },
-    { label: 'Analytics', icon: BarChart3 },
 ];
 
 type Props = PropsWithChildren<{
@@ -170,7 +166,7 @@ export default function AdminLayout({
                     </div>
                 </div>
 
-                <nav className="flex-1 overflow-hidden px-3 pb-5">
+                <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {!sidebarCollapsed && (
                         <p className="px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
                             Workspace
@@ -229,35 +225,33 @@ export default function AdminLayout({
                     </div>
 
                     {!sidebarCollapsed && (
-                        <div className="mt-7 flex items-center justify-between px-3">
-                            <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                                Commerce
-                            </p>
-                            <span className="rounded-md bg-white/[0.06] px-1.5 py-0.5 text-[8px] font-bold tracking-wider text-slate-500 uppercase">
-                                Soon
-                            </span>
-                        </div>
+                        <p className="mt-7 px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
+                            Settings
+                        </p>
                     )}
                     <div className="mt-2 grid gap-1">
-                        {upcoming.map(({ label, icon: Icon }) => (
-                            <div
-                                key={label}
-                                className={`flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''}`}
-                                title="Coming soon"
+                        <Link
+                            href={admin.users.index.url()}
+                            prefetch
+                            onClick={() => setSidebarOpen(false)}
+                            title={sidebarCollapsed ? 'Customers' : undefined}
+                            className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''} ${currentPath.startsWith(admin.users.index.url()) ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                        >
+                            <span
+                                className={`grid size-8 place-items-center rounded-lg transition ${currentPath.startsWith(admin.users.index.url()) ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
                             >
-                                <span className="grid size-8 place-items-center rounded-lg">
-                                    <Icon className="size-[18px]" />
-                                </span>
-                                <span
-                                    className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
-                                >
-                                    {label}
-                                </span>
-                                {!sidebarCollapsed && (
-                                    <span className="size-1.5 rounded-full bg-slate-700" />
+                                <Users className="size-[18px]" />
+                            </span>
+                            <span
+                                className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
+                            >
+                                Customers
+                            </span>
+                            {currentPath.startsWith(admin.users.index.url()) &&
+                                !sidebarCollapsed && (
+                                    <ChevronRight className="size-4 text-orange-100" />
                                 )}
-                            </div>
-                        ))}
+                        </Link>
                     </div>
                 </nav>
 
@@ -310,7 +304,7 @@ export default function AdminLayout({
                             <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="search"
-                                placeholder="Search vendors, categories, brands..."
+                                placeholder="Search vendors, users, categories, brands..."
                                 className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-14 pl-10 text-sm text-slate-700 transition outline-none placeholder:text-slate-400 focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-500/10 dark:border-white/8 dark:bg-white/[0.04] dark:text-slate-200 dark:focus:border-orange-500/40 dark:focus:bg-white/[0.06]"
                             />
                             <span className="pointer-events-none absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 shadow-sm dark:border-white/10 dark:bg-white/5">
