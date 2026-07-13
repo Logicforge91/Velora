@@ -38,6 +38,25 @@ export type AdminAuditLog = {
     actor?: { id: number; name: string; email: string } | null;
 };
 
+export type CatalogImport = {
+    id: number;
+    uuid: string;
+    original_name: string;
+    status: string;
+    dry_run: boolean;
+    total_rows: number;
+    processed_rows: number;
+    created_rows: number;
+    updated_rows: number;
+    failed_rows: number;
+    errors:
+        { row: number | null; sku: string | null; message: string }[] | null;
+    started_at: string | null;
+    completed_at: string | null;
+    created_at: string;
+    uploader?: { id: number; name: string; email: string } | null;
+};
+
 export type Brand = {
     id: number;
     name: string;

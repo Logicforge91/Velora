@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CatalogImportController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -45,6 +46,9 @@ Route::prefix('admin')
 
         Route::resource('brands', BrandController::class)
             ->except('show');
+
+        Route::get('catalog-imports/template', [CatalogImportController::class, 'template'])->name('catalog-imports.template');
+        Route::resource('catalog-imports', CatalogImportController::class)->only(['index', 'create', 'store', 'show']);
 
         Route::controller(VendorController::class)
             ->prefix('vendors')

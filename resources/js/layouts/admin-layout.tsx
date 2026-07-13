@@ -8,6 +8,7 @@ import {
     ChevronDown,
     ChevronRight,
     CircleHelp,
+    FileSpreadsheet,
     Command,
     LayoutDashboard,
     LogOut,
@@ -82,6 +83,11 @@ const navigationSections = [
                 icon: Boxes,
             },
             { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
+            {
+                label: 'Bulk Imports',
+                href: admin.catalogImports.index.url(),
+                icon: FileSpreadsheet,
+            },
         ],
     },
     {
