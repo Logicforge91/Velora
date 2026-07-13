@@ -58,26 +58,22 @@ class CategoryManagementService
             )
             ->when(
                 $status === 'active',
-                fn (Builder $query): Builder =>
-                    $query->where('status', true)
+                fn (Builder $query): Builder => $query->where('status', true)
             )
             ->when(
                 $status === 'inactive',
-                fn (Builder $query): Builder =>
-                    $query->where('status', false)
+                fn (Builder $query): Builder => $query->where('status', false)
             )
             ->when(
                 $parent === 'root',
-                fn (Builder $query): Builder =>
-                    $query->whereNull('parent_id')
+                fn (Builder $query): Builder => $query->whereNull('parent_id')
             )
             ->when(
                 ctype_digit($parent),
-                fn (Builder $query): Builder =>
-                    $query->where(
-                        'parent_id',
-                        (int) $parent
-                    )
+                fn (Builder $query): Builder => $query->where(
+                    'parent_id',
+                    (int) $parent
+                )
             )
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -87,20 +83,22 @@ class CategoryManagementService
 
     public function getCounts(): array
     {
+        $counts = Category::query()
+            ->selectRaw(
+                'COUNT(*) as total,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as active,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as inactive,
+                SUM(CASE WHEN parent_id IS NULL THEN 1 ELSE 0 END) as root',
+                [true, false],
+            )
+            ->toBase()
+            ->firstOrFail();
+
         return [
-            'all' => Category::query()->count(),
-
-            'active' => Category::query()
-                ->where('status', true)
-                ->count(),
-
-            'inactive' => Category::query()
-                ->where('status', false)
-                ->count(),
-
-            'root' => Category::query()
-                ->whereNull('parent_id')
-                ->count(),
+            'all' => (int) $counts->total,
+            'active' => (int) $counts->active,
+            'inactive' => (int) $counts->inactive,
+            'root' => (int) $counts->root,
         ];
     }
 
@@ -259,8 +257,7 @@ class CategoryManagementService
     {
         if ($category->children()->exists()) {
             throw ValidationException::withMessages([
-                'category' =>
-                    'Delete or move the child categories before deleting this category.',
+                'category' => 'Delete or move the child categories before deleting this category.',
             ]);
         }
 
@@ -281,14 +278,13 @@ class CategoryManagementService
         Category $category,
         ?int $parentId
     ): void {
-        if (!$parentId) {
+        if (! $parentId) {
             return;
         }
 
         if ($parentId === $category->id) {
             throw ValidationException::withMessages([
-                'parent_id' =>
-                    'A category cannot be its own parent.',
+                'parent_id' => 'A category cannot be its own parent.',
             ]);
         }
 
@@ -302,8 +298,7 @@ class CategoryManagementService
             true
         )) {
             throw ValidationException::withMessages([
-                'parent_id' =>
-                    'A child category cannot be selected as the parent.',
+                'parent_id' => 'A child category cannot be selected as the parent.',
             ]);
         }
     }
@@ -366,12 +361,11 @@ class CategoryManagementService
                 ->where('slug', $slug)
                 ->when(
                     $ignoreCategoryId,
-                    fn (Builder $query): Builder =>
-                        $query->where(
-                            'id',
-                            '!=',
-                            $ignoreCategoryId
-                        )
+                    fn (Builder $query): Builder => $query->where(
+                        'id',
+                        '!=',
+                        $ignoreCategoryId
+                    )
                 )
                 ->exists()
         ) {

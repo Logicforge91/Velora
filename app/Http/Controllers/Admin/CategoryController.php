@@ -30,8 +30,6 @@ class CategoryController extends Controller
             'categories' => $categories,
 
             'counts' => $this->categoryService->getCounts(),
-
-            'parentOptions' => $this->categoryService->getParentOptions(),
         ]);
     }
 

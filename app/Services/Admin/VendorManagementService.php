@@ -79,27 +79,25 @@ class VendorManagementService
     public function getStatusCounts(): array
     {
         $counts = Vendor::query()
-            ->selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status');
+            ->selectRaw(
+                'COUNT(*) as total,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as approved,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as rejected',
+                [
+                    Vendor::STATUS_PENDING,
+                    Vendor::STATUS_APPROVED,
+                    Vendor::STATUS_REJECTED,
+                ],
+            )
+            ->toBase()
+            ->firstOrFail();
 
         return [
-            'all' => Vendor::query()->count(),
-
-            'pending' => (int) $counts->get(
-                Vendor::STATUS_PENDING,
-                0
-            ),
-
-            'approved' => (int) $counts->get(
-                Vendor::STATUS_APPROVED,
-                0
-            ),
-
-            'rejected' => (int) $counts->get(
-                Vendor::STATUS_REJECTED,
-                0
-            ),
+            'all' => (int) $counts->total,
+            'pending' => (int) $counts->pending,
+            'approved' => (int) $counts->approved,
+            'rejected' => (int) $counts->rejected,
         ];
     }
 
