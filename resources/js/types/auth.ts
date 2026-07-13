@@ -8,6 +8,7 @@ export type AccountRole =
 export type AccountPermission =
     | 'admin.dashboard.view'
     | 'users.manage'
+    | 'roles.manage'
     | 'vendors.manage'
     | 'catalogue.manage'
     | 'orders.manage'

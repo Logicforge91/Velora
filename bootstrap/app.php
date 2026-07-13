@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CaptureAdminAuditLog;
 use App\Http\Middleware\EnsureUserHasPermission;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\HandleAppearance;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+            'admin.audit' => CaptureAdminAuditLog::class,
             'permission' => EnsureUserHasPermission::class,
         ]);
     })
