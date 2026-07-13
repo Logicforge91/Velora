@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RejectVendorRequest;
+use App\Http\Requests\Admin\UpdateVendorRiskRequest;
+use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorKycDocument;
 use App\Services\Admin\VendorManagementService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,11 +39,26 @@ class VendorController extends Controller
         $vendor->load([
             'user:id,name,email,status,role,created_at',
             'approvedBy:id,name,email',
+            'kycVerifiedBy:id,name,email',
+            'kycDocuments.uploader:id,name,email',
+            'kycDocuments.reviewer:id,name,email',
+            'reviewEvents.actor:id,name,email',
         ]);
 
         return Inertia::render('admin/vendors/show', [
             'vendor' => $vendor,
+            'documentTypes' => VendorKycDocument::types(),
+            'requiredDocumentTypes' => VendorManagementService::REQUIRED_KYC_TYPES,
         ]);
+    }
+
+    public function updateRisk(UpdateVendorRiskRequest $request, Vendor $vendor): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        $this->vendorService->updateRisk($vendor, $actor, $request->validated());
+
+        return back()->with('success', 'Seller risk assessment updated.');
     }
 
     public function approve(

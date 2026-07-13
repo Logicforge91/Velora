@@ -8,10 +8,18 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
+use App\Http\Controllers\Admin\SupportMessageController;
+use App\Http\Controllers\Admin\SupportTicketController;
+use App\Http\Controllers\Admin\TaxInvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\VendorKycDocumentController;
+use App\Http\Controllers\Admin\WarehouseController;
+use App\Http\Controllers\Admin\WarehouseInventoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +51,10 @@ Route::prefix('admin')
                 Route::get('{vendor}', 'show')->name('show');
                 Route::patch('{vendor}/approve', 'approve')->name('approve');
                 Route::patch('{vendor}/reject', 'reject')->name('reject');
+                Route::patch('{vendor}/risk', 'updateRisk')->name('risk.update');
+                Route::post('{vendor}/kyc-documents', [VendorKycDocumentController::class, 'store'])->name('kyc-documents.store');
+                Route::patch('{vendor}/kyc-documents/{kycDocument}', [VendorKycDocumentController::class, 'update'])->scopeBindings()->name('kyc-documents.update');
+                Route::get('{vendor}/kyc-documents/{kycDocument}/download', [VendorKycDocumentController::class, 'download'])->scopeBindings()->name('kyc-documents.download');
             });
 
         Route::resource('categories', CategoryController::class)
@@ -65,6 +77,21 @@ Route::prefix('admin')
 
         Route::resource('shipments', AdminShipmentController::class)
             ->only(['index', 'update']);
+
+        Route::resource('returns', AdminReturnController::class)
+            ->only(['index', 'create', 'store', 'show', 'update']);
+
+        Route::resource('settlements', SettlementController::class)
+            ->only(['index', 'create', 'store', 'show', 'update']);
+
+        Route::post('support/{support}/messages', SupportMessageController::class)->name('support.messages.store');
+        Route::resource('support', SupportTicketController::class)->only(['index', 'create', 'store', 'show', 'update']);
+
+        Route::resource('tax-invoices', TaxInvoiceController::class)->only(['index', 'create', 'store', 'show', 'update']);
+
+        Route::put('warehouses/{warehouse}/inventory', WarehouseInventoryController::class)
+            ->name('warehouses.inventory.update');
+        Route::resource('warehouses', WarehouseController::class);
 
         Route::get('users/{user}/history', [UserController::class, 'history'])
             ->name('users.history');

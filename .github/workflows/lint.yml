@@ -36,7 +36,7 @@ jobs:
           npm install
 
       - name: Run Pint
-        run: composer lint
+        run: vendor/bin/pint --format agent
 
       - name: Format Frontend
         run: npm run format
