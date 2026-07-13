@@ -12,6 +12,62 @@ export type Paginated<T> = {
 };
 export type Counts = Record<string, number>;
 
+export type AdminRole = {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    permissions: string[];
+    is_system: boolean;
+    users_count?: number;
+    users?: { id: number; name: string; email: string }[];
+};
+
+export type AdminAuditLog = {
+    id: number;
+    event_uuid: string;
+    actor_id: number | null;
+    category: string;
+    action: string;
+    severity: 'info' | 'notice' | 'warning' | 'critical';
+    description: string;
+    auditable_type: string | null;
+    auditable_id: number | null;
+    route_name: string | null;
+    method: string;
+    path: string;
+    response_status: number;
+    succeeded: boolean;
+    duration_ms: number;
+    ip_address: string | null;
+    user_agent: string | null;
+    before_values: Record<string, unknown> | null;
+    after_values: Record<string, unknown> | null;
+    metadata: Record<string, unknown> | null;
+    record_hash: string;
+    occurred_at: string;
+    actor?: { id: number; name: string; email: string } | null;
+};
+
+export type CatalogImport = {
+    id: number;
+    uuid: string;
+    original_name: string;
+    status: string;
+    dry_run: boolean;
+    total_rows: number;
+    processed_rows: number;
+    created_rows: number;
+    updated_rows: number;
+    failed_rows: number;
+    errors:
+        { row: number | null; sku: string | null; message: string }[] | null;
+    started_at: string | null;
+    completed_at: string | null;
+    created_at: string;
+    uploader?: { id: number; name: string; email: string } | null;
+};
+
 export type Brand = {
     id: number;
     name: string;
