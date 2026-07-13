@@ -1,13 +1,28 @@
 <?php
 
 use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\AdminRoleController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CatalogImportController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\SettlementController;
+use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
+use App\Http\Controllers\Admin\SupportMessageController;
+use App\Http\Controllers\Admin\SupportTicketController;
+use App\Http\Controllers\Admin\TaxInvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\VendorKycDocumentController;
+use App\Http\Controllers\Admin\WarehouseController;
+use App\Http\Controllers\Admin\WarehouseInventoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
@@ -20,40 +35,92 @@ Route::middleware('auth')
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'admin'])
+    ->middleware(['auth', 'admin', 'admin.audit'])
     ->group(function (): void {
         Route::get('dashboard', AdminDashboardController::class)
             ->name('dashboard');
 
         Route::get('analytics', AnalyticsController::class)
+            ->middleware('permission:reports.view')
             ->name('analytics');
 
+        Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show'])->middleware('permission:reports.view');
+
+        Route::resource('admin-roles', AdminRoleController::class)->except(['show'])->middleware('permission:roles.manage');
+
         Route::resource('brands', BrandController::class)
-            ->except('show');
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
+
+        Route::get('catalog-imports/template', [CatalogImportController::class, 'template'])->middleware('permission:catalogue.manage')->name('catalog-imports.template');
+        Route::resource('catalog-imports', CatalogImportController::class)->only(['index', 'create', 'store', 'show'])->middleware('permission:catalogue.manage');
 
         Route::controller(VendorController::class)
             ->prefix('vendors')
             ->name('vendors.')
+            ->middleware('permission:vendors.manage')
             ->group(function (): void {
                 Route::get('/', 'index')->name('index');
                 Route::get('{vendor}', 'show')->name('show');
                 Route::patch('{vendor}/approve', 'approve')->name('approve');
                 Route::patch('{vendor}/reject', 'reject')->name('reject');
+                Route::patch('{vendor}/risk', 'updateRisk')->name('risk.update');
+                Route::post('{vendor}/kyc-documents', [VendorKycDocumentController::class, 'store'])->name('kyc-documents.store');
+                Route::patch('{vendor}/kyc-documents/{kycDocument}', [VendorKycDocumentController::class, 'update'])->scopeBindings()->name('kyc-documents.update');
+                Route::get('{vendor}/kyc-documents/{kycDocument}/download', [VendorKycDocumentController::class, 'download'])->scopeBindings()->name('kyc-documents.download');
             });
 
         Route::resource('categories', CategoryController::class)
-            ->except('show');
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
 
         Route::resource('products', AdminProductController::class)
-            ->except('show');
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
 
         Route::resource('orders', OrderController::class)
-            ->only(['index', 'show', 'update']);
+            ->only(['index', 'show', 'update'])
+            ->middleware('permission:orders.manage');
+
+        Route::resource('coupons', CouponController::class)
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
+
+        Route::resource('reviews', AdminReviewController::class)
+            ->only(['index', 'update'])
+            ->middleware('permission:catalogue.manage');
+
+        Route::resource('payments', AdminPaymentController::class)
+            ->only(['index', 'update'])
+            ->middleware('permission:payments.manage');
+
+        Route::resource('shipments', AdminShipmentController::class)
+            ->only(['index', 'update'])
+            ->middleware('permission:orders.manage');
+
+        Route::resource('returns', AdminReturnController::class)
+            ->only(['index', 'create', 'store', 'show', 'update'])
+            ->middleware('permission:orders.manage');
+
+        Route::resource('settlements', SettlementController::class)
+            ->only(['index', 'create', 'store', 'show', 'update'])
+            ->middleware('permission:payments.manage');
+
+        Route::post('support/{support}/messages', SupportMessageController::class)->middleware('permission:support.requests.manage')->name('support.messages.store');
+        Route::resource('support', SupportTicketController::class)->only(['index', 'create', 'store', 'show', 'update'])->middleware('permission:support.requests.manage');
+
+        Route::resource('tax-invoices', TaxInvoiceController::class)->only(['index', 'create', 'store', 'show', 'update'])->middleware('permission:payments.manage');
+
+        Route::put('warehouses/{warehouse}/inventory', WarehouseInventoryController::class)
+            ->middleware('permission:catalogue.manage')
+            ->name('warehouses.inventory.update');
+        Route::resource('warehouses', WarehouseController::class)->middleware('permission:catalogue.manage');
 
         Route::get('users/{user}/history', [UserController::class, 'history'])
+            ->middleware('permission:users.manage')
             ->name('users.history');
 
-        Route::resource('users', UserController::class);
+        Route::resource('users', UserController::class)->middleware('permission:users.manage');
     });
 
 Route::middleware('auth')->group(function () {

@@ -1,29 +1,47 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import {
     BarChart3,
+    BadgePercent,
+    Banknote,
     Bell,
     Boxes,
     ChevronDown,
     ChevronRight,
     CircleHelp,
+    FileSpreadsheet,
     Command,
     LayoutDashboard,
     LogOut,
     Menu,
+    MessageSquareText,
+    Headphones,
     Moon,
     Package,
     PanelLeftClose,
     PanelLeftOpen,
+    ReceiptText,
     Search,
+    ScrollText,
+    ShieldCheck,
     ShoppingBag,
     Store,
     Sun,
     Tags,
+    Truck,
+    Undo2,
     Users,
+    WalletCards,
+    Warehouse,
     X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { PropsWithChildren } from 'react';
+import type { AccountPermission } from '@/types/auth';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -35,14 +53,138 @@ import {
 import { logout } from '@/routes';
 import admin from '@/routes/admin';
 
-const navigation = [
-    { label: 'Overview', href: admin.dashboard.url(), icon: LayoutDashboard },
-    { label: 'Products', href: admin.products.index.url(), icon: Package },
-    { label: 'Orders', href: admin.orders.index.url(), icon: ShoppingBag },
-    { label: 'Analytics', href: admin.analytics.url(), icon: BarChart3 },
-    { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
-    { label: 'Categories', href: admin.categories.index.url(), icon: Boxes },
-    { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
+const navigationSections = [
+    {
+        label: 'Overview',
+        icon: LayoutDashboard,
+        items: [
+            {
+                label: 'Dashboard',
+                href: admin.dashboard.url(),
+                icon: LayoutDashboard,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Analytics',
+                href: admin.analytics.url(),
+                icon: BarChart3,
+                permission: 'reports.view',
+            },
+        ],
+    },
+    {
+        label: 'Catalog',
+        icon: Package,
+        items: [
+            {
+                label: 'Products',
+                href: admin.products.index.url(),
+                icon: Package,
+                permission: 'catalogue.manage',
+            },
+            {
+                label: 'Categories',
+                href: admin.categories.index.url(),
+                icon: Boxes,
+                permission: 'catalogue.manage',
+            },
+            { label: 'Brands', href: admin.brands.index.url(), icon: Tags, permission: 'catalogue.manage' },
+            {
+                label: 'Bulk Imports',
+                href: admin.catalogImports.index.url(),
+                icon: FileSpreadsheet,
+                permission: 'catalogue.manage',
+            },
+        ],
+    },
+    {
+        label: 'Sales',
+        icon: ShoppingBag,
+        items: [
+            {
+                label: 'Orders',
+                href: admin.orders.index.url(),
+                icon: ShoppingBag,
+                permission: 'orders.manage',
+            },
+            {
+                label: 'Promotions',
+                href: admin.coupons.index.url(),
+                icon: BadgePercent,
+                permission: 'catalogue.manage',
+            },
+            {
+                label: 'Reviews',
+                href: admin.reviews.index.url(),
+                icon: MessageSquareText,
+                permission: 'catalogue.manage',
+            },
+        ],
+    },
+    {
+        label: 'Operations',
+        icon: Truck,
+        items: [
+            {
+                label: 'Shipments',
+                href: admin.shipments.index.url(),
+                icon: Truck,
+                permission: 'orders.manage',
+            },
+            {
+                label: 'Warehouses',
+                href: admin.warehouses.index.url(),
+                icon: Warehouse,
+                permission: 'catalogue.manage',
+            },
+            { label: 'Returns', href: admin.returns.index.url(), icon: Undo2, permission: 'orders.manage' },
+            {
+                label: 'Support',
+                href: admin.support.index.url(),
+                icon: Headphones,
+                permission: 'support.requests.manage',
+            },
+        ],
+    },
+    {
+        label: 'Finance',
+        icon: WalletCards,
+        items: [
+            {
+                label: 'Payments',
+                href: admin.payments.index.url(),
+                icon: WalletCards,
+                permission: 'payments.manage',
+            },
+            {
+                label: 'GST Invoices',
+                href: admin.taxInvoices.index.url(),
+                icon: ReceiptText,
+                permission: 'payments.manage',
+            },
+            {
+                label: 'Settlements',
+                href: admin.settlements.index.url(),
+                icon: Banknote,
+                permission: 'payments.manage',
+            },
+        ],
+    },
+    {
+        label: 'Accounts',
+        icon: Users,
+        items: [
+            { label: 'Vendors', href: admin.vendors.index.url(), icon: Store, permission: 'vendors.manage' },
+            { label: 'Customers', href: admin.users.index.url(), icon: Users, permission: 'users.manage' },
+            { label: 'Admin Roles', href: admin.adminRoles.index.url(), icon: ShieldCheck, permission: 'roles.manage' },
+            {
+                label: 'Audit Logs',
+                href: admin.auditLogs.index.url(),
+                icon: ScrollText,
+                permission: 'reports.view',
+            },
+        ],
+    },
 ];
 
 type Props = PropsWithChildren<{
@@ -57,14 +199,34 @@ export default function AdminLayout({
 }: Props) {
     const { auth, errors, flash, pendingVendorCount } = usePage().props;
     const { url } = usePage();
+    const currentPath = url.split('?')[0];
+    const grantedPermissions = new Set<AccountPermission>(auth.permissions);
+    const permittedNavigationSections = navigationSections
+        .map((section) => ({
+            ...section,
+            items: section.items.filter((item) =>
+                grantedPermissions.has(item.permission as AccountPermission),
+            ),
+        }))
+        .filter((section) => section.items.length > 0);
+    const activeSectionLabel = permittedNavigationSections.find((section) =>
+        section.items.some(
+            (item) =>
+                currentPath === item.href ||
+                (item.href !== admin.dashboard.url() &&
+                    currentPath.startsWith(item.href)),
+        ),
+    )?.label;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [openSection, setOpenSection] = useState<string | null>(
+        activeSectionLabel ?? 'Overview',
+    );
     const [dark, setDark] = useState(() =>
         typeof document === 'undefined'
             ? false
             : document.documentElement.classList.contains('dark'),
     );
-    const currentPath = url.split('?')[0];
     const pendingCount = Number(pendingVendorCount ?? 0);
 
     const toggleTheme = () => {
@@ -167,91 +329,123 @@ export default function AdminLayout({
                 </div>
 
                 <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                    {!sidebarCollapsed && (
-                        <p className="px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                            Workspace
-                        </p>
-                    )}
-                    <div className="mt-2 grid gap-1">
-                        {navigation.map((item) => {
-                            const active =
-                                currentPath === item.href ||
-                                (item.href !== admin.dashboard.url() &&
-                                    currentPath.startsWith(item.href));
-                            const Icon = item.icon;
+                    <div className="grid gap-1.5">
+                        {permittedNavigationSections.map((section) => {
+                            const sectionActive =
+                                activeSectionLabel === section.label;
+                            const SectionIcon = section.icon;
+
+                            if (sidebarCollapsed) {
+                                return (
+                                    <button
+                                        key={section.label}
+                                        type="button"
+                                        onClick={() => {
+                                            setOpenSection(section.label);
+                                            setSidebarCollapsed(false);
+                                        }}
+                                        title={section.label}
+                                        aria-label={`Open ${section.label} menu`}
+                                        className={`group relative flex items-center justify-center rounded-xl px-2 py-2.5 transition ${sectionActive ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-500 hover:bg-white/[0.06] hover:text-white'}`}
+                                    >
+                                        <span
+                                            className={`grid size-8 place-items-center rounded-lg transition ${sectionActive ? 'bg-white/15' : 'group-hover:text-slate-200'}`}
+                                        >
+                                            <SectionIcon className="size-[18px]" />
+                                        </span>
+                                        {section.label === 'Accounts' &&
+                                            pendingCount > 0 && (
+                                                <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-400 ring-2 ring-[#111827] dark:ring-[#0d121c]" />
+                                            )}
+                                    </button>
+                                );
+                            }
 
                             return (
-                                <Link
-                                    key={item.label}
-                                    href={item.href}
-                                    prefetch
-                                    onClick={() => setSidebarOpen(false)}
-                                    title={
-                                        sidebarCollapsed
-                                            ? item.label
-                                            : undefined
-                                    }
-                                    className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''} ${active ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
-                                >
-                                    <span
-                                        className={`grid size-8 place-items-center rounded-lg transition ${active ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
-                                    >
-                                        <Icon className="size-[18px]" />
-                                    </span>
-                                    <span
-                                        className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
-                                    >
-                                        {item.label}
-                                    </span>
-                                    {item.label === 'Vendors' &&
-                                    pendingCount > 0 &&
-                                    !sidebarCollapsed ? (
-                                        <span
-                                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${active ? 'bg-white text-orange-600' : 'bg-amber-400 text-slate-950'}`}
-                                        >
-                                            {pendingCount > 99
-                                                ? '99+'
-                                                : pendingCount}
-                                        </span>
-                                    ) : (
-                                        active &&
-                                        !sidebarCollapsed && (
-                                            <ChevronRight className="size-4 text-orange-100" />
+                                <Collapsible
+                                    key={section.label}
+                                    open={openSection === section.label}
+                                    onOpenChange={(open) =>
+                                        setOpenSection(
+                                            open ? section.label : null,
                                         )
-                                    )}
-                                </Link>
+                                    }
+                                >
+                                    <CollapsibleTrigger
+                                        className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${sectionActive ? 'bg-white/[0.06] text-white' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                    >
+                                        <span
+                                            className={`grid size-8 place-items-center rounded-lg transition ${sectionActive ? 'bg-orange-500/15 text-orange-400' : 'text-slate-500 group-hover:text-slate-200'}`}
+                                        >
+                                            <SectionIcon className="size-[18px]" />
+                                        </span>
+                                        <span className="min-w-0 flex-1 truncate text-left">
+                                            {section.label}
+                                        </span>
+                                        {section.label === 'Accounts' &&
+                                            pendingCount > 0 && (
+                                                <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
+                                                    {pendingCount > 99
+                                                        ? '99+'
+                                                        : pendingCount}
+                                                </span>
+                                            )}
+                                        <ChevronDown className="size-4 shrink-0 text-slate-500 transition-transform duration-200 group-hover:text-slate-300 group-data-[state=open]:rotate-180" />
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent className="overflow-hidden">
+                                        <div className="mt-1 ml-7 grid gap-1 border-l border-white/8 pl-3">
+                                            {section.items.map((item) => {
+                                                const active =
+                                                    currentPath === item.href ||
+                                                    (item.href !==
+                                                        admin.dashboard.url() &&
+                                                        currentPath.startsWith(
+                                                            item.href,
+                                                        ));
+                                                const Icon = item.icon;
+
+                                                return (
+                                                    <Link
+                                                        key={item.label}
+                                                        href={item.href}
+                                                        prefetch
+                                                        onClick={() =>
+                                                            setSidebarOpen(
+                                                                false,
+                                                            )
+                                                        }
+                                                        className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition ${active ? 'bg-[#f97316] text-white shadow-md shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                                    >
+                                                        <Icon
+                                                            className={`size-4 shrink-0 ${active ? 'text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
+                                                        />
+                                                        <span className="min-w-0 flex-1 truncate">
+                                                            {item.label}
+                                                        </span>
+                                                        {item.label ===
+                                                            'Vendors' &&
+                                                        pendingCount > 0 ? (
+                                                            <span
+                                                                className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${active ? 'bg-white text-orange-600' : 'bg-amber-400 text-slate-950'}`}
+                                                            >
+                                                                {pendingCount >
+                                                                99
+                                                                    ? '99+'
+                                                                    : pendingCount}
+                                                            </span>
+                                                        ) : (
+                                                            active && (
+                                                                <ChevronRight className="size-3.5 text-orange-100" />
+                                                            )
+                                                        )}
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    </CollapsibleContent>
+                                </Collapsible>
                             );
                         })}
-                    </div>
-
-                    {!sidebarCollapsed && (
-                        <p className="mt-7 px-3 text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                            Settings
-                        </p>
-                    )}
-                    <div className="mt-2 grid gap-1">
-                        <Link
-                            href={admin.users.index.url()}
-                            prefetch
-                            onClick={() => setSidebarOpen(false)}
-                            title={sidebarCollapsed ? 'Customers' : undefined}
-                            className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''} ${currentPath.startsWith(admin.users.index.url()) ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
-                        >
-                            <span
-                                className={`grid size-8 place-items-center rounded-lg transition ${currentPath.startsWith(admin.users.index.url()) ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
-                            >
-                                <Users className="size-[18px]" />
-                            </span>
-                            <span
-                                className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
-                            >
-                                Customers
-                            </span>
-                            {currentPath.startsWith(admin.users.index.url()) &&
-                                !sidebarCollapsed && (
-                                    <ChevronRight className="size-4 text-orange-100" />
-                                )}
-                        </Link>
                     </div>
                 </nav>
 

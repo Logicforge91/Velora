@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Vendor;
 use App\Services\Admin\ProductManagementService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -69,6 +70,7 @@ class ProductController extends Controller
             'product' => $product,
             'categories' => Category::query()->select(['id', 'name'])->orderBy('name')->get(),
             'brands' => Brand::query()->select(['id', 'name'])->orderBy('name')->get(),
+            'vendors' => Vendor::query()->select(['id', 'business_name'])->where('status', Vendor::STATUS_APPROVED)->orderBy('business_name')->get(),
             'statuses' => Product::statuses(),
         ]);
     }

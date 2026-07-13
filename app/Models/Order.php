@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
@@ -41,6 +42,20 @@ class Order extends Model
         'discount_total' => 0,
     ];
 
+    protected static function booted(): void
+    {
+        static::created(function (Order $order): void {
+            $order->payment()->create([
+                'provider' => $order->payment_method,
+                'amount' => $order->total,
+                'status' => $order->payment_status,
+                'paid_at' => $order->payment_status === 'paid' ? now() : null,
+            ]);
+
+            $order->shipment()->create();
+        });
+    }
+
     protected function casts(): array
     {
         return [
@@ -63,6 +78,30 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /** @return HasMany<ReturnCase, $this> */
+    public function returns(): HasMany
+    {
+        return $this->hasMany(ReturnCase::class);
+    }
+
+    /** @return HasMany<TaxInvoice, $this> */
+    public function taxInvoices(): HasMany
+    {
+        return $this->hasMany(TaxInvoice::class);
+    }
+
+    /** @return HasOne<Payment, $this> */
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    /** @return HasOne<Shipment, $this> */
+    public function shipment(): HasOne
+    {
+        return $this->hasOne(Shipment::class);
     }
 
     /** @return list<string> */

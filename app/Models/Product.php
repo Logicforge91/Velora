@@ -24,6 +24,7 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'brand_id',
+        'vendor_id',
         'name',
         'slug',
         'sku',
@@ -67,10 +68,22 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    /** @return BelongsTo<Vendor, $this> */
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
     /** @return HasMany<ProductImage, $this> */
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+    }
+
+    /** @return HasMany<Review, $this> */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     /** @return HasOne<ProductImage, $this> */
