@@ -57,23 +57,19 @@ class BrandManagementService
             )
             ->when(
                 $status === 'active',
-                fn (Builder $query): Builder =>
-                    $query->where('status', true)
+                fn (Builder $query): Builder => $query->where('status', true)
             )
             ->when(
                 $status === 'inactive',
-                fn (Builder $query): Builder =>
-                    $query->where('status', false)
+                fn (Builder $query): Builder => $query->where('status', false)
             )
             ->when(
                 $featured === 'yes',
-                fn (Builder $query): Builder =>
-                    $query->where('is_featured', true)
+                fn (Builder $query): Builder => $query->where('is_featured', true)
             )
             ->when(
                 $featured === 'no',
-                fn (Builder $query): Builder =>
-                    $query->where('is_featured', false)
+                fn (Builder $query): Builder => $query->where('is_featured', false)
             )
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -83,20 +79,22 @@ class BrandManagementService
 
     public function getCounts(): array
     {
+        $counts = Brand::query()
+            ->selectRaw(
+                'COUNT(*) as total,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as active,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as inactive,
+                SUM(CASE WHEN is_featured = ? THEN 1 ELSE 0 END) as featured',
+                [true, false, true],
+            )
+            ->toBase()
+            ->firstOrFail();
+
         return [
-            'all' => Brand::query()->count(),
-
-            'active' => Brand::query()
-                ->where('status', true)
-                ->count(),
-
-            'inactive' => Brand::query()
-                ->where('status', false)
-                ->count(),
-
-            'featured' => Brand::query()
-                ->where('is_featured', true)
-                ->count(),
+            'all' => (int) $counts->total,
+            'active' => (int) $counts->active,
+            'inactive' => (int) $counts->inactive,
+            'featured' => (int) $counts->featured,
         ];
     }
 
@@ -243,12 +241,11 @@ class BrandManagementService
                 ->where('slug', $slug)
                 ->when(
                     $ignoreBrandId,
-                    fn (Builder $query): Builder =>
-                        $query->where(
-                            'id',
-                            '!=',
-                            $ignoreBrandId
-                        )
+                    fn (Builder $query): Builder => $query->where(
+                        'id',
+                        '!=',
+                        $ignoreBrandId
+                    )
                 )
                 ->exists()
         ) {
