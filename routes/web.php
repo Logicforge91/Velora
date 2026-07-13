@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\SupportMessageController;
 use App\Http\Controllers\Admin\SupportTicketController;
+use App\Http\Controllers\Admin\TaxInvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\WarehouseController;
@@ -80,6 +81,8 @@ Route::prefix('admin')
 
         Route::post('support/{support}/messages', SupportMessageController::class)->name('support.messages.store');
         Route::resource('support', SupportTicketController::class)->only(['index', 'create', 'store', 'show', 'update']);
+
+        Route::resource('tax-invoices', TaxInvoiceController::class)->only(['index', 'create', 'store', 'show', 'update']);
 
         Route::put('warehouses/{warehouse}/inventory', WarehouseInventoryController::class)
             ->name('warehouses.inventory.update');

@@ -18,6 +18,7 @@ import {
     Package,
     PanelLeftClose,
     PanelLeftOpen,
+    ReceiptText,
     Search,
     ShoppingBag,
     Store,
@@ -59,6 +60,11 @@ const navigation = [
         icon: MessageSquareText,
     },
     { label: 'Payments', href: admin.payments.index.url(), icon: WalletCards },
+    {
+        label: 'GST Invoices',
+        href: admin.taxInvoices.index.url(),
+        icon: ReceiptText,
+    },
     {
         label: 'Settlements',
         href: admin.settlements.index.url(),

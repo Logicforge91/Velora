@@ -305,3 +305,58 @@ export type SupportTicket = {
     assignee?: { id: number; name: string; email: string } | null;
     messages?: SupportMessage[];
 };
+
+export type TaxInvoiceItem = {
+    id: number;
+    description: string;
+    hsn_code: string | null;
+    quantity: number;
+    unit: string;
+    taxable_value: string;
+    gst_rate: string;
+    cgst_amount: string;
+    sgst_amount: string;
+    igst_amount: string;
+    cess_amount: string;
+    total_amount: string;
+};
+
+export type TaxInvoice = {
+    id: number;
+    order_id: number;
+    vendor_id: number | null;
+    parent_invoice_id: number | null;
+    type: 'invoice' | 'credit_note';
+    number: string;
+    financial_year: string;
+    issued_on: string;
+    status: 'draft' | 'issued' | 'cancelled';
+    supplier_name: string;
+    supplier_address: string;
+    supplier_gstin: string | null;
+    supplier_state_code: string;
+    recipient_name: string;
+    recipient_address: string;
+    recipient_gstin: string | null;
+    place_of_supply_state: string;
+    place_of_supply_code: string;
+    reverse_charge: boolean;
+    taxable_value: string;
+    cgst_amount: string;
+    sgst_amount: string;
+    igst_amount: string;
+    cess_amount: string;
+    total_amount: string;
+    notes: string | null;
+    issued_at: string | null;
+    cancelled_at: string | null;
+    order: {
+        id: number;
+        number: string;
+        user?: { name: string; email: string };
+    };
+    vendor?: Vendor | null;
+    parent_invoice?: Pick<TaxInvoice, 'id' | 'number' | 'total_amount'> | null;
+    issuer?: { id: number; name: string } | null;
+    items?: TaxInvoiceItem[];
+};
