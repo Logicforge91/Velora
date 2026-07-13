@@ -12,6 +12,17 @@ export type Paginated<T> = {
 };
 export type Counts = Record<string, number>;
 
+export type AdminRole = {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    permissions: string[];
+    is_system: boolean;
+    users_count?: number;
+    users?: { id: number; name: string; email: string }[];
+};
+
 export type AdminAuditLog = {
     id: number;
     event_uuid: string;

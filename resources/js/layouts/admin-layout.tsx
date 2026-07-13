@@ -22,6 +22,7 @@ import {
     ReceiptText,
     Search,
     ScrollText,
+    ShieldCheck,
     ShoppingBag,
     Store,
     Sun,
@@ -35,6 +36,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { PropsWithChildren } from 'react';
+import type { AccountPermission } from '@/types/auth';
 import {
     Collapsible,
     CollapsibleContent,
@@ -60,11 +62,13 @@ const navigationSections = [
                 label: 'Dashboard',
                 href: admin.dashboard.url(),
                 icon: LayoutDashboard,
+                permission: 'admin.dashboard.view',
             },
             {
                 label: 'Analytics',
                 href: admin.analytics.url(),
                 icon: BarChart3,
+                permission: 'reports.view',
             },
         ],
     },
@@ -76,17 +80,20 @@ const navigationSections = [
                 label: 'Products',
                 href: admin.products.index.url(),
                 icon: Package,
+                permission: 'catalogue.manage',
             },
             {
                 label: 'Categories',
                 href: admin.categories.index.url(),
                 icon: Boxes,
+                permission: 'catalogue.manage',
             },
-            { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
+            { label: 'Brands', href: admin.brands.index.url(), icon: Tags, permission: 'catalogue.manage' },
             {
                 label: 'Bulk Imports',
                 href: admin.catalogImports.index.url(),
                 icon: FileSpreadsheet,
+                permission: 'catalogue.manage',
             },
         ],
     },
@@ -98,16 +105,19 @@ const navigationSections = [
                 label: 'Orders',
                 href: admin.orders.index.url(),
                 icon: ShoppingBag,
+                permission: 'orders.manage',
             },
             {
                 label: 'Promotions',
                 href: admin.coupons.index.url(),
                 icon: BadgePercent,
+                permission: 'catalogue.manage',
             },
             {
                 label: 'Reviews',
                 href: admin.reviews.index.url(),
                 icon: MessageSquareText,
+                permission: 'catalogue.manage',
             },
         ],
     },
@@ -119,17 +129,20 @@ const navigationSections = [
                 label: 'Shipments',
                 href: admin.shipments.index.url(),
                 icon: Truck,
+                permission: 'orders.manage',
             },
             {
                 label: 'Warehouses',
                 href: admin.warehouses.index.url(),
                 icon: Warehouse,
+                permission: 'catalogue.manage',
             },
-            { label: 'Returns', href: admin.returns.index.url(), icon: Undo2 },
+            { label: 'Returns', href: admin.returns.index.url(), icon: Undo2, permission: 'orders.manage' },
             {
                 label: 'Support',
                 href: admin.support.index.url(),
                 icon: Headphones,
+                permission: 'support.requests.manage',
             },
         ],
     },
@@ -141,16 +154,19 @@ const navigationSections = [
                 label: 'Payments',
                 href: admin.payments.index.url(),
                 icon: WalletCards,
+                permission: 'payments.manage',
             },
             {
                 label: 'GST Invoices',
                 href: admin.taxInvoices.index.url(),
                 icon: ReceiptText,
+                permission: 'payments.manage',
             },
             {
                 label: 'Settlements',
                 href: admin.settlements.index.url(),
                 icon: Banknote,
+                permission: 'payments.manage',
             },
         ],
     },
@@ -158,12 +174,14 @@ const navigationSections = [
         label: 'Accounts',
         icon: Users,
         items: [
-            { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
-            { label: 'Customers', href: admin.users.index.url(), icon: Users },
+            { label: 'Vendors', href: admin.vendors.index.url(), icon: Store, permission: 'vendors.manage' },
+            { label: 'Customers', href: admin.users.index.url(), icon: Users, permission: 'users.manage' },
+            { label: 'Admin Roles', href: admin.adminRoles.index.url(), icon: ShieldCheck, permission: 'roles.manage' },
             {
                 label: 'Audit Logs',
                 href: admin.auditLogs.index.url(),
                 icon: ScrollText,
+                permission: 'reports.view',
             },
         ],
     },
@@ -182,7 +200,16 @@ export default function AdminLayout({
     const { auth, errors, flash, pendingVendorCount } = usePage().props;
     const { url } = usePage();
     const currentPath = url.split('?')[0];
-    const activeSectionLabel = navigationSections.find((section) =>
+    const grantedPermissions = new Set<AccountPermission>(auth.permissions);
+    const permittedNavigationSections = navigationSections
+        .map((section) => ({
+            ...section,
+            items: section.items.filter((item) =>
+                grantedPermissions.has(item.permission as AccountPermission),
+            ),
+        }))
+        .filter((section) => section.items.length > 0);
+    const activeSectionLabel = permittedNavigationSections.find((section) =>
         section.items.some(
             (item) =>
                 currentPath === item.href ||
@@ -303,7 +330,7 @@ export default function AdminLayout({
 
                 <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <div className="grid gap-1.5">
-                        {navigationSections.map((section) => {
+                        {permittedNavigationSections.map((section) => {
                             const sectionActive =
                                 activeSectionLabel === section.label;
                             const SectionIcon = section.icon;
