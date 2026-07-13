@@ -6,5 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Coupon extends Model
 {
-    //
+    protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_order_amount', 'maximum_discount_amount', 'usage_limit', 'used_count', 'starts_at', 'expires_at', 'status'];
+
+    protected $attributes = ['type' => 'percentage', 'minimum_order_amount' => 0, 'used_count' => 0, 'status' => true];
+
+    protected function casts(): array
+    {
+        return ['value' => 'decimal:2', 'minimum_order_amount' => 'decimal:2', 'maximum_discount_amount' => 'decimal:2', 'usage_limit' => 'integer', 'used_count' => 'integer', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'status' => 'boolean'];
+    }
 }

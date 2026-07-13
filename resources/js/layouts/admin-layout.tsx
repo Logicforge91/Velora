@@ -1,6 +1,7 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import {
     BarChart3,
+    BadgePercent,
     Bell,
     Boxes,
     ChevronDown,
@@ -10,6 +11,7 @@ import {
     LayoutDashboard,
     LogOut,
     Menu,
+    MessageSquareText,
     Moon,
     Package,
     PanelLeftClose,
@@ -19,7 +21,9 @@ import {
     Store,
     Sun,
     Tags,
+    Truck,
     Users,
+    WalletCards,
     X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -40,6 +44,18 @@ const navigation = [
     { label: 'Products', href: admin.products.index.url(), icon: Package },
     { label: 'Orders', href: admin.orders.index.url(), icon: ShoppingBag },
     { label: 'Analytics', href: admin.analytics.url(), icon: BarChart3 },
+    {
+        label: 'Promotions',
+        href: admin.coupons.index.url(),
+        icon: BadgePercent,
+    },
+    {
+        label: 'Reviews',
+        href: admin.reviews.index.url(),
+        icon: MessageSquareText,
+    },
+    { label: 'Payments', href: admin.payments.index.url(), icon: WalletCards },
+    { label: 'Shipments', href: admin.shipments.index.url(), icon: Truck },
     { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
     { label: 'Categories', href: admin.categories.index.url(), icon: Boxes },
     { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
