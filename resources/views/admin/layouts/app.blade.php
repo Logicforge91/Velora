@@ -309,6 +309,52 @@
                     </span>
                 </a>
 
+                {{-- Brand Management --}}
+<a
+    href="{{ route('admin.brands.index') }}"
+    @class([
+        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+        'bg-white/10 text-white ring-1 ring-inset ring-white/10'
+            => request()->routeIs('admin.brands.*'),
+        'text-slate-400 hover:bg-white/5 hover:text-white'
+            => !request()->routeIs('admin.brands.*'),
+    ])
+    @if (request()->routeIs('admin.brands.*'))
+        aria-current="page"
+    @endif
+>
+    <span
+        @class([
+            'grid size-9 shrink-0 place-items-center rounded-lg transition',
+            'bg-indigo-500 text-white shadow-lg shadow-indigo-950/50'
+                => request()->routeIs('admin.brands.*'),
+            'bg-white/5 text-slate-400'
+                => !request()->routeIs('admin.brands.*'),
+        ])
+    >
+        <svg
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+        >
+            <path
+                d="M20.59 13.41 11 3.83V3H4v7h.83l9.58 9.59
+                   a2 2 0 0 0 2.82 0l3.36-3.36
+                   a2 2 0 0 0 0-2.82Z"
+            />
+
+            <circle cx="7.5" cy="6.5" r="1"/>
+        </svg>
+    </span>
+
+    <span class="flex-1">
+        Brands
+    </span>
+</a>
+
                 {{-- Users --}}
                 <span
                     class="flex cursor-not-allowed items-center gap-3

@@ -6,6 +6,7 @@ use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\BrandController;
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -25,6 +26,11 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('/dashboard', AdminDashboardController::class)
             ->name('dashboard');
+
+              Route::resource(
+            'brands',
+            BrandController::class
+        )->except('show');
 
 
               Route::get(
