@@ -42,6 +42,20 @@ class Order extends Model
         'discount_total' => 0,
     ];
 
+    protected static function booted(): void
+    {
+        static::created(function (Order $order): void {
+            $order->payment()->create([
+                'provider' => $order->payment_method,
+                'amount' => $order->total,
+                'status' => $order->payment_status,
+                'paid_at' => $order->payment_status === 'paid' ? now() : null,
+            ]);
+
+            $order->shipment()->create();
+        });
+    }
+
     protected function casts(): array
     {
         return [
@@ -67,10 +81,16 @@ class Order extends Model
     }
 
     /** @return HasOne<Payment, $this> */
-    public function payment(): HasOne { return $this->hasOne(Payment::class); }
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
 
     /** @return HasOne<Shipment, $this> */
-    public function shipment(): HasOne { return $this->hasOne(Shipment::class); }
+    public function shipment(): HasOne
+    {
+        return $this->hasOne(Shipment::class);
+    }
 
     /** @return list<string> */
     public static function statuses(): array
