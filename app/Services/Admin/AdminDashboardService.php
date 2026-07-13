@@ -2,6 +2,8 @@
 
 namespace App\Services\Admin;
 
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -18,7 +20,12 @@ class AdminDashboardService
      *     active_users: int,
      *     inactive_users: int,
      *     new_users_30_days: int,
-     *     active_rate: int
+     *     active_rate: int,
+     *     total_products: int,
+     *     low_stock_products: int,
+     *     total_orders: int,
+     *     pending_orders: int,
+     *     gross_revenue: float
      * }
      */
     public function getStatistics(): array
@@ -50,6 +57,17 @@ class AdminDashboardService
 
         $totalUsers = (int) $statistics->total_users;
         $activeUsers = (int) $statistics->active_users;
+        $productStatistics = Product::query()
+            ->selectRaw('COUNT(*) as total_products')
+            ->selectRaw('SUM(CASE WHEN stock <= low_stock_threshold THEN 1 ELSE 0 END) as low_stock_products')
+            ->toBase()
+            ->firstOrFail();
+        $orderStatistics = Order::query()
+            ->selectRaw('COUNT(*) as total_orders')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_orders', [Order::STATUS_PENDING])
+            ->selectRaw('COALESCE(SUM(CASE WHEN status != ? THEN total ELSE 0 END), 0) as gross_revenue', [Order::STATUS_CANCELLED])
+            ->toBase()
+            ->firstOrFail();
 
         return [
             'total_users' => $totalUsers,
@@ -62,6 +80,11 @@ class AdminDashboardService
             'inactive_users' => (int) $statistics->inactive_users,
             'new_users_30_days' => (int) $statistics->new_users_30_days,
             'active_rate' => $totalUsers === 0 ? 0 : (int) round(($activeUsers / $totalUsers) * 100),
+            'total_products' => (int) $productStatistics->total_products,
+            'low_stock_products' => (int) $productStatistics->low_stock_products,
+            'total_orders' => (int) $orderStatistics->total_orders,
+            'pending_orders' => (int) $orderStatistics->pending_orders,
+            'gross_revenue' => (float) $orderStatistics->gross_revenue,
         ];
     }
 

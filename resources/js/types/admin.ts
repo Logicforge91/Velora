@@ -83,3 +83,53 @@ export type UserHistory = {
     created_at: string;
     actor: { id: number; name: string; email: string } | null;
 };
+
+export type Product = {
+    id: number;
+    category_id: number | null;
+    brand_id: number | null;
+    name: string;
+    slug: string;
+    sku: string;
+    short_description: string | null;
+    description: string | null;
+    price: string;
+    compare_at_price: string | null;
+    stock: number;
+    low_stock_threshold: number;
+    status: 'draft' | 'active' | 'archived';
+    is_featured: boolean;
+    created_at: string;
+    category?: { id: number; name: string } | null;
+    brand?: { id: number; name: string } | null;
+    primary_image?: { id: number; url: string; path: string } | null;
+};
+
+export type OrderItem = {
+    id: number;
+    product_id: number | null;
+    product_name: string;
+    sku: string;
+    unit_price: string;
+    quantity: number;
+    total: string;
+    product?: Product | null;
+};
+
+export type Order = {
+    id: number;
+    number: string;
+    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+    payment_method: string;
+    payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+    shipping_address: Record<string, string>;
+    subtotal: string;
+    shipping_total: string;
+    discount_total: string;
+    total: string;
+    customer_note: string | null;
+    placed_at: string;
+    items_count?: number;
+    user: { id: number; name: string; email: string };
+    items?: OrderItem[];
+};

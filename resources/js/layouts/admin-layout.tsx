@@ -37,15 +37,12 @@ import admin from '@/routes/admin';
 
 const navigation = [
     { label: 'Overview', href: admin.dashboard.url(), icon: LayoutDashboard },
+    { label: 'Products', href: admin.products.index.url(), icon: Package },
+    { label: 'Orders', href: admin.orders.index.url(), icon: ShoppingBag },
+    { label: 'Analytics', href: admin.analytics.url(), icon: BarChart3 },
     { label: 'Vendors', href: admin.vendors.index.url(), icon: Store },
     { label: 'Categories', href: admin.categories.index.url(), icon: Boxes },
     { label: 'Brands', href: admin.brands.index.url(), icon: Tags },
-];
-
-const upcoming = [
-    { label: 'Products', icon: Package },
-    { label: 'Orders', icon: ShoppingBag },
-    { label: 'Analytics', icon: BarChart3 },
 ];
 
 type Props = PropsWithChildren<{
@@ -225,38 +222,6 @@ export default function AdminLayout({
                                 </Link>
                             );
                         })}
-                    </div>
-
-                    {!sidebarCollapsed && (
-                        <div className="mt-7 flex items-center justify-between px-3">
-                            <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-                                Commerce
-                            </p>
-                            <span className="rounded-md bg-white/[0.06] px-1.5 py-0.5 text-[8px] font-bold tracking-wider text-slate-500 uppercase">
-                                Soon
-                            </span>
-                        </div>
-                    )}
-                    <div className="mt-2 grid gap-1">
-                        {upcoming.map(({ label, icon: Icon }) => (
-                            <div
-                                key={label}
-                                className={`flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''}`}
-                                title="Coming soon"
-                            >
-                                <span className="grid size-8 place-items-center rounded-lg">
-                                    <Icon className="size-[18px]" />
-                                </span>
-                                <span
-                                    className={`min-w-0 flex-1 truncate ${sidebarCollapsed ? 'lg:hidden' : ''}`}
-                                >
-                                    {label}
-                                </span>
-                                {!sidebarCollapsed && (
-                                    <span className="size-1.5 rounded-full bg-slate-700" />
-                                )}
-                            </div>
-                        ))}
                     </div>
 
                     {!sidebarCollapsed && (
