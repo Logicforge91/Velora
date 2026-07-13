@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin;
 use App\Enums\AccountPermission;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCategoryRequest extends FormRequest
+class StoreBrandRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,7 +16,7 @@ class UpdateCategoryRequest extends FormRequest
     {
         $this->merge([
             'status' => $this->boolean('status'),
-            'remove_image' => $this->boolean('remove_image'),
+            'is_featured' => $this->boolean('is_featured'),
 
             'sort_order' => $this->filled('sort_order')
                 ? $this->input('sort_order')
@@ -27,12 +27,6 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'parent_id' => [
-                'nullable',
-                'integer',
-                'exists:categories,id',
-            ],
-
             'name' => [
                 'required',
                 'string',
@@ -51,16 +45,17 @@ class UpdateCategoryRequest extends FormRequest
                 'max:3000',
             ],
 
-            'image' => [
+            'logo' => [
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
                 'max:2048',
             ],
 
-            'remove_image' => [
-                'required',
-                'boolean',
+            'website_url' => [
+                'nullable',
+                'url',
+                'max:255',
             ],
 
             'sort_order' => [
@@ -68,6 +63,11 @@ class UpdateCategoryRequest extends FormRequest
                 'integer',
                 'min:0',
                 'max:99999',
+            ],
+
+            'is_featured' => [
+                'required',
+                'boolean',
             ],
 
             'status' => [
@@ -80,15 +80,15 @@ class UpdateCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'parent_id.exists' => 'The selected parent category does not exist.',
+            'name.required' => 'Please enter the brand name.',
 
-            'name.required' => 'Please enter the category name.',
+            'website_url.url' => 'Please enter a valid website URL.',
 
-            'image.image' => 'The category image must be a valid image.',
+            'logo.image' => 'The brand logo must be an image.',
 
-            'image.mimes' => 'Only JPG, JPEG, PNG and WebP images are allowed.',
+            'logo.mimes' => 'The logo must be a JPG, JPEG, PNG or WebP file.',
 
-            'image.max' => 'The category image cannot exceed 2 MB.',
+            'logo.max' => 'The brand logo cannot exceed 2 MB.',
         ];
     }
 }

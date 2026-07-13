@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Vendor extends Model
 {
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_REJECTED = 'rejected';
+
     public const STATUS_SUSPENDED = 'suspended';
 
     protected $fillable = [
@@ -55,12 +58,24 @@ class Vendor extends Model
         return $this->status === self::STATUS_APPROVED;
     }
 
+    public function isRejected(): bool
+    {
+        return $this->status === self::STATUS_REJECTED;
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->status === self::STATUS_SUSPENDED;
+    }
+
+    /** @return list<string> */
     public static function statuses(): array
-{
-    return [
-        self::STATUS_PENDING,
-        self::STATUS_APPROVED,
-        self::STATUS_REJECTED,
-    ];
-}
+    {
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_APPROVED,
+            self::STATUS_REJECTED,
+            self::STATUS_SUSPENDED,
+        ];
+    }
 }

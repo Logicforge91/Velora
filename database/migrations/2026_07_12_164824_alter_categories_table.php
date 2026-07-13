@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-             $table->foreignId('parent_id')
+            $table->foreignId('parent_id')
                 ->nullable()
                 ->constrained('categories')
                 ->nullOnDelete();
@@ -29,12 +29,11 @@ return new class extends Migration
                 ->default(true)
                 ->index();
 
-                            $table->index([
+            $table->index([
                 'parent_id',
                 'status',
                 'sort_order',
             ]);
-
         });
     }
 
@@ -43,6 +42,21 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('categories', function (Blueprint $table): void {
+            $table->dropForeign(['parent_id']);
+            $table->dropUnique(['slug']);
+            $table->dropIndex(['status']);
+            $table->dropIndex(['parent_id', 'status', 'sort_order']);
+
+            $table->dropColumn([
+                'parent_id',
+                'name',
+                'slug',
+                'description',
+                'image',
+                'sort_order',
+                'status',
+            ]);
+        });
     }
 };

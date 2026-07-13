@@ -7,47 +7,43 @@ use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Services\Admin\CategoryManagementService;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CategoryController extends Controller
 {
     public function __construct(
         private readonly CategoryManagementService $categoryService
-    ) {
-    }
+    ) {}
 
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
-        return view('admin.categories.index', [
-            'categories' =>
-                $this->categoryService->getCategories(
-                    $request->only([
-                        'search',
-                        'status',
-                        'parent',
-                    ])
-                ),
+        $categories = $this->categoryService->getCategories(
+            $request->only(['search', 'status', 'parent'])
+        );
 
-            'counts' =>
-                $this->categoryService->getCounts(),
+        $categories->through(fn (Category $category): Category => $category->append('image_url'));
 
-            'parentOptions' =>
-                $this->categoryService->getParentOptions(),
+        return Inertia::render('admin/categories/index', [
+            'categories' => $categories,
+
+            'counts' => $this->categoryService->getCounts(),
+
+            'parentOptions' => $this->categoryService->getParentOptions(),
         ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        return view('admin.categories.create', [
+        return Inertia::render('admin/categories/form', [
             'category' => new Category([
                 'status' => true,
                 'sort_order' => 0,
             ]),
 
-            'parentOptions' =>
-                $this->categoryService->getParentOptions(),
+            'parentOptions' => $this->categoryService->getParentOptions(),
         ]);
     }
 
@@ -69,15 +65,14 @@ class CategoryController extends Controller
             );
     }
 
-    public function edit(Category $category): View
+    public function edit(Category $category): Response
     {
-        return view('admin.categories.edit', [
-            'category' => $category,
+        return Inertia::render('admin/categories/form', [
+            'category' => $category->append('image_url'),
 
-            'parentOptions' =>
-                $this->categoryService->getParentOptions(
-                    $category
-                ),
+            'parentOptions' => $this->categoryService->getParentOptions(
+                $category
+            ),
         ]);
     }
 
