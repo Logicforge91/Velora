@@ -80,6 +80,18 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    /** @return HasMany<ReturnCase, $this> */
+    public function returns(): HasMany
+    {
+        return $this->hasMany(ReturnCase::class);
+    }
+
+    /** @return HasMany<TaxInvoice, $this> */
+    public function taxInvoices(): HasMany
+    {
+        return $this->hasMany(TaxInvoice::class);
+    }
+
     /** @return HasOne<Payment, $this> */
     public function payment(): HasOne
     {

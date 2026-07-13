@@ -9,6 +9,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -32,6 +33,11 @@ class User extends Authenticatable
 
     public const ROLE_SUPPORT_AGENT = 'support_agent';
 
+    protected $attributes = [
+        'role' => self::ROLE_CUSTOMER,
+        'status' => true,
+    ];
+
     protected $fillable = [
         'name',
         'email',
@@ -39,6 +45,7 @@ class User extends Authenticatable
         'role',
         'status',
         'current_team_id',
+        'uses_custom_admin_roles',
     ];
 
     protected $hidden = [
@@ -52,6 +59,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
+            'uses_custom_admin_roles' => 'boolean',
         ];
     }
 
@@ -85,6 +93,14 @@ class User extends Authenticatable
     /** @return list<AccountPermission> */
     public function permissions(): array
     {
+        if ($this->isAdmin() && $this->uses_custom_admin_roles) {
+            return $this->adminRoles
+                ->flatMap(fn (AdminRole $role): array => $role->permissionEnums())
+                ->unique(fn (AccountPermission $permission): string => $permission->value)
+                ->values()
+                ->all();
+        }
+
         return $this->accountRole()?->permissions() ?? [];
     }
 
@@ -92,7 +108,7 @@ class User extends Authenticatable
     {
         $permission = is_string($permission) ? AccountPermission::tryFrom($permission) : $permission;
 
-        return $permission !== null && $this->accountRole()?->hasPermission($permission) === true;
+        return $permission !== null && in_array($permission, $this->permissions(), true);
     }
 
     public function isActive(): bool
@@ -110,6 +126,18 @@ class User extends Authenticatable
     public function histories(): HasMany
     {
         return $this->hasMany(UserHistory::class);
+    }
+
+    /** @return HasMany<AdminAuditLog, $this> */
+    public function adminAuditLogs(): HasMany
+    {
+        return $this->hasMany(AdminAuditLog::class, 'actor_id');
+    }
+
+    /** @return BelongsToMany<AdminRole, $this> */
+    public function adminRoles(): BelongsToMany
+    {
+        return $this->belongsToMany(AdminRole::class)->withTimestamps();
     }
 
     /** @return HasMany<Order, $this> */
