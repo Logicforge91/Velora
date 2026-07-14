@@ -133,27 +133,26 @@ export default function AdminDashboard({
 
     return (
         <AdminLayout title="Commerce Overview" breadcrumb="Dashboard">
-            <section className="relative overflow-hidden rounded-[1.75rem] bg-[#111827] text-white shadow-xl shadow-slate-900/10 dark:border dark:border-white/8 dark:bg-[#111722]">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(249,115,22,0.24),transparent_28%),radial-gradient(circle_at_68%_110%,rgba(139,92,246,0.2),transparent_32%)]" />
+            <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-commerce-navy text-white shadow-[0_24px_60px_rgb(15_23_42/0.16)] ring-1 ring-slate-950/5">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(249,115,22,0.26),transparent_28%),radial-gradient(circle_at_68%_110%,rgba(216,177,89,0.18),transparent_34%)]" />
                 <div className="pointer-events-none absolute -top-20 right-[14%] size-56 rounded-full border border-white/5" />
                 <div className="pointer-events-none absolute -top-9 right-[9%] size-56 rounded-full border border-white/5" />
                 <div className="relative grid lg:grid-cols-[minmax(0,1fr)_22rem]">
                     <div className="px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
                         <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[10px] font-semibold tracking-[0.14em] text-orange-200 uppercase backdrop-blur-sm">
                             <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.1)]" />
-                            Live commerce intelligence
+                            Live retail intelligence
                         </div>
                         <h2 className="mt-5 max-w-2xl text-3xl font-semibold tracking-[-0.035em] sm:text-4xl lg:text-[2.65rem] lg:leading-[1.1]">
-                            Your marketplace,
+                            Your commerce universe,
                             <span className="text-orange-400">
                                 {' '}
-                                under control.
+                                beautifully orchestrated.
                             </span>
                         </h2>
                         <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-[15px]">
-                            Monitor account health, onboard trusted sellers, and
-                            keep your catalogue moving from one focused
-                            workspace.
+                            Run sellers, products, orders, fulfilment, and
+                            revenue from one precise executive workspace.
                         </p>
                         <div className="mt-7 flex flex-wrap gap-3">
                             <Link
@@ -188,10 +187,10 @@ export default function AdminDashboard({
                             <div
                                 className="relative grid size-28 shrink-0 place-items-center rounded-full"
                                 style={{
-                                    background: `conic-gradient(#34d399 ${statistics.active_rate}%, rgba(255,255,255,.08) 0)`,
+                                    background: `conic-gradient(#f59e0b ${statistics.active_rate}%, rgba(255,255,255,.08) 0)`,
                                 }}
                             >
-                                <div className="grid size-[5.75rem] place-items-center rounded-full bg-[#171e2a]">
+                                <div className="grid size-[5.75rem] place-items-center rounded-full bg-commerce-navy-soft shadow-inner shadow-black/20">
                                     <div className="text-center">
                                         <p className="text-2xl font-semibold tracking-tight">
                                             {statistics.active_rate}%

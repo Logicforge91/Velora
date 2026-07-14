@@ -44,7 +44,7 @@ export function AdminPanel({
     return (
         <section
             className={cn(
-                'overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/8 dark:bg-white/[0.04]',
+                'overflow-hidden rounded-2xl border border-slate-200/75 bg-commerce-surface shadow-[var(--admin-shadow)]',
                 className,
             )}
         >
@@ -66,7 +66,7 @@ export function AdminFilterBar({
         <form
             onSubmit={onSubmit}
             className={cn(
-                'grid gap-3 border-b border-slate-200/80 bg-slate-50/40 p-4 dark:border-white/8 dark:bg-white/[0.02]',
+                'grid gap-3 border-b border-slate-200/70 bg-gradient-to-r from-slate-50/75 to-orange-50/20 p-4',
                 className,
             )}
         >

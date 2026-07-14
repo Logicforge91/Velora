@@ -59,6 +59,14 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    --color-commerce-canvas: oklch(0.982 0.004 75);
+    --color-commerce-surface: oklch(1 0 0);
+    --color-commerce-navy: oklch(0.205 0.035 258);
+    --color-commerce-navy-soft: oklch(0.255 0.038 258);
+    --color-commerce-brand: oklch(0.672 0.196 43.5);
+    --color-commerce-gold: oklch(0.82 0.13 78);
+    --color-commerce-ink: oklch(0.215 0.025 258);
 }
 
 :root {
@@ -148,17 +156,21 @@
 
 @layer components {
     [data-admin-shell] {
+        --admin-shadow:
+            0 1px 2px rgb(15 23 42 / 0.025), 0 14px 34px rgb(15 23 42 / 0.045);
         background-image:
             radial-gradient(
-                circle at 85% 0%,
-                rgb(249 115 22 / 0.055),
-                transparent 24rem
+                circle at 88% -5%,
+                rgb(249 115 22 / 0.075),
+                transparent 28rem
             ),
             radial-gradient(
-                circle at 45% 105%,
-                rgb(99 102 241 / 0.04),
-                transparent 28rem
-            );
+                circle at 38% 105%,
+                rgb(180 143 76 / 0.055),
+                transparent 32rem
+            ),
+            linear-gradient(180deg, rgb(255 255 255 / 0.52), transparent 20rem);
+        color: var(--color-commerce-ink);
     }
 
     .dark [data-admin-shell] {
@@ -201,6 +213,14 @@
 
     [data-admin-shell] table tbody tr:focus-within {
         @apply bg-orange-50/50 ring-1 ring-orange-200/70 ring-inset;
+    }
+
+    [data-admin-shell] :is(section, article) {
+        --tw-shadow-color: rgb(15 23 42 / 0.035);
+    }
+
+    [data-admin-shell] input::placeholder {
+        @apply text-slate-400/90;
     }
 
     #nprogress .bar {

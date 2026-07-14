@@ -334,7 +334,7 @@ export default function AdminLayout({
     return (
         <div
             data-admin-shell
-            className="min-h-screen bg-[#f4f6f8] text-slate-950 lg:flex dark:bg-[#080c13] dark:text-slate-100"
+            className="min-h-screen bg-commerce-canvas font-sans text-commerce-ink antialiased lg:flex"
         >
             <Head title={title} />
 
@@ -494,18 +494,22 @@ export default function AdminLayout({
             )}
 
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex w-[17.5rem] flex-col border-r border-white/8 bg-[#111827] text-white shadow-2xl transition-[width,transform] duration-300 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0 lg:shadow-none dark:bg-[#0d121c] ${sidebarCollapsed ? 'lg:w-[5.5rem]' : 'lg:w-[17.5rem]'} ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                className={`fixed inset-y-0 left-0 z-50 flex w-[17.5rem] flex-col border-r border-white/8 bg-commerce-navy text-white shadow-2xl transition-[width,transform] duration-300 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 lg:translate-x-0 lg:shadow-none ${sidebarCollapsed ? 'lg:w-[5.5rem]' : 'lg:w-[17.5rem]'} ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    <div className="absolute -top-24 -left-16 size-52 rounded-full bg-orange-500/10 blur-3xl" />
+                    <div className="absolute right-0 bottom-20 size-40 rounded-full bg-commerce-gold/5 blur-3xl" />
+                </div>
                 <div
-                    className={`flex h-[4.5rem] items-center px-5 ${sidebarCollapsed ? 'lg:justify-center lg:px-3' : 'justify-between'}`}
+                    className={`relative flex h-[4.75rem] items-center px-5 ${sidebarCollapsed ? 'lg:justify-center lg:px-3' : 'justify-between'}`}
                 >
                     <Link
                         href={admin.dashboard.url()}
                         className="flex min-w-0 items-center gap-3"
                     >
-                        <span className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#f97316] text-lg font-black text-white shadow-lg shadow-orange-950/30">
+                        <span className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-commerce-brand to-orange-600 text-lg font-black text-white shadow-lg ring-1 shadow-orange-950/30 ring-white/20">
                             V
-                            <span className="absolute -right-2 -bottom-2 size-5 rounded-full bg-amber-300/80" />
+                            <span className="absolute -right-2 -bottom-2 size-5 rounded-full bg-commerce-gold/90" />
                         </span>
                         <span
                             className={`min-w-0 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
@@ -514,7 +518,7 @@ export default function AdminLayout({
                                 Velora
                             </span>
                             <span className="block truncate text-[9px] font-semibold tracking-[0.22em] text-slate-400 uppercase">
-                                Commerce OS
+                                Premium Commerce
                             </span>
                         </span>
                     </Link>
@@ -531,15 +535,15 @@ export default function AdminLayout({
                 <div
                     className={`px-4 pb-5 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
                 >
-                    <div className="relative overflow-hidden rounded-2xl border border-white/8 bg-white/[0.06] p-4">
-                        <div className="absolute -top-8 -right-6 size-20 rounded-full bg-orange-500/15 blur-2xl" />
+                    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.065] p-4 shadow-inner shadow-white/[0.025]">
+                        <div className="absolute -top-8 -right-6 size-20 rounded-full bg-commerce-gold/15 blur-2xl" />
                         <div className="relative flex items-center justify-between gap-3">
                             <div>
                                 <p className="text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
-                                    Store status
+                                    Storefront status
                                 </p>
                                 <p className="mt-1.5 text-sm font-semibold">
-                                    Marketplace live
+                                    Online & accepting orders
                                 </p>
                             </div>
                             <span className="grid size-9 place-items-center rounded-xl bg-emerald-400/10 text-emerald-400">
@@ -673,7 +677,7 @@ export default function AdminLayout({
                 <div
                     className={`flex items-center border-t border-white/6 px-4 py-3 text-[10px] text-slate-600 ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}
                 >
-                    {!sidebarCollapsed && <span>Velora Admin v1.0</span>}
+                    {!sidebarCollapsed && <span>Velora Commerce Suite</span>}
                     <button
                         type="button"
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -695,8 +699,8 @@ export default function AdminLayout({
             </aside>
 
             <div className="flex min-w-0 flex-1 flex-col">
-                <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl dark:border-white/8 dark:bg-[#0c111a]/90">
-                    <div className="flex h-[4.5rem] items-center gap-3 px-4 sm:px-6 lg:px-8">
+                <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/88 shadow-[0_1px_0_rgb(255_255_255/0.8)] backdrop-blur-xl">
+                    <div className="flex h-[4.75rem] items-center gap-3 px-4 sm:px-6 lg:px-8">
                         <button
                             type="button"
                             onClick={() => setSidebarOpen(true)}
@@ -707,7 +711,10 @@ export default function AdminLayout({
                         </button>
 
                         <div className="min-w-0 lg:w-64 lg:flex-none">
-                            <h1 className="truncate text-lg font-bold tracking-tight text-slate-950 dark:text-white">
+                            <p className="hidden text-[9px] font-bold tracking-[0.16em] text-orange-600 uppercase lg:block">
+                                Commerce command center
+                            </p>
+                            <h1 className="truncate text-lg font-bold tracking-tight text-commerce-ink">
                                 {title}
                             </h1>
                         </div>
@@ -715,7 +722,7 @@ export default function AdminLayout({
                         <button
                             type="button"
                             onClick={() => setSearchOpen(true)}
-                            className="relative mx-auto hidden h-10 max-w-xl flex-1 items-center rounded-xl border border-slate-200 bg-slate-50 pr-14 pl-10 text-left text-sm text-slate-400 transition hover:border-orange-200 hover:bg-white hover:shadow-sm md:flex dark:border-white/8 dark:bg-white/[0.04] dark:hover:border-orange-500/30 dark:hover:bg-white/[0.06]"
+                            className="relative mx-auto hidden h-10 max-w-xl flex-1 items-center rounded-xl border border-slate-200/80 bg-slate-50/80 pr-14 pl-10 text-left text-sm text-slate-400 shadow-inner shadow-slate-950/[0.015] transition hover:border-orange-200 hover:bg-white hover:shadow-sm md:flex"
                         >
                             <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" />
                             Search pages and operations...
@@ -810,9 +817,9 @@ export default function AdminLayout({
                     </div>
                 </header>
 
-                <div className="border-b border-slate-200/70 bg-white/60 dark:border-white/6 dark:bg-white/[0.015]">
+                <div className="border-b border-slate-200/60 bg-white/55 backdrop-blur-sm">
                     <nav
-                        className="mx-auto flex h-10 w-full max-w-[1500px] items-center gap-1.5 px-4 text-[11px] font-medium sm:px-6 lg:px-8"
+                        className="mx-auto flex h-10 w-full max-w-[1560px] items-center gap-1.5 px-4 text-[11px] font-medium sm:px-6 lg:px-8"
                         aria-label="Breadcrumb"
                     >
                         <Link
@@ -829,7 +836,7 @@ export default function AdminLayout({
                     </nav>
                 </div>
 
-                <main className="relative mx-auto w-full max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
+                <main className="relative mx-auto w-full max-w-[1560px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                     {flash?.success && (
                         <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
                             {flash.success}
