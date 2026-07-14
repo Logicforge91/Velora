@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Enums\AccountPermission;
 use App\Enums\AccountRole;
 use App\Enums\TeamRole;
+use App\Models\AdminRole;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -70,7 +72,21 @@ class UserFactory extends Factory
 
     public function admin(): static
     {
-        return $this->state(fn () => ['role' => AccountRole::Admin->value]);
+        return $this
+            ->state(fn () => ['role' => AccountRole::Admin->value])
+            ->afterCreating(function (User $user): void {
+                $role = AdminRole::query()->firstOrCreate(
+                    ['slug' => AdminRole::SUPER_ADMINISTRATOR_SLUG],
+                    [
+                        'name' => 'Super Administrator',
+                        'description' => 'Unrestricted marketplace administration.',
+                        'permissions' => array_column(AccountPermission::assignableToAdmin(), 'value'),
+                        'is_system' => true,
+                    ],
+                );
+
+                $user->adminRoles()->syncWithoutDetaching([$role->id]);
+            });
     }
 
     public function vendor(): static

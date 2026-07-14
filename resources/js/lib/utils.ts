@@ -10,3 +10,13 @@ export function cn(...inputs: ClassValue[]) {
 export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+const dateTimeFormatter = new Intl.DateTimeFormat('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Asia/Kolkata',
+});
+
+export function formatDateTime(value: string | number | Date): string {
+    return dateTimeFormatter.format(new Date(value));
+}

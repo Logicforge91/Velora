@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class AdminRole extends Model
 {
+    public const SUPER_ADMINISTRATOR_SLUG = 'super-administrator';
+
     /** @use HasFactory<AdminRoleFactory> */
     use HasFactory;
 
@@ -25,11 +27,27 @@ class AdminRole extends Model
     /** @return list<AccountPermission> */
     public function permissionEnums(): array
     {
-        return collect($this->permissions ?? [])
-            ->map(fn (string $permission): ?AccountPermission => AccountPermission::tryFrom($permission))
-            ->filter()
-            ->values()
-            ->all();
+        $values = $this->getAttribute('permissions');
+
+        if (! is_array($values)) {
+            return [];
+        }
+
+        $permissions = [];
+
+        foreach ($values as $value) {
+            if (! is_string($value)) {
+                continue;
+            }
+
+            $permission = AccountPermission::tryFrom($value);
+
+            if ($permission !== null) {
+                $permissions[] = $permission;
+            }
+        }
+
+        return $permissions;
     }
 
     /** @return BelongsToMany<User, $this> */

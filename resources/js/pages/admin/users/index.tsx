@@ -20,6 +20,7 @@ import AdminLayout from '@/layouts/admin-layout';
 import usersRoutes from '@/routes/admin/users';
 import type {
     AccountRoleOption,
+    AdminRoleOption,
     Counts,
     ManagedUser,
     Paginated,
@@ -65,23 +66,27 @@ export default function UsersIndex({
     users,
     counts,
     roles,
+    adminRoles,
 }: {
     users: Paginated<ManagedUser>;
     counts: Counts;
     roles: AccountRoleOption[];
+    adminRoles: AdminRoleOption[];
 }) {
     const { url } = usePage();
     const params = new URLSearchParams(url.split('?')[1] ?? '');
     const [search, setSearch] = useState(params.get('search') ?? '');
     const [role, setRole] = useState(params.get('role') ?? '');
+    const [adminRole, setAdminRole] = useState(params.get('admin_role') ?? '');
     const [status, setStatus] = useState(params.get('status') ?? '');
-    const hasFilters = search !== '' || role !== '' || status !== '';
+    const hasFilters =
+        search !== '' || role !== '' || adminRole !== '' || status !== '';
 
     const filterUsers = (event: FormEvent) => {
         event.preventDefault();
         router.get(
             usersRoutes.index.url(),
-            { search, role, status },
+            { search, role, admin_role: adminRole, status },
             { preserveState: true, replace: true },
         );
     };
@@ -89,6 +94,7 @@ export default function UsersIndex({
     const clearFilters = () => {
         setSearch('');
         setRole('');
+        setAdminRole('');
         setStatus('');
         router.get(
             usersRoutes.index.url(),
@@ -154,7 +160,7 @@ export default function UsersIndex({
             <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/30 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none">
                 <form
                     onSubmit={filterUsers}
-                    className="grid gap-3 border-b border-slate-200 p-4 sm:p-5 lg:grid-cols-[minmax(16rem,1fr)_13rem_12rem_auto] dark:border-white/10"
+                    className="grid gap-3 border-b border-slate-200 p-4 sm:p-5 xl:grid-cols-[minmax(15rem,1fr)_12rem_13rem_11rem_auto] dark:border-white/10"
                 >
                     <label className="relative">
                         <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" />
@@ -171,10 +177,22 @@ export default function UsersIndex({
                         onChange={(event) => setRole(event.target.value)}
                         className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none focus:border-orange-300 focus:ring-4 focus:ring-orange-500/10 dark:border-white/10 dark:bg-[#101722]"
                     >
-                        <option value="">All roles</option>
+                        <option value="">All account types</option>
                         {roles.map((option) => (
                             <option key={option.value} value={option.value}>
                                 {option.label}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        value={adminRole}
+                        onChange={(event) => setAdminRole(event.target.value)}
+                        className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none focus:border-orange-300 focus:ring-4 focus:ring-orange-500/10 dark:border-white/10 dark:bg-[#101722]"
+                    >
+                        <option value="">All admin roles</option>
+                        {adminRoles.map((option) => (
+                            <option key={option.id} value={option.id}>
+                                {option.name}
                             </option>
                         ))}
                     </select>
@@ -222,10 +240,19 @@ export default function UsersIndex({
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {users.data.map((user) => {
-                                const roleLabel =
+                                const accountTypeLabel =
                                     roles.find(
                                         (option) => option.value === user.role,
                                     )?.label ?? user.role;
+                                const roleLabel =
+                                    user.role === 'admin' &&
+                                    user.admin_roles?.length
+                                        ? user.admin_roles
+                                              .map(
+                                                  (adminRole) => adminRole.name,
+                                              )
+                                              .join(', ')
+                                        : accountTypeLabel;
 
                                 return (
                                     <tr

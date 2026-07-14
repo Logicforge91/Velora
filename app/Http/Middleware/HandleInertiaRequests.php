@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\AccountPermission;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -60,7 +61,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            'pendingVendorCount' => fn () => $isAdminRoute
+            'pendingVendorCount' => fn () => $isAdminRoute && $user?->hasPermission(AccountPermission::ManageVendors)
                 ? Vendor::query()->where('status', Vendor::STATUS_PENDING)->count()
                 : 0,
         ];

@@ -1,9 +1,5 @@
 export type AccountRole =
-    | 'admin'
-    | 'vendor'
-    | 'customer'
-    | 'delivery_agent'
-    | 'support_agent';
+    'admin' | 'vendor' | 'customer' | 'delivery_agent' | 'support_agent';
 
 export type AccountPermission =
     | 'admin.dashboard.view'

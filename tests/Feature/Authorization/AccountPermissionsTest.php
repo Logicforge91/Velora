@@ -7,9 +7,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
 
-test('administrator role receives every account permission', function () {
-    expect(AccountRole::Admin->permissions())
-        ->toHaveCount(count(AccountPermission::cases()));
+test('administrator account type receives no implicit permissions', function () {
+    expect(AccountRole::Admin->permissions())->toBeEmpty();
 });
 
 test('account roles receive only their intended permissions', function (AccountRole $role, AccountPermission $allowed, AccountPermission $denied) {
@@ -22,10 +21,10 @@ test('account roles receive only their intended permissions', function (AccountR
     'support agent' => [AccountRole::SupportAgent, AccountPermission::HandleSupportRequests, AccountPermission::ManageAssignedDeliveries],
 ]);
 
-test('account permissions are registered as Laravel gates', function () {
+test('dynamic administrator permissions are registered as Laravel gates', function () {
     $admin = User::factory()->admin()->create();
 
-    foreach (AccountPermission::cases() as $permission) {
+    foreach (AccountPermission::assignableToAdmin() as $permission) {
         expect(Gate::forUser($admin)->allows($permission->value))->toBeTrue();
     }
 });
@@ -52,7 +51,7 @@ test('permissions are shared with Inertia clients', function () {
     $this->actingAs($vendor)
         ->get(route('dashboard'))
         ->assertInertia(fn (Assert $page) => $page
-            ->where('auth.permissions', fn (array $permissions) => in_array(AccountPermission::ManageOwnCatalogue->value, $permissions, true))
+            ->where('auth.permissions', fn ($permissions) => collect($permissions)->contains(AccountPermission::ManageOwnCatalogue->value))
         );
 });
 

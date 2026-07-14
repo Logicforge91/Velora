@@ -10,20 +10,22 @@ import {
 import type { FormEvent } from 'react';
 import AdminLayout from '@/layouts/admin-layout';
 import usersRoutes from '@/routes/admin/users';
-import type { AccountRoleOption, ManagedUser } from '@/types/admin';
+import type { AdminRoleOption, ManagedUser } from '@/types/admin';
 
 export default function UserForm({
     managedUser,
-    roles,
+    adminRoles,
 }: {
     managedUser: Partial<ManagedUser>;
-    roles: AccountRoleOption[];
+    adminRoles: AdminRoleOption[];
 }) {
     const exists = Boolean(managedUser.id);
     const form = useForm({
         name: managedUser.name ?? '',
         email: managedUser.email ?? '',
-        role: managedUser.role ?? 'customer',
+        role: 'admin',
+        admin_role_id:
+            managedUser.admin_roles?.[0]?.id ?? adminRoles[0]?.id ?? null,
         status: managedUser.status ?? true,
         password: '',
         password_confirmation: '',
@@ -124,19 +126,27 @@ export default function UserForm({
                         <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                             <span className="flex items-center gap-2">
                                 <Shield className="size-4 text-slate-400" />
-                                Account role
+                                Role
                             </span>
                             <select
-                                value={form.data.role}
+                                value={form.data.admin_role_id ?? ''}
                                 onChange={(event) =>
-                                    form.setData('role', event.target.value)
+                                    form.setData(
+                                        'admin_role_id',
+                                        Number(event.target.value),
+                                    )
                                 }
                                 className={`${inputClass} dark:bg-[#101722]`}
                                 required
                             >
-                                {roles.map((role) => (
-                                    <option key={role.value} value={role.value}>
-                                        {role.label}
+                                {adminRoles.length === 0 && (
+                                    <option value="" disabled>
+                                        Create an admin role first
+                                    </option>
+                                )}
+                                {adminRoles.map((role) => (
+                                    <option key={role.id} value={role.id}>
+                                        {role.name}
                                     </option>
                                 ))}
                             </select>
@@ -145,6 +155,15 @@ export default function UserForm({
                                     {form.errors.role}
                                 </span>
                             )}
+                            {form.errors.admin_role_id && (
+                                <span className="mt-1.5 block text-xs font-medium text-rose-600">
+                                    {form.errors.admin_role_id}
+                                </span>
+                            )}
+                            <span className="mt-1.5 block text-xs font-normal text-slate-500">
+                                Administrator options are managed from the Admin
+                                Roles menu.
+                            </span>
                         </label>
                         <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                             <span className="flex items-center gap-2">
@@ -240,7 +259,9 @@ export default function UserForm({
                         </Link>
                         <button
                             type="submit"
-                            disabled={form.processing}
+                            disabled={
+                                form.processing || adminRoles.length === 0
+                            }
                             className="inline-flex h-11 items-center justify-center rounded-xl bg-orange-500 px-6 text-sm font-semibold text-white shadow-sm shadow-orange-500/20 transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {form.processing

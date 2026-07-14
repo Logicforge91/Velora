@@ -34,11 +34,19 @@ class Brand extends Model
         ];
     }
 
+    /**
+     * @param  Builder<Brand>  $query
+     * @return Builder<Brand>
+     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', true);
     }
 
+    /**
+     * @param  Builder<Brand>  $query
+     * @return Builder<Brand>
+     */
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);

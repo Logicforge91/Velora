@@ -35,10 +35,10 @@ export default function WarehouseForm({
         event.preventDefault();
 
         if (exists) {
-form.put(routes.update.url(warehouse.id!));
-} else {
-form.post(routes.store.url());
-}
+            form.put(routes.update.url(warehouse.id!));
+        } else {
+            form.post(routes.store.url());
+        }
     };
     const error = (key: string) => form.errors[key as keyof typeof form.errors];
 
