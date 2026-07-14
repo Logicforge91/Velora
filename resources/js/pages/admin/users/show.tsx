@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import UserHistoryList from '@/components/admin/user-history-list';
 import AdminLayout from '@/layouts/admin-layout';
+import { formatDateTime } from '@/lib/utils';
 import usersRoutes from '@/routes/admin/users';
 import type {
     AccountRoleOption,
@@ -37,9 +38,13 @@ export default function UserShow({
     recentHistory: UserHistory[];
     roles: AccountRoleOption[];
 }) {
-    const roleLabel =
+    const accountTypeLabel =
         roles.find((role) => role.value === managedUser.role)?.label ??
         managedUser.role;
+    const roleLabel =
+        managedUser.role === 'admin' && managedUser.admin_roles?.length
+            ? managedUser.admin_roles.map((role) => role.name).join(', ')
+            : accountTypeLabel;
     const deleteUser = () => {
         if (
             window.confirm(
@@ -109,7 +114,11 @@ export default function UserShow({
                         <div className="flex gap-3 py-4">
                             <ShieldCheck className="mt-0.5 size-4 text-slate-400" />
                             <div>
-                                <dt className="text-xs text-slate-500">Role</dt>
+                                <dt className="text-xs text-slate-500">
+                                    {managedUser.role === 'admin'
+                                        ? 'Admin role'
+                                        : 'Account type'}
+                                </dt>
                                 <dd className="mt-0.5 text-sm font-semibold">
                                     {roleLabel}
                                 </dd>
@@ -122,9 +131,7 @@ export default function UserShow({
                                     Joined
                                 </dt>
                                 <dd className="mt-0.5 text-sm font-semibold">
-                                    {new Date(
-                                        managedUser.created_at,
-                                    ).toLocaleString()}
+                                    {formatDateTime(managedUser.created_at)}
                                 </dd>
                             </div>
                         </div>

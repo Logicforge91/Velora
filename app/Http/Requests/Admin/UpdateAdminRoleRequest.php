@@ -35,7 +35,7 @@ class UpdateAdminRoleRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:1000'],
             'permissions' => ['required', 'array', 'min:1'],
             'permissions.*' => ['required', 'distinct', Rule::enum(AccountPermission::class), Rule::in(array_column(AccountPermission::assignableToAdmin(), 'value'))],
-            'user_ids' => ['present', 'array'],
+            'user_ids' => ['present', 'array', 'max:500'],
             'user_ids.*' => [
                 'integer',
                 'distinct',

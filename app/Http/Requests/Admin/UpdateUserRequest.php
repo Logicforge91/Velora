@@ -35,6 +35,12 @@ class UpdateUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
             'role' => ['required', Rule::enum(AccountRole::class)],
+            'admin_role_id' => [
+                Rule::requiredIf(fn (): bool => $this->input('role') === AccountRole::Admin->value),
+                'nullable',
+                'integer',
+                Rule::exists('admin_roles', 'id'),
+            ],
             'status' => ['required', 'boolean'],
             'password' => ['nullable', 'confirmed', Password::defaults()],
         ];

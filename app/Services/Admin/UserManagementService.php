@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Enums\AccountRole;
+use App\Models\AdminRole;
 use App\Models\User;
 use App\Models\UserHistory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -14,17 +15,19 @@ use Illuminate\Validation\ValidationException;
 class UserManagementService
 {
     /**
-     * @param  array{search?: mixed, role?: mixed, status?: mixed}  $filters
+     * @param  array{search?: mixed, role?: mixed, admin_role?: mixed, status?: mixed}  $filters
      * @return LengthAwarePaginator<int, User>
      */
     public function getUsers(array $filters = []): LengthAwarePaginator
     {
         $search = trim((string) ($filters['search'] ?? ''));
         $role = (string) ($filters['role'] ?? '');
+        $adminRoleId = (int) ($filters['admin_role'] ?? 0);
         $status = (string) ($filters['status'] ?? '');
 
         return User::query()
             ->select(['id', 'name', 'email', 'role', 'status', 'email_verified_at', 'created_at', 'updated_at'])
+            ->with('adminRoles:id,name,slug')
             ->when($search !== '', function (Builder $query) use ($search): void {
                 $query->where(function (Builder $query) use ($search): void {
                     $query->where('name', 'like', "%{$search}%")
@@ -32,6 +35,7 @@ class UserManagementService
                 });
             })
             ->when(AccountRole::tryFrom($role), fn (Builder $query): Builder => $query->where('role', $role))
+            ->when($adminRoleId > 0, fn (Builder $query): Builder => $query->whereHas('adminRoles', fn (Builder $query): Builder => $query->whereKey($adminRoleId)))
             ->when($status === 'active', fn (Builder $query): Builder => $query->where('status', true))
             ->when($status === 'inactive', fn (Builder $query): Builder => $query->where('status', false))
             ->latest()
@@ -70,11 +74,27 @@ class UserManagementService
         );
     }
 
+    /** @return array<int, array{id: int, name: string}> */
+    public function getAdminRoles(): array
+    {
+        return AdminRole::query()
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get()
+            ->map(fn (AdminRole $role): array => ['id' => $role->id, 'name' => $role->name])
+            ->all();
+    }
+
     /** @param array<string, mixed> $data */
     public function create(array $data, User $actor, ?string $ipAddress): User
     {
         return DB::transaction(function () use ($data, $actor, $ipAddress): User {
+            $adminRoleId = Arr::pull($data, 'admin_role_id');
             $user = User::query()->create($data);
+
+            if ($user->isAdmin()) {
+                $user->adminRoles()->sync([(int) $adminRoleId]);
+            }
 
             $this->recordHistory($user, $actor, 'created', null, $ipAddress);
 
@@ -91,7 +111,16 @@ class UserManagementService
             ]);
         }
 
-        return DB::transaction(function () use ($user, $data, $actor, $ipAddress): User {
+        $adminRoleId = Arr::pull($data, 'admin_role_id');
+        $currentAdminRoleId = $user->adminRoles()->value('admin_roles.id');
+
+        if ($user->is($actor) && (int) $currentAdminRoleId !== (int) $adminRoleId) {
+            throw ValidationException::withMessages([
+                'admin_role_id' => 'You cannot change your own administrator role.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($user, $data, $adminRoleId, $currentAdminRoleId, $actor, $ipAddress): User {
             $trackedAttributes = ['name', 'email', 'role', 'status'];
             $before = Arr::only($user->getAttributes(), $trackedAttributes);
 
@@ -100,6 +129,7 @@ class UserManagementService
             }
 
             $user->update($data);
+            $user->adminRoles()->sync($user->isAdmin() ? [(int) $adminRoleId] : []);
             $after = Arr::only($user->getAttributes(), $trackedAttributes);
             $changes = [];
 
@@ -111,6 +141,12 @@ class UserManagementService
 
             if (array_key_exists('password', $data)) {
                 $changes['password'] = ['from' => null, 'to' => 'updated'];
+            }
+
+            $updatedAdminRoleId = $user->adminRoles()->value('admin_roles.id');
+
+            if ($currentAdminRoleId !== $updatedAdminRoleId) {
+                $changes['admin_role_id'] = ['from' => $currentAdminRoleId, 'to' => $updatedAdminRoleId];
             }
 
             if ($changes !== []) {

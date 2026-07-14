@@ -193,8 +193,13 @@ class TaxInvoiceService
         $taxable = $data['prices_include_tax']
             ? round($lineGross / (1 + (($taxRate + $cessRate) / 100)), 2)
             : $lineGross;
-        $gst = round($taxable * $taxRate / 100, 2);
-        $cess = round($taxable * $cessRate / 100, 2);
+        $combinedTax = $data['prices_include_tax']
+            ? round($lineGross - $taxable, 2)
+            : round($taxable * ($taxRate + $cessRate) / 100, 2);
+        $gst = $taxRate + $cessRate > 0
+            ? round($combinedTax * $taxRate / ($taxRate + $cessRate), 2)
+            : 0.0;
+        $cess = round($combinedTax - $gst, 2);
         $interstate = $data['supplier_state_code'] !== $data['place_of_supply_code'];
         $cgst = $interstate ? 0.0 : round($gst / 2, 2);
         $sgst = $interstate ? 0.0 : $gst - $cgst;
@@ -207,7 +212,7 @@ class TaxInvoiceService
             'sgst_amount' => $sgst,
             'igst_amount' => $igst,
             'cess_amount' => $cess,
-            'total_amount' => round($taxable + $gst + $cess, 2),
+            'total_amount' => round($taxable + $combinedTax, 2),
         ];
     }
 

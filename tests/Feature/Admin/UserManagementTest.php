@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\AccountRole;
+use App\Models\AdminRole;
 use App\Models\User;
 use App\Models\UserHistory;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +25,43 @@ test('administrators can view and filter the user list', function () {
         ->has('counts')
         ->has('roles', count(AccountRole::cases()))
     );
+});
+
+test('administrator role dropdown matches roles configured in admin roles', function () {
+    $admin = User::factory()->admin()->create();
+    $operationsRole = AdminRole::factory()->create(['name' => 'Marketplace Operations']);
+
+    $this->actingAs($admin)
+        ->get(route('admin.users.create'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/users/form')
+            ->missing('roles')
+            ->where('adminRoles', fn ($roles) => collect($roles)->contains(fn ($role) => $role['id'] === $operationsRole->id && $role['name'] === 'Marketplace Operations'))
+        );
+
+    $response = $this->actingAs($admin)->post(route('admin.users.store'), [
+        'name' => 'Operations Administrator',
+        'email' => 'operations@example.com',
+        'role' => AccountRole::Admin->value,
+        'admin_role_id' => $operationsRole->id,
+        'status' => true,
+        'password' => 'correct-horse-battery-staple',
+        'password_confirmation' => 'correct-horse-battery-staple',
+    ]);
+
+    $managedAdmin = User::query()->where('email', 'operations@example.com')->firstOrFail();
+
+    $response->assertRedirect(route('admin.users.show', $managedAdmin));
+    expect($managedAdmin->adminRoles()->sole()->is($operationsRole))->toBeTrue();
+
+    $this->actingAs($admin)
+        ->get(route('admin.users.index', ['admin_role' => $operationsRole->id]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('users.data', 1)
+            ->where('users.data.0.admin_roles.0.name', 'Marketplace Operations')
+        );
 });
 
 test('administrators can create users and creation is recorded', function () {
