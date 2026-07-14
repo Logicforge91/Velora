@@ -4,6 +4,8 @@ use Laravel\Pulse\Http\Middleware\Authorize;
 use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders;
 
+$serverDirectories = env('PULSE_SERVER_DIRECTORIES', '/');
+
 return [
 
     /*
@@ -168,7 +170,7 @@ return [
 
         Recorders\Servers::class => [
             'server_name' => env('PULSE_SERVER_NAME', gethostname()),
-            'directories' => explode(':', env('PULSE_SERVER_DIRECTORIES', '/')),
+            'directories' => explode(':', is_string($serverDirectories) ? $serverDirectories : '/'),
         ],
 
         Recorders\SlowJobs::class => [

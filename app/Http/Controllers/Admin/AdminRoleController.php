@@ -27,8 +27,8 @@ class AdminRoleController extends Controller
             'roles' => AdminRole::query()->withCount('users')->latest()->paginate(15),
             'counts' => [
                 'roles' => AdminRole::query()->count(),
-                'assigned_admins' => User::query()->where('uses_custom_admin_roles', true)->count(),
-                'legacy_super_admins' => User::query()->where('role', AccountRole::Admin->value)->where('uses_custom_admin_roles', false)->count(),
+                'assigned_admins' => User::query()->where('role', AccountRole::Admin->value)->whereHas('adminRoles')->count(),
+                'unassigned_admins' => User::query()->where('role', AccountRole::Admin->value)->whereDoesntHave('adminRoles')->count(),
             ],
         ]);
     }
@@ -93,7 +93,7 @@ class AdminRoleController extends Controller
                 'label' => $permission->label(),
             ]),
             'admins' => User::query()
-                ->select(['id', 'name', 'email', 'uses_custom_admin_roles'])
+                ->select(['id', 'name', 'email'])
                 ->where('role', AccountRole::Admin->value)
                 ->whereKeyNot(auth()->id())
                 ->orderBy('name')
@@ -104,8 +104,11 @@ class AdminRoleController extends Controller
     /** @param list<int> $userIds */
     private function syncUsers(AdminRole $adminRole, array $userIds): void
     {
-        $affectedUserIds = $adminRole->users()->pluck('users.id')->merge($userIds)->unique();
-        $adminRole->users()->sync($userIds);
-        User::query()->whereKey($affectedUserIds)->update(['uses_custom_admin_roles' => true]);
+        $removedUserIds = $adminRole->users()->whereNotIn('users.id', $userIds)->pluck('users.id');
+        $adminRole->users()->detach($removedUserIds);
+
+        User::query()
+            ->whereKey($userIds)
+            ->each(fn (User $user) => $user->adminRoles()->sync([$adminRole->id]));
     }
 }

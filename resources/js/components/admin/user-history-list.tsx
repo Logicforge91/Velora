@@ -1,4 +1,5 @@
 import { History, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { formatDateTime } from '@/lib/utils';
 import type { AccountRoleOption, UserHistory } from '@/types/admin';
 
 const actionStyles = {
@@ -98,9 +99,7 @@ export default function UserHistoryList({
                                     className="shrink-0 text-xs text-slate-400"
                                     dateTime={entry.created_at}
                                 >
-                                    {new Date(
-                                        entry.created_at,
-                                    ).toLocaleString()}
+                                    {formatDateTime(entry.created_at)}
                                 </time>
                             </div>
                             {entry.changes && (

@@ -33,6 +33,7 @@ class Category extends Model
         ];
     }
 
+    /** @return BelongsTo<Category, $this> */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(
@@ -41,6 +42,7 @@ class Category extends Model
         );
     }
 
+    /** @return HasMany<Category, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(
@@ -56,11 +58,19 @@ class Category extends Model
         return $this->hasMany(Product::class);
     }
 
+    /**
+     * @param  Builder<Category>  $query
+     * @return Builder<Category>
+     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', true);
     }
 
+    /**
+     * @param  Builder<Category>  $query
+     * @return Builder<Category>
+     */
     public function scopeRoot(Builder $query): Builder
     {
         return $query->whereNull('parent_id');

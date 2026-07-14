@@ -7,9 +7,9 @@ use App\Enums\AccountPermission;
 use App\Enums\AccountRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -45,7 +45,6 @@ class User extends Authenticatable
         'role',
         'status',
         'current_team_id',
-        'uses_custom_admin_roles',
     ];
 
     protected $hidden = [
@@ -59,7 +58,6 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
-            'uses_custom_admin_roles' => 'boolean',
         ];
     }
 
@@ -93,12 +91,16 @@ class User extends Authenticatable
     /** @return list<AccountPermission> */
     public function permissions(): array
     {
-        if ($this->isAdmin() && $this->uses_custom_admin_roles) {
-            return $this->adminRoles
-                ->flatMap(fn (AdminRole $role): array => $role->permissionEnums())
-                ->unique(fn (AccountPermission $permission): string => $permission->value)
-                ->values()
-                ->all();
+        if ($this->isAdmin()) {
+            $permissions = [];
+
+            foreach ($this->adminRoles as $role) {
+                foreach ($role->permissionEnums() as $permission) {
+                    $permissions[$permission->value] = $permission;
+                }
+            }
+
+            return array_values($permissions);
         }
 
         return $this->accountRole()?->permissions() ?? [];
