@@ -49,6 +49,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAppearance } from '@/hooks/use-appearance';
 import { logout } from '@/routes';
 import admin from '@/routes/admin';
 import type { AccountPermission } from '@/types/auth';
@@ -191,7 +192,7 @@ const navigationSections = [
                 permission: 'vendors.manage',
             },
             {
-                label: 'Customers',
+                label: 'Users',
                 href: admin.users.index.url(),
                 icon: Users,
                 permission: 'users.manage',
@@ -247,19 +248,12 @@ export default function AdminLayout({
     const [openSection, setOpenSection] = useState<string | null>(
         activeSectionLabel ?? 'Overview',
     );
-    const [dark, setDark] = useState(() =>
-        typeof document === 'undefined'
-            ? false
-            : document.documentElement.classList.contains('dark'),
-    );
+    const { resolvedAppearance, updateAppearance } = useAppearance();
+    const dark = resolvedAppearance === 'dark';
     const pendingCount = Number(pendingVendorCount ?? 0);
 
     const toggleTheme = () => {
-        const next = !dark;
-
-        setDark(next);
-        document.documentElement.classList.toggle('dark', next);
-        localStorage.setItem('appearance', next ? 'dark' : 'light');
+        updateAppearance(dark ? 'light' : 'dark');
     };
 
     useEffect(() => {
