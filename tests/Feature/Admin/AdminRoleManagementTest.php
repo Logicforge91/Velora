@@ -3,10 +3,17 @@
 use App\Enums\AccountPermission;
 use App\Models\AdminRole;
 use App\Models\User;
+use Database\Seeders\AdminRoleSeeder;
 use Inertia\Testing\AssertableInertia as Assert;
 
-test('legacy administrators retain super admin access to role management', function () {
-    $admin = User::factory()->admin()->create();
+test('legacy administrators are mapped to the new super administrator role', function () {
+    $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+    (new AdminRoleSeeder)->run();
+    $admin = $admin->fresh();
+
+    expect($admin->adminRoles)->toHaveCount(1)
+        ->and($admin->adminRoles->first()->slug)->toBe(AdminRole::SUPER_ADMINISTRATOR_SLUG);
 
     $this->actingAs($admin)
         ->get(route('admin.admin-roles.index'))
@@ -14,7 +21,8 @@ test('legacy administrators retain super admin access to role management', funct
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/admin-roles/index')
             ->has('roles.data')
-            ->where('counts.legacy_super_admins', 1)
+            ->where('counts.assigned_admins', 1)
+            ->where('counts.unassigned_admins', 0)
         );
 });
 
@@ -36,8 +44,7 @@ test('super administrators can assign a restricted operational role', function (
     $role = AdminRole::query()->where('slug', 'catalogue-manager')->firstOrFail();
 
     $response->assertRedirect(route('admin.admin-roles.edit', $role));
-    expect($catalogueAdmin->fresh()->uses_custom_admin_roles)->toBeTrue()
-        ->and($catalogueAdmin->fresh()->hasPermission(AccountPermission::ManageCatalogue))->toBeTrue()
+    expect($catalogueAdmin->fresh()->hasPermission(AccountPermission::ManageCatalogue))->toBeTrue()
         ->and($catalogueAdmin->fresh()->hasPermission(AccountPermission::ManageUsers))->toBeFalse();
 
     $restrictedAdmin = $catalogueAdmin->fresh();
@@ -48,14 +55,14 @@ test('super administrators can assign a restricted operational role', function (
 });
 
 test('assigned permissions are shared with the admin interface', function () {
-    $admin = User::factory()->admin()->create(['uses_custom_admin_roles' => true]);
+    $admin = User::factory()->admin()->create();
     $role = AdminRole::factory()->create([
         'permissions' => [
             AccountPermission::AccessAdminDashboard->value,
             AccountPermission::ViewReports->value,
         ],
     ]);
-    $role->users()->attach($admin);
+    $admin->adminRoles()->sync([$role->id]);
 
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))

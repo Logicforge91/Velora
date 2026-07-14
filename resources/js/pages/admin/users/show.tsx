@@ -37,9 +37,13 @@ export default function UserShow({
     recentHistory: UserHistory[];
     roles: AccountRoleOption[];
 }) {
-    const roleLabel =
+    const accountTypeLabel =
         roles.find((role) => role.value === managedUser.role)?.label ??
         managedUser.role;
+    const roleLabel =
+        managedUser.role === 'admin' && managedUser.admin_roles?.length
+            ? managedUser.admin_roles.map((role) => role.name).join(', ')
+            : accountTypeLabel;
     const deleteUser = () => {
         if (
             window.confirm(
@@ -109,7 +113,11 @@ export default function UserShow({
                         <div className="flex gap-3 py-4">
                             <ShieldCheck className="mt-0.5 size-4 text-slate-400" />
                             <div>
-                                <dt className="text-xs text-slate-500">Role</dt>
+                                <dt className="text-xs text-slate-500">
+                                    {managedUser.role === 'admin'
+                                        ? 'Admin role'
+                                        : 'Account type'}
+                                </dt>
                                 <dd className="mt-0.5 text-sm font-semibold">
                                     {roleLabel}
                                 </dd>

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class AdminRole extends Model
 {
+    public const SUPER_ADMINISTRATOR_SLUG = 'super-administrator';
+
     /** @use HasFactory<AdminRoleFactory> */
     use HasFactory;
 

@@ -10,7 +10,6 @@ type AdminOption = {
     id: number;
     name: string;
     email: string;
-    uses_custom_admin_roles: boolean;
 };
 
 export default function AdminRoleForm({

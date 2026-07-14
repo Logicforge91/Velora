@@ -21,17 +21,18 @@ class UserController extends Controller
     public function index(Request $request): Response
     {
         return Inertia::render('admin/users/index', [
-            'users' => $this->userService->getUsers($request->only(['search', 'role', 'status'])),
+            'users' => $this->userService->getUsers($request->only(['search', 'role', 'admin_role', 'status'])),
             'counts' => $this->userService->getCounts(),
             'roles' => $this->userService->getRoles(),
+            'adminRoles' => $this->userService->getAdminRoles(),
         ]);
     }
 
     public function create(): Response
     {
         return Inertia::render('admin/users/form', [
-            'managedUser' => new User(['status' => true, 'role' => 'customer']),
-            'roles' => $this->userService->getRoles(),
+            'managedUser' => new User(['status' => true, 'role' => 'admin']),
+            'adminRoles' => $this->userService->getAdminRoles(),
         ]);
     }
 
@@ -51,21 +52,22 @@ class UserController extends Controller
     public function show(User $user): Response
     {
         return Inertia::render('admin/users/show', [
-            'managedUser' => $user,
+            'managedUser' => $user->load('adminRoles:id,name,slug'),
             'recentHistory' => $user->histories()
                 ->with('actor:id,name,email')
                 ->latest()
                 ->limit(6)
                 ->get(),
             'roles' => $this->userService->getRoles(),
+            'adminRoles' => $this->userService->getAdminRoles(),
         ]);
     }
 
     public function edit(User $user): Response
     {
         return Inertia::render('admin/users/form', [
-            'managedUser' => $user,
-            'roles' => $this->userService->getRoles(),
+            'managedUser' => $user->load('adminRoles:id,name,slug'),
+            'adminRoles' => $this->userService->getAdminRoles(),
         ]);
     }
 

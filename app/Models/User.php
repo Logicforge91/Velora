@@ -45,7 +45,6 @@ class User extends Authenticatable
         'role',
         'status',
         'current_team_id',
-        'uses_custom_admin_roles',
     ];
 
     protected $hidden = [
@@ -59,7 +58,6 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
-            'uses_custom_admin_roles' => 'boolean',
         ];
     }
 
@@ -93,7 +91,7 @@ class User extends Authenticatable
     /** @return list<AccountPermission> */
     public function permissions(): array
     {
-        if ($this->isAdmin() && $this->uses_custom_admin_roles) {
+        if ($this->isAdmin()) {
             $permissions = [];
 
             foreach ($this->adminRoles as $role) {

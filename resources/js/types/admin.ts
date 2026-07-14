@@ -155,6 +155,7 @@ export type VendorReviewEvent = {
 };
 
 export type AccountRoleOption = { value: string; label: string };
+export type AdminRoleOption = { id: number; name: string };
 export type ManagedUser = {
     id: number;
     name: string;
@@ -165,6 +166,7 @@ export type ManagedUser = {
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;
+    admin_roles?: Pick<AdminRole, 'id' | 'name' | 'slug'>[];
 };
 export type UserHistory = {
     id: number;

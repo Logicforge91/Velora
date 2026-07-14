@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AdminRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -9,7 +10,7 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::query()->updateOrCreate(
+        $administrator = User::query()->updateOrCreate(
             [
                 'email' => 'admin@vendora.test',
             ],
@@ -21,5 +22,8 @@ class AdminUserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        $superAdministrator = AdminRole::query()->where('slug', AdminRole::SUPER_ADMINISTRATOR_SLUG)->firstOrFail();
+        $administrator->adminRoles()->sync([$superAdministrator->id]);
     }
 }

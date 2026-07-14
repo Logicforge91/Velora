@@ -61,8 +61,8 @@ export default function AdminRolesIndex({
                             tone: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300',
                         },
                         {
-                            label: 'Super admins',
-                            value: counts.legacy_super_admins,
+                            label: 'Unassigned admins',
+                            value: counts.unassigned_admins,
                             icon: Users,
                             tone: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-300',
                         },
