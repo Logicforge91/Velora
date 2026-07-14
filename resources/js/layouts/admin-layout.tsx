@@ -36,7 +36,6 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { PropsWithChildren } from 'react';
-import type { AccountPermission } from '@/types/auth';
 import {
     Collapsible,
     CollapsibleContent,
@@ -52,6 +51,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { logout } from '@/routes';
 import admin from '@/routes/admin';
+import type { AccountPermission } from '@/types/auth';
 
 const navigationSections = [
     {
@@ -88,7 +88,12 @@ const navigationSections = [
                 icon: Boxes,
                 permission: 'catalogue.manage',
             },
-            { label: 'Brands', href: admin.brands.index.url(), icon: Tags, permission: 'catalogue.manage' },
+            {
+                label: 'Brands',
+                href: admin.brands.index.url(),
+                icon: Tags,
+                permission: 'catalogue.manage',
+            },
             {
                 label: 'Bulk Imports',
                 href: admin.catalogImports.index.url(),
@@ -137,7 +142,12 @@ const navigationSections = [
                 icon: Warehouse,
                 permission: 'catalogue.manage',
             },
-            { label: 'Returns', href: admin.returns.index.url(), icon: Undo2, permission: 'orders.manage' },
+            {
+                label: 'Returns',
+                href: admin.returns.index.url(),
+                icon: Undo2,
+                permission: 'orders.manage',
+            },
             {
                 label: 'Support',
                 href: admin.support.index.url(),
@@ -174,9 +184,24 @@ const navigationSections = [
         label: 'Accounts',
         icon: Users,
         items: [
-            { label: 'Vendors', href: admin.vendors.index.url(), icon: Store, permission: 'vendors.manage' },
-            { label: 'Customers', href: admin.users.index.url(), icon: Users, permission: 'users.manage' },
-            { label: 'Admin Roles', href: admin.adminRoles.index.url(), icon: ShieldCheck, permission: 'roles.manage' },
+            {
+                label: 'Vendors',
+                href: admin.vendors.index.url(),
+                icon: Store,
+                permission: 'vendors.manage',
+            },
+            {
+                label: 'Customers',
+                href: admin.users.index.url(),
+                icon: Users,
+                permission: 'users.manage',
+            },
+            {
+                label: 'Admin Roles',
+                href: admin.adminRoles.index.url(),
+                icon: ShieldCheck,
+                permission: 'roles.manage',
+            },
             {
                 label: 'Audit Logs',
                 href: admin.auditLogs.index.url(),
@@ -506,18 +531,20 @@ export default function AdminLayout({
                             </span>
                         </label>
 
-                        <Link
-                            href={admin.vendors.index.url()}
-                            className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 shadow-sm transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:border-orange-500/20 dark:hover:bg-orange-500/10 dark:hover:text-orange-300"
-                            aria-label="View vendor notifications"
-                        >
-                            <Bell className="size-[18px]" />
-                            {pendingCount > 0 && (
-                                <span className="absolute -top-1 -right-1 grid size-4 place-items-center rounded-full bg-orange-500 text-[8px] font-bold text-white ring-2 ring-white dark:ring-[#0c111a]">
-                                    {pendingCount > 9 ? '9+' : pendingCount}
-                                </span>
-                            )}
-                        </Link>
+                        {grantedPermissions.has('vendors.manage') && (
+                            <Link
+                                href={admin.vendors.index.url()}
+                                className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 shadow-sm transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:border-orange-500/20 dark:hover:bg-orange-500/10 dark:hover:text-orange-300"
+                                aria-label="View vendor notifications"
+                            >
+                                <Bell className="size-[18px]" />
+                                {pendingCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 grid size-4 place-items-center rounded-full bg-orange-500 text-[8px] font-bold text-white ring-2 ring-white dark:ring-[#0c111a]">
+                                        {pendingCount > 9 ? '9+' : pendingCount}
+                                    </span>
+                                )}
+                            </Link>
+                        )}
 
                         <button
                             type="button"
