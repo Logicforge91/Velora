@@ -3,9 +3,9 @@
 namespace App\Services\Admin;
 
 use App\Models\Brand;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +14,10 @@ use Throwable;
 
 class BrandManagementService
 {
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Brand>
+     */
     public function getBrands(
         array $filters = []
     ): LengthAwarePaginator {
@@ -77,6 +81,7 @@ class BrandManagementService
             ->withQueryString();
     }
 
+    /** @return array{all: int, active: int, inactive: int, featured: int} */
     public function getCounts(): array
     {
         $counts = Brand::query()
@@ -98,6 +103,7 @@ class BrandManagementService
         ];
     }
 
+    /** @param array<string, mixed> $data */
     public function create(array $data): Brand
     {
         $logoPath = null;
@@ -138,6 +144,7 @@ class BrandManagementService
         }
     }
 
+    /** @param array<string, mixed> $data */
     public function update(
         Brand $brand,
         array $data

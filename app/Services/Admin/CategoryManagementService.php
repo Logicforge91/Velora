@@ -3,10 +3,10 @@
 namespace App\Services\Admin;
 
 use App\Models\Category;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +16,10 @@ use Throwable;
 
 class CategoryManagementService
 {
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Category>
+     */
     public function getCategories(
         array $filters = []
     ): LengthAwarePaginator {
@@ -81,6 +85,7 @@ class CategoryManagementService
             ->withQueryString();
     }
 
+    /** @return array{all: int, active: int, inactive: int, root: int} */
     public function getCounts(): array
     {
         $counts = Category::query()
@@ -102,6 +107,7 @@ class CategoryManagementService
         ];
     }
 
+    /** @return Collection<int, Category> */
     public function getParentOptions(
         ?Category $currentCategory = null
     ): Collection {
@@ -127,6 +133,7 @@ class CategoryManagementService
         return $query->get();
     }
 
+    /** @param array<string, mixed> $data */
     public function create(array $data): Category
     {
         $imagePath = null;
@@ -171,6 +178,7 @@ class CategoryManagementService
         }
     }
 
+    /** @param array<string, mixed> $data */
     public function update(
         Category $category,
         array $data
@@ -303,13 +311,14 @@ class CategoryManagementService
         }
     }
 
+    /** @return list<int> */
     private function getDescendantIds(
         Category $category
     ): array {
         $descendantIds = [];
         $parentIds = [$category->id];
 
-        while ($parentIds !== []) {
+        while (true) {
             $childIds = Category::query()
                 ->whereIn('parent_id', $parentIds)
                 ->pluck('id')

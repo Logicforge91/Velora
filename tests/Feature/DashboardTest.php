@@ -11,16 +11,18 @@ test('guests are redirected to login from the admin dashboard', function () {
 test('admins can access the admin dashboard', function () {
     $this->withoutVite();
 
-    $admin = User::factory()->create([
-        'role' => User::ROLE_ADMIN,
+    $admin = User::factory()->admin()->create([
         'status' => true,
     ]);
 
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))
         ->assertOk()
-        ->assertViewIs('admin.dashboard')
-        ->assertSee('Dashboard Overview');
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/dashboard')
+            ->has('statistics')
+            ->has('recentUsers')
+        );
 });
 
 test('customers cannot access the admin dashboard', function () {
@@ -35,8 +37,7 @@ test('customers cannot access the admin dashboard', function () {
 });
 
 test('inactive admins cannot access the dashboard', function () {
-    $admin = User::factory()->create([
-        'role' => User::ROLE_ADMIN,
+    $admin = User::factory()->admin()->create([
         'status' => false,
     ]);
 
@@ -48,8 +49,7 @@ test('inactive admins cannot access the dashboard', function () {
 });
 
 test('admins are redirected from the standard dashboard to the admin dashboard', function () {
-    $admin = User::factory()->create([
-        'role' => User::ROLE_ADMIN,
+    $admin = User::factory()->admin()->create([
         'status' => true,
     ]);
 
