@@ -7,6 +7,8 @@ import {
     ReceiptIndianRupee,
     TrendingUp,
 } from 'lucide-react';
+import { AdminPageHeader, AdminPanel } from '@/components/admin/primitives';
+import StatCards from '@/components/admin/stat-cards';
 import AdminLayout from '@/layouts/admin-layout';
 import admin from '@/routes/admin';
 
@@ -90,43 +92,21 @@ export default function Analytics({
             title="Commerce Analytics"
             breadcrumb="Analytics / Overview"
         >
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                <div>
-                    <p className="text-xs font-bold tracking-widest text-orange-600 uppercase">
-                        Marketplace intelligence
-                    </p>
-                    <h2 className="mt-2 text-2xl font-black">
-                        Performance at a glance
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Revenue, fulfilment and inventory signals from live
-                        operational data.
-                    </p>
-                </div>
-                <Link
-                    href={admin.orders.index.url()}
-                    className="rounded-xl bg-slate-950 px-4 py-2.5 text-center text-sm font-bold text-white dark:bg-white dark:text-slate-950"
-                >
-                    Open order operations
-                </Link>
-            </div>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {cards.map(({ label, value, note, icon: Icon, tone }) => (
-                    <div
-                        key={label}
-                        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/5"
+            <AdminPageHeader
+                title="Performance intelligence"
+                description="Revenue, fulfilment, and inventory signals from live operational data."
+                action={
+                    <Link
+                        href={admin.orders.index.url()}
+                        className="inline-flex rounded-xl bg-slate-950 px-4 py-2.5 text-center text-sm font-bold text-white transition hover:bg-slate-800"
                     >
-                        <div
-                            className={`grid size-10 place-items-center rounded-xl ${tone}`}
-                        >
-                            <Icon className="size-5" />
-                        </div>
-                        <p className="mt-5 text-2xl font-black">{value}</p>
-                        <p className="mt-1 text-sm font-semibold">{label}</p>
-                        <p className="mt-1 text-xs text-slate-500">{note}</p>
-                    </div>
-                ))}
+                        Open order operations
+                    </Link>
+                }
+            />
+
+            <div className="mt-6">
+                <StatCards cards={cards} />
             </div>
 
             <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.75fr)]">
@@ -273,7 +253,7 @@ function Panel({
     children: React.ReactNode;
 }) {
     return (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-white/10 dark:bg-white/5">
+        <AdminPanel className="p-5 sm:p-6">
             <div className="flex items-center gap-2">
                 <span className="grid size-8 place-items-center rounded-lg bg-orange-50 text-orange-600 dark:bg-orange-500/10">
                     <Icon className="size-4" />
@@ -281,7 +261,7 @@ function Panel({
                 <h3 className="font-bold">{title}</h3>
             </div>
             {children}
-        </section>
+        </AdminPanel>
     );
 }
 function Empty({ label }: { label: string }) {

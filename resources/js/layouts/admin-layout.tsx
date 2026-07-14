@@ -1,5 +1,6 @@
-import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link, router, usePage } from '@inertiajs/react';
 import {
+    ArrowRight,
     BarChart3,
     BadgePercent,
     Banknote,
@@ -15,17 +16,16 @@ import {
     Menu,
     MessageSquareText,
     Headphones,
-    Moon,
     Package,
     PanelLeftClose,
     PanelLeftOpen,
     ReceiptText,
     Search,
+    Sparkles,
     ScrollText,
     ShieldCheck,
     ShoppingBag,
     Store,
-    Sun,
     Tags,
     Truck,
     Undo2,
@@ -34,7 +34,7 @@ import {
     Warehouse,
     X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
     Collapsible,
@@ -49,7 +49,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAppearance } from '@/hooks/use-appearance';
 import { logout } from '@/routes';
 import admin from '@/routes/admin';
 import type { AccountPermission } from '@/types/auth';
@@ -244,16 +243,44 @@ export default function AdminLayout({
         ),
     )?.label;
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
+        typeof window === 'undefined'
+            ? false
+            : window.localStorage.getItem('admin-sidebar-collapsed') === 'true',
+    );
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeSearchIndex, setActiveSearchIndex] = useState(0);
+    const searchInputRef = useRef<HTMLInputElement>(null);
     const [openSection, setOpenSection] = useState<string | null>(
         activeSectionLabel ?? 'Overview',
     );
-    const { resolvedAppearance, updateAppearance } = useAppearance();
-    const dark = resolvedAppearance === 'dark';
     const pendingCount = Number(pendingVendorCount ?? 0);
+    const searchableNavigation = permittedNavigationSections.flatMap(
+        (section) =>
+            section.items.map((item) => ({
+                ...item,
+                section: section.label,
+            })),
+    );
+    const searchResults = (() => {
+        const query = searchQuery.trim().toLowerCase();
 
-    const toggleTheme = () => {
-        updateAppearance(dark ? 'light' : 'dark');
+        if (query === '') {
+            return searchableNavigation.slice(0, 8);
+        }
+
+        return searchableNavigation
+            .filter((item) =>
+                `${item.label} ${item.section}`.toLowerCase().includes(query),
+            )
+            .slice(0, 8);
+    })();
+
+    const closeSearch = () => {
+        setSearchOpen(false);
+        setSearchQuery('');
+        setActiveSearchIndex(0);
     };
 
     useEffect(() => {
@@ -263,13 +290,13 @@ export default function AdminLayout({
                 event.key.toLowerCase() === 'k'
             ) {
                 event.preventDefault();
-                document
-                    .querySelector<HTMLInputElement>('input[type="search"]')
-                    ?.focus();
+                setSearchOpen(true);
             }
 
             if (event.key === 'Escape') {
                 setSidebarOpen(false);
+                setSearchOpen(false);
+                setSearchQuery('');
             }
         };
 
@@ -278,9 +305,184 @@ export default function AdminLayout({
         return () => document.removeEventListener('keydown', onKeyDown);
     }, []);
 
+    useEffect(() => {
+        const root = document.documentElement;
+        const restoreDarkTheme = root.classList.contains('dark');
+
+        root.classList.remove('dark');
+
+        return () => {
+            if (restoreDarkTheme) {
+                root.classList.add('dark');
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        window.localStorage.setItem(
+            'admin-sidebar-collapsed',
+            String(sidebarCollapsed),
+        );
+    }, [sidebarCollapsed]);
+
+    useEffect(() => {
+        if (searchOpen) {
+            window.setTimeout(() => searchInputRef.current?.focus(), 0);
+        }
+    }, [searchOpen]);
+
     return (
-        <div className="min-h-screen bg-[#f6f7f9] text-slate-950 lg:flex dark:bg-[#090d14] dark:text-slate-100">
+        <div
+            data-admin-shell
+            className="min-h-screen bg-[#f4f6f8] text-slate-950 lg:flex dark:bg-[#080c13] dark:text-slate-100"
+        >
             <Head title={title} />
+
+            {searchOpen && (
+                <div
+                    className="fixed inset-0 z-[70] flex items-start justify-center bg-slate-950/60 px-4 pt-[12vh] backdrop-blur-sm"
+                    role="presentation"
+                    onMouseDown={(event) => {
+                        if (event.target === event.currentTarget) {
+                            closeSearch();
+                        }
+                    }}
+                >
+                    <section
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Search admin workspace"
+                        className="w-full max-w-2xl overflow-hidden rounded-3xl border border-white/60 bg-white shadow-2xl shadow-slate-950/25 dark:border-white/10 dark:bg-[#111722]"
+                    >
+                        <div className="flex items-center gap-3 border-b border-slate-200 px-5 dark:border-white/8">
+                            <Search className="size-5 shrink-0 text-orange-500" />
+                            <input
+                                ref={searchInputRef}
+                                type="search"
+                                value={searchQuery}
+                                onChange={(event) => {
+                                    setSearchQuery(event.target.value);
+                                    setActiveSearchIndex(0);
+                                }}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'ArrowDown') {
+                                        event.preventDefault();
+                                        setActiveSearchIndex((index) =>
+                                            Math.min(
+                                                index + 1,
+                                                Math.max(
+                                                    searchResults.length - 1,
+                                                    0,
+                                                ),
+                                            ),
+                                        );
+                                    }
+
+                                    if (event.key === 'ArrowUp') {
+                                        event.preventDefault();
+                                        setActiveSearchIndex((index) =>
+                                            Math.max(index - 1, 0),
+                                        );
+                                    }
+
+                                    if (
+                                        event.key === 'Enter' &&
+                                        searchResults[activeSearchIndex]
+                                    ) {
+                                        event.preventDefault();
+                                        router.visit(
+                                            searchResults[activeSearchIndex]
+                                                .href,
+                                        );
+                                        closeSearch();
+                                    }
+                                }}
+                                placeholder="Search pages and operations..."
+                                aria-controls="admin-search-results"
+                                aria-activedescendant={
+                                    searchResults[activeSearchIndex]
+                                        ? `admin-search-result-${activeSearchIndex}`
+                                        : undefined
+                                }
+                                className="h-16 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-slate-400"
+                            />
+                            <button
+                                type="button"
+                                onClick={closeSearch}
+                                className="rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-400 dark:border-white/10"
+                            >
+                                ESC
+                            </button>
+                        </div>
+                        <div className="max-h-[26rem] overflow-y-auto p-2">
+                            <p className="px-3 py-2 text-[10px] font-bold tracking-[0.16em] text-slate-400 uppercase">
+                                {searchQuery
+                                    ? 'Search results'
+                                    : 'Quick access'}
+                            </p>
+                            <div
+                                id="admin-search-results"
+                                role="listbox"
+                                className="grid gap-1"
+                            >
+                                {searchResults.map((item, index) => {
+                                    const Icon = item.icon;
+
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            id={`admin-search-result-${index}`}
+                                            role="option"
+                                            aria-selected={
+                                                activeSearchIndex === index
+                                            }
+                                            href={item.href}
+                                            prefetch
+                                            onClick={closeSearch}
+                                            onMouseEnter={() =>
+                                                setActiveSearchIndex(index)
+                                            }
+                                            className={`group flex items-center gap-3 rounded-2xl px-3 py-3 transition ${activeSearchIndex === index ? 'bg-orange-50 ring-1 ring-orange-100 dark:bg-orange-500/10 dark:ring-orange-500/20' : 'hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                                        >
+                                            <span className="grid size-10 place-items-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-orange-100 group-hover:text-orange-600 dark:bg-white/5 dark:text-slate-400 dark:group-hover:bg-orange-500/10 dark:group-hover:text-orange-300">
+                                                <Icon className="size-[18px]" />
+                                            </span>
+                                            <span className="min-w-0 flex-1">
+                                                <span className="block text-sm font-semibold">
+                                                    {item.label}
+                                                </span>
+                                                <span className="block text-xs text-slate-400">
+                                                    {item.section}
+                                                </span>
+                                            </span>
+                                            <ArrowRight className="size-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-orange-500" />
+                                        </Link>
+                                    );
+                                })}
+                                {searchResults.length === 0 && (
+                                    <div className="px-6 py-12 text-center">
+                                        <Search className="mx-auto size-8 text-slate-300" />
+                                        <p className="mt-3 text-sm font-semibold">
+                                            No matching admin pages
+                                        </p>
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            Try a page name such as orders,
+                                            users, or products.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <footer className="flex items-center justify-between border-t border-slate-100 bg-slate-50/70 px-5 py-3 text-[10px] font-medium text-slate-400 dark:border-white/6 dark:bg-white/[0.025]">
+                            <span>Only permitted destinations are shown</span>
+                            <span className="flex items-center gap-1.5">
+                                <Sparkles className="size-3 text-orange-500" />
+                                Velora command centre
+                            </span>
+                        </footer>
+                    </section>
+                </div>
+            )}
 
             {sidebarOpen && (
                 <button
@@ -510,20 +712,26 @@ export default function AdminLayout({
                             </h1>
                         </div>
 
-                        <label className="relative mx-auto hidden max-w-xl flex-1 md:block">
-                            <span className="sr-only">
-                                Search admin workspace
-                            </span>
+                        <button
+                            type="button"
+                            onClick={() => setSearchOpen(true)}
+                            className="relative mx-auto hidden h-10 max-w-xl flex-1 items-center rounded-xl border border-slate-200 bg-slate-50 pr-14 pl-10 text-left text-sm text-slate-400 transition hover:border-orange-200 hover:bg-white hover:shadow-sm md:flex dark:border-white/8 dark:bg-white/[0.04] dark:hover:border-orange-500/30 dark:hover:bg-white/[0.06]"
+                        >
                             <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" />
-                            <input
-                                type="search"
-                                placeholder="Search vendors, users, categories, brands..."
-                                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-14 pl-10 text-sm text-slate-700 transition outline-none placeholder:text-slate-400 focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-500/10 dark:border-white/8 dark:bg-white/[0.04] dark:text-slate-200 dark:focus:border-orange-500/40 dark:focus:bg-white/[0.06]"
-                            />
+                            Search pages and operations...
                             <span className="pointer-events-none absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 shadow-sm dark:border-white/10 dark:bg-white/5">
                                 <Command className="size-3" />K
                             </span>
-                        </label>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setSearchOpen(true)}
+                            className="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 shadow-sm transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600 md:hidden dark:border-white/10 dark:bg-white/5 dark:hover:border-orange-500/20 dark:hover:bg-orange-500/10 dark:hover:text-orange-300"
+                            aria-label="Search admin workspace"
+                        >
+                            <Search className="size-[18px]" />
+                        </button>
 
                         {grantedPermissions.has('vendors.manage') && (
                             <Link
@@ -539,19 +747,6 @@ export default function AdminLayout({
                                 )}
                             </Link>
                         )}
-
-                        <button
-                            type="button"
-                            onClick={toggleTheme}
-                            className="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:text-white"
-                            aria-label="Toggle color theme"
-                        >
-                            {dark ? (
-                                <Sun className="size-[18px]" />
-                            ) : (
-                                <Moon className="size-[18px]" />
-                            )}
-                        </button>
 
                         <div className="hidden h-8 w-px bg-slate-200 xl:block dark:bg-white/8" />
 
@@ -634,7 +829,7 @@ export default function AdminLayout({
                     </nav>
                 </div>
 
-                <main className="mx-auto w-full max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
+                <main className="relative mx-auto w-full max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
                     {flash?.success && (
                         <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
                             {flash.success}

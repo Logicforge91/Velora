@@ -11,6 +11,15 @@ import {
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import Pagination from '@/components/admin/pagination';
+import {
+    AdminConfirmDialog,
+    AdminEmptyState,
+    AdminFilterBar,
+    AdminPageHeader,
+    AdminPanel,
+    AdminStatusBadge,
+} from '@/components/admin/primitives';
+import StatCards from '@/components/admin/stat-cards';
 import AdminLayout from '@/layouts/admin-layout';
 import productsRoutes from '@/routes/admin/products';
 import type { Counts, Paginated, Product } from '@/types/admin';
@@ -42,6 +51,10 @@ export default function ProductsIndex({
     const [categoryId, setCategoryId] = useState(
         params.get('category_id') ?? '',
     );
+    const [deletingProduct, setDeletingProduct] = useState<Product | null>(
+        null,
+    );
+    const [deleting, setDeleting] = useState(false);
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -84,44 +97,28 @@ export default function ProductsIndex({
             title="Product Operations"
             breadcrumb="Catalogue / Products"
         >
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                <div>
-                    <h2 className="text-xl font-bold">Product catalogue</h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Control listings, pricing, visibility and inventory
-                        health.
-                    </p>
-                </div>
-                <Link
-                    href={productsRoutes.create.url()}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/20"
-                >
-                    <PackagePlus className="size-4" />
-                    Add product
-                </Link>
-            </div>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {cards.map(({ label, value, icon: Icon, tone }) => (
-                    <div
-                        key={label}
-                        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/5"
+            <AdminPageHeader
+                title="Product catalogue"
+                description="Control listings, pricing, visibility and inventory health."
+                action={
+                    <Link
+                        href={productsRoutes.create.url()}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-400"
                     >
-                        <div
-                            className={`grid size-10 place-items-center rounded-xl ${tone}`}
-                        >
-                            <Icon className="size-5" />
-                        </div>
-                        <p className="mt-5 text-2xl font-black">{value}</p>
-                        <p className="mt-1 text-sm text-slate-500">{label}</p>
-                    </div>
-                ))}
+                        <PackagePlus className="size-4" />
+                        Add product
+                    </Link>
+                }
+            />
+
+            <div className="mt-6">
+                <StatCards cards={cards} />
             </div>
 
-            <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
-                <form
+            <AdminPanel className="mt-6">
+                <AdminFilterBar
                     onSubmit={submit}
-                    className="grid gap-3 border-b border-slate-200 p-4 lg:grid-cols-[minmax(15rem,1fr)_11rem_11rem_13rem_auto] dark:border-white/10"
+                    className="lg:grid-cols-[minmax(15rem,1fr)_11rem_11rem_13rem_auto]"
                 >
                     <label className="relative">
                         <Search className="absolute top-3 left-3 size-4 text-slate-400" />
@@ -170,7 +167,7 @@ export default function ProductsIndex({
                     <button className="rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white dark:bg-white dark:text-slate-950">
                         Apply
                     </button>
-                </form>
+                </AdminFilterBar>
 
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-left">
@@ -262,11 +259,9 @@ export default function ProductsIndex({
                                             </span>
                                         </td>
                                         <td className="px-4 py-4">
-                                            <span
-                                                className={`rounded-full px-2.5 py-1 text-xs font-bold capitalize ${product.status === 'active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300'}`}
-                                            >
-                                                {product.status}
-                                            </span>
+                                            <AdminStatusBadge
+                                                value={product.status}
+                                            />
                                         </td>
                                         <td className="px-5 py-4">
                                             <div className="flex justify-end gap-1">
@@ -282,13 +277,8 @@ export default function ProductsIndex({
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        confirm(
-                                                            `Delete ${product.name}?`,
-                                                        ) &&
-                                                        router.delete(
-                                                            productsRoutes.destroy.url(
-                                                                product.id,
-                                                            ),
+                                                        setDeletingProduct(
+                                                            product,
                                                         )
                                                     }
                                                     className="rounded-lg p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10"
@@ -303,11 +293,12 @@ export default function ProductsIndex({
                             })}
                             {products.data.length === 0 && (
                                 <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="px-6 py-14 text-center text-sm text-slate-500"
-                                    >
-                                        No products match these filters.
+                                    <td colSpan={6} className="p-0">
+                                        <AdminEmptyState
+                                            icon={Boxes}
+                                            title="No matching products"
+                                            description="Adjust the catalogue filters or add a new product."
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -315,7 +306,37 @@ export default function ProductsIndex({
                     </table>
                 </div>
                 <Pagination links={products.links} />
-            </section>
+            </AdminPanel>
+
+            <AdminConfirmDialog
+                open={deletingProduct !== null}
+                title="Delete product?"
+                description={`This will permanently remove ${deletingProduct?.name ?? 'this product'} from the catalogue. This action cannot be undone.`}
+                confirmLabel="Delete product"
+                processing={deleting}
+                onOpenChange={(open) => {
+                    if (!open && !deleting) {
+                        setDeletingProduct(null);
+                    }
+                }}
+                onConfirm={() => {
+                    if (!deletingProduct) {
+                        return;
+                    }
+
+                    setDeleting(true);
+                    router.delete(
+                        productsRoutes.destroy.url(deletingProduct.id),
+                        {
+                            preserveScroll: true,
+                            onFinish: () => {
+                                setDeleting(false);
+                                setDeletingProduct(null);
+                            },
+                        },
+                    );
+                }}
+            />
         </AdminLayout>
     );
 }
