@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropIndex(['uses_custom_admin_roles']);
             $table->dropColumn('uses_custom_admin_roles');
         });
     }

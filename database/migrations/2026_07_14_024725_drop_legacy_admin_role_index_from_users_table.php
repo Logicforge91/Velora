@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasColumn('users', 'uses_custom_admin_roles') || ! Schema::hasIndex('users', ['uses_custom_admin_roles'])) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropIndex(['uses_custom_admin_roles']);
         });
     }
 
@@ -21,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasColumn('users', 'uses_custom_admin_roles') || Schema::hasIndex('users', ['uses_custom_admin_roles'])) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->index('uses_custom_admin_roles');
         });
     }
 };
