@@ -11,7 +11,7 @@ class ProductFactory extends Factory
 {
     public function definition(): array
     {
-        $name = fake()->unique()->words(3, true);
+        $name = Str::of(fake()->unique()->sentence(3))->trim('.')->toString();
 
         return [
             'name' => Str::title($name),

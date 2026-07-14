@@ -25,7 +25,7 @@ enum AccountRole: string
     public function permissions(): array
     {
         return match ($this) {
-            self::Admin => AccountPermission::cases(),
+            self::Admin => [],
             self::Vendor => [
                 AccountPermission::AccessVendorDashboard,
                 AccountPermission::ManageOwnCatalogue,
