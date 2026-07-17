@@ -70,6 +70,12 @@ const navigationSections = [
                 icon: BarChart3,
                 permission: 'reports.view',
             },
+            {
+                label: 'Growth Centre',
+                href: admin.growthCentre.url(),
+                icon: Sparkles,
+                permission: 'reports.view',
+            },
         ],
     },
     {
