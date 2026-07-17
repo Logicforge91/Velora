@@ -15,6 +15,7 @@ class DashboardController extends Controller
         return Inertia::render('admin/dashboard', [
             'statistics' => $dashboardService->getStatistics(),
             'recentUsers' => $dashboardService->getRecentUsers(),
+            'adminRoleMix' => $dashboardService->getAdminRoleMix(),
         ]);
     }
 }

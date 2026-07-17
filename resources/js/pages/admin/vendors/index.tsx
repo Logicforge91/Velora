@@ -3,6 +3,13 @@ import { AlertTriangle, Search, ShieldCheck, Store } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import Pagination from '@/components/admin/pagination';
+import {
+    AdminEmptyState,
+    AdminFilterBar,
+    AdminPageHeader,
+    AdminPanel,
+    AdminStatusBadge,
+} from '@/components/admin/primitives';
 import StatCards from '@/components/admin/stat-cards';
 import AdminLayout from '@/layouts/admin-layout';
 import vendorsRoutes from '@/routes/admin/vendors';
@@ -34,15 +41,10 @@ export default function VendorsIndex({
             title="Seller Onboarding"
             breadcrumb="Marketplace / Sellers"
         >
-            <div>
-                <h2 className="text-2xl font-black">
-                    Seller verification center
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                    Review business identity, KYC completeness, risk signals and
-                    activation readiness.
-                </p>
-            </div>
+            <AdminPageHeader
+                title="Seller verification center"
+                description="Review business identity, KYC completeness, risk signals and activation readiness."
+            />
             <div className="mt-6">
                 <StatCards
                     cards={[
@@ -73,10 +75,10 @@ export default function VendorsIndex({
                     ]}
                 />
             </div>
-            <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-white/10 dark:bg-white/5">
-                <form
+            <AdminPanel className="mt-6">
+                <AdminFilterBar
                     onSubmit={submit}
-                    className="grid gap-3 border-b border-slate-200 p-4 md:grid-cols-[1fr_10rem_10rem_10rem_auto] dark:border-white/10"
+                    className="md:grid-cols-[1fr_10rem_10rem_10rem_auto]"
                 >
                     <label className="relative">
                         <Search className="absolute top-3 left-3 size-4 text-slate-400" />
@@ -119,7 +121,7 @@ export default function VendorsIndex({
                     <button className="rounded-xl bg-slate-950 px-5 text-sm font-bold text-white dark:bg-white dark:text-slate-950">
                         Apply
                     </button>
-                </form>
+                </AdminFilterBar>
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-left">
                         <thead className="bg-slate-50 text-xs text-slate-500 uppercase dark:bg-white/5">
@@ -147,7 +149,9 @@ export default function VendorsIndex({
                                         </p>
                                     </td>
                                     <td className="px-5 py-4">
-                                        <Badge value={vendor.status} />
+                                        <AdminStatusBadge
+                                            value={vendor.status}
+                                        />
                                     </td>
                                     <td className="px-5 py-4">
                                         <p className="text-sm font-bold capitalize">
@@ -186,12 +190,12 @@ export default function VendorsIndex({
                             ))}
                             {vendors.data.length === 0 && (
                                 <tr>
-                                    <td
-                                        colSpan={5}
-                                        className="p-14 text-center text-sm text-slate-500"
-                                    >
-                                        No seller applications match these
-                                        filters.
+                                    <td colSpan={5} className="p-0">
+                                        <AdminEmptyState
+                                            icon={Store}
+                                            title="No matching sellers"
+                                            description="Adjust the verification filters to find another seller application."
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -199,7 +203,7 @@ export default function VendorsIndex({
                     </table>
                 </div>
                 <Pagination links={vendors.links} />
-            </section>
+            </AdminPanel>
         </AdminLayout>
     );
 }
@@ -228,12 +232,5 @@ function Select({
                 </option>
             ))}
         </select>
-    );
-}
-function Badge({ value }: { value: string }) {
-    return (
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase dark:bg-white/10">
-            {value}
-        </span>
     );
 }
