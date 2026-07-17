@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\AccountPermission;
+use App\Enums\AccountRole;
 use App\Models\AdminRole;
 use App\Models\User;
 use Database\Seeders\AdminRoleSeeder;
@@ -89,7 +90,7 @@ test('customers cannot inherit admin access from an attached admin role', functi
     $customer->adminRoles()->attach($adminRole);
     $customer->refresh();
 
-    expect($customer->permissions())->toBeEmpty()
+    expect($customer->permissions())->toBe(AccountRole::Customer->permissions())
         ->and($customer->hasPermission(AccountPermission::AccessAdminDashboard))->toBeFalse()
         ->and($customer->hasPermission(AccountPermission::ManageRoles))->toBeFalse();
 
