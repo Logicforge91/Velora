@@ -25,15 +25,40 @@ use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\VendorKycDocumentController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\WarehouseInventoryController;
+use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 
+Route::controller(StorefrontController::class)
+    ->name('storefront.')
+    ->group(function (): void {
+        Route::get('shop', 'catalog')->name('catalog');
+        Route::get('products/{product}', 'product')->name('product');
+        Route::get('wishlist', 'wishlist')->name('wishlist');
+        Route::get('cart', 'cart')->name('cart');
+        Route::get('checkout', 'checkout')->name('checkout');
+    });
+
+Route::middleware('guest')
+    ->get('admin/login', AdminLoginController::class)
+    ->name('admin.login');
+
 Route::middleware('auth')
     ->get('/dashboard', DashboardController::class)
     ->name('dashboard');
+
+Route::prefix('account')
+    ->name('customer.')
+    ->middleware('auth')
+    ->group(function (): void {
+        Route::get('profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+    });
 
 Route::prefix('admin')
     ->name('admin.')
