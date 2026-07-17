@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
@@ -7,7 +8,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to login from the admin dashboard', function () {
     $this->get(route('admin.dashboard'))
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('admin.login'));
 });
 
 test('admins can access the admin dashboard', function () {
@@ -53,7 +54,7 @@ test('inactive admins cannot access the dashboard', function () {
 
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('admin.login'));
 
     $this->assertGuest();
 });
@@ -74,11 +75,35 @@ test('customers can access the standard dashboard', function () {
         'status' => true,
     ]);
 
+    $order = Order::query()->create([
+        'user_id' => $customer->id,
+        'number' => 'VEL-CUS-1001',
+        'status' => Order::STATUS_SHIPPED,
+        'shipping_address' => ['city' => 'Bengaluru'],
+        'subtotal' => 2499,
+        'total' => 2499,
+        'placed_at' => now(),
+    ]);
+
+    $order->items()->create([
+        'product_name' => 'Studio Wireless Headphones',
+        'sku' => 'STUDIO-01',
+        'unit_price' => 2499,
+        'quantity' => 1,
+        'total' => 2499,
+    ]);
+
     $this->actingAs($customer)
         ->get(route('dashboard'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('dashboard')
             ->has('pendingInvitations')
+            ->where('orderSummary.total', 1)
+            ->where('orderSummary.active', 1)
+            ->where('orderSummary.delivered', 0)
+            ->has('recentOrders', 1)
+            ->where('recentOrders.0.number', 'VEL-CUS-1001')
+            ->where('recentOrders.0.itemPreview', 'Studio Wireless Headphones')
         );
 });
