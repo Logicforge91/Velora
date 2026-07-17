@@ -15,7 +15,8 @@ import {
     categories,
     scrollToStorefrontSection,
 } from '@/components/storefront/catalog';
-import { dashboard, home, login } from '@/routes';
+import CustomerAccountMenu from '@/components/storefront/customer-account-menu';
+import { home, login } from '@/routes';
 import { cart, catalog, wishlist } from '@/routes/storefront';
 
 type Props = {
@@ -103,14 +104,16 @@ export default function SiteHeader({
                                 2
                             </span>
                         </Link>
-                        <Link
-                            href={
-                                isAuthenticated ? dashboard.url() : login.url()
-                            }
-                            className="ml-1 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-950/15 transition hover:bg-orange-500 dark:bg-orange-500"
-                        >
-                            {isAuthenticated ? 'Dashboard' : 'Sign in'}
-                        </Link>
+                        {isAuthenticated ? (
+                            <CustomerAccountMenu />
+                        ) : (
+                            <Link
+                                href={login.url()}
+                                className="ml-1 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-950/15 transition hover:bg-orange-500 dark:bg-orange-500"
+                            >
+                                Sign in
+                            </Link>
+                        )}
                     </nav>
                     <button
                         type="button"
@@ -182,16 +185,16 @@ export default function SiteHeader({
                                 <ShoppingCart className="size-4" /> Cart
                             </Link>
                         </div>
-                        <Link
-                            href={
-                                isAuthenticated ? dashboard.url() : login.url()
-                            }
-                            className="mt-4 flex justify-center rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white"
-                        >
-                            {isAuthenticated
-                                ? 'Open dashboard'
-                                : 'Sign in to Velora'}
-                        </Link>
+                        {isAuthenticated ? (
+                            <CustomerAccountMenu mobile />
+                        ) : (
+                            <Link
+                                href={login.url()}
+                                className="mt-4 flex justify-center rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white"
+                            >
+                                Sign in to Velora
+                            </Link>
+                        )}
                     </div>
                 )}
             </header>

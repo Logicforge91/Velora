@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
 
-test('public registration is disabled and users are provisioned through admin routes', function () {
-    expect(Features::enabled(Features::registration()))->toBeFalse()
-        ->and(Route::has('register'))->toBeFalse()
-        ->and(Route::has('register.store'))->toBeFalse()
+test('public customer registration and admin user provisioning are available', function () {
+    expect(Features::enabled(Features::registration()))->toBeTrue()
+        ->and(Route::has('register'))->toBeTrue()
+        ->and(Route::has('register.store'))->toBeTrue()
         ->and(Route::has('admin.users.create'))->toBeTrue()
         ->and(Route::has('admin.users.store'))->toBeTrue();
 });

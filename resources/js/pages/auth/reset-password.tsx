@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { Check, LockKeyhole, Mail } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
@@ -24,64 +25,78 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                 resetOnSuccess={['password', 'password_confirmation']}
             >
                 {({ processing, errors }) => (
-                    <div className="grid gap-6">
+                    <div className="grid gap-5">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                name="email"
-                                autoComplete="email"
-                                value={email}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
+                            <Label htmlFor="email" className="font-bold">
+                                Account email
+                            </Label>
+                            <div className="relative">
+                                <Mail className="pointer-events-none absolute top-1/2 left-4 z-10 size-4 -translate-y-1/2 text-slate-400" />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    autoComplete="email"
+                                    value={email}
+                                    className="h-12 rounded-xl border-slate-200 bg-slate-100/80 pl-11 text-slate-500 dark:border-white/10 dark:bg-white/5"
+                                    readOnly
+                                />
+                            </div>
+                            <InputError message={errors.email} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <PasswordInput
-                                id="password"
-                                name="password"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                autoFocus
-                                placeholder="Password"
-                                passwordrules={passwordRules}
-                            />
+                            <Label htmlFor="password" className="font-bold">
+                                New password
+                            </Label>
+                            <div className="relative">
+                                <LockKeyhole className="pointer-events-none absolute top-1/2 left-4 z-10 size-4 -translate-y-1/2 text-slate-400" />
+                                <PasswordInput
+                                    id="password"
+                                    name="password"
+                                    required
+                                    autoComplete="new-password"
+                                    autoFocus
+                                    placeholder="Create a new password"
+                                    passwordrules={passwordRules}
+                                    className="h-12 rounded-xl border-slate-200 bg-slate-50/70 pl-11 dark:border-white/10 dark:bg-white/5"
+                                />
+                            </div>
                             <InputError message={errors.password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
+                            <Label
+                                htmlFor="password_confirmation"
+                                className="font-bold"
+                            >
+                                Confirm new password
                             </Label>
-                            <PasswordInput
-                                id="password_confirmation"
-                                name="password_confirmation"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                placeholder="Confirm password"
-                                passwordrules={passwordRules}
-                            />
+                            <div className="relative">
+                                <Check className="pointer-events-none absolute top-1/2 left-4 z-10 size-4 -translate-y-1/2 text-slate-400" />
+                                <PasswordInput
+                                    id="password_confirmation"
+                                    name="password_confirmation"
+                                    required
+                                    autoComplete="new-password"
+                                    placeholder="Repeat your new password"
+                                    passwordrules={passwordRules}
+                                    className="h-12 rounded-xl border-slate-200 bg-slate-50/70 pl-11 dark:border-white/10 dark:bg-white/5"
+                                />
+                            </div>
                             <InputError
                                 message={errors.password_confirmation}
-                                className="mt-2"
                             />
                         </div>
 
                         <Button
                             type="submit"
-                            className="mt-4 w-full"
                             disabled={processing}
                             data-test="reset-password-button"
+                            className="mt-1 h-12 w-full rounded-xl bg-slate-950 font-black text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
                         >
                             {processing && <Spinner />}
-                            Reset password
+                            Set new password
                         </Button>
                     </div>
                 )}
@@ -91,6 +106,7 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
 }
 
 ResetPassword.layout = {
-    title: 'Reset password',
-    description: 'Please enter your new password below',
+    title: 'Choose a new password',
+    description:
+        'Create a strong new password to secure your shopping account.',
 };

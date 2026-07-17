@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\VendorKycDocumentController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\WarehouseInventoryController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\Teams\TeamInvitationController;
@@ -50,6 +51,14 @@ Route::middleware('guest')
 Route::middleware('auth')
     ->get('/dashboard', DashboardController::class)
     ->name('dashboard');
+
+Route::prefix('account')
+    ->name('customer.')
+    ->middleware('auth')
+    ->group(function (): void {
+        Route::get('profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+    });
 
 Route::prefix('admin')
     ->name('admin.')
