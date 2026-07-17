@@ -5,7 +5,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
-import { edit as editProfile } from '@/routes/profile';
+import { edit as editProfile } from '@/routes/customer/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { User } from '@/types';
 

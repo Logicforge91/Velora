@@ -73,7 +73,7 @@ export default function CustomerProfile({ joinedAt }: { joinedAt: string }) {
                         </p>
                         <nav className="mt-3 grid gap-1">
                             <AccountLink
-                                href={dashboard.url()}
+                                href={`${dashboard.url()}#orders`}
                                 icon={ClipboardList}
                                 label="My orders"
                             />
