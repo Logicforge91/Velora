@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AccountRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
@@ -31,7 +32,8 @@ class UserController extends Controller
     public function create(): Response
     {
         return Inertia::render('admin/users/form', [
-            'managedUser' => new User(['status' => true, 'role' => 'admin']),
+            'managedUser' => new User(['status' => true, 'role' => AccountRole::Customer->value]),
+            'roles' => $this->userService->getRoles(),
             'adminRoles' => $this->userService->getAdminRoles(),
         ]);
     }
@@ -67,6 +69,7 @@ class UserController extends Controller
     {
         return Inertia::render('admin/users/form', [
             'managedUser' => $user->load('adminRoles:id,name,slug'),
+            'roles' => $this->userService->getRoles(),
             'adminRoles' => $this->userService->getAdminRoles(),
         ]);
     }

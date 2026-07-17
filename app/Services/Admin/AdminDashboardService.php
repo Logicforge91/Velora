@@ -2,9 +2,12 @@
 
 namespace App\Services\Admin;
 
+use App\Models\AdminRole;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Vendor;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class AdminDashboardService
@@ -15,8 +18,7 @@ class AdminDashboardService
      *     total_admins: int,
      *     total_vendors: int,
      *     total_customers: int,
-     *     total_delivery_agents: int,
-     *     total_support_agents: int,
+     *     pending_vendors: int,
      *     active_users: int,
      *     inactive_users: int,
      *     new_users_30_days: int,
@@ -34,19 +36,13 @@ class AdminDashboardService
             ->selectRaw(
                 'COUNT(*) as total_users,
                 SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as total_admins,
-                SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as total_vendors,
                 SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as total_customers,
-                SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as total_delivery_agents,
-                SUM(CASE WHEN role = ? THEN 1 ELSE 0 END) as total_support_agents,
                 SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as active_users,
                 SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as inactive_users,
                 SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_users_30_days',
                 [
                     User::ROLE_ADMIN,
-                    User::ROLE_VENDOR,
                     User::ROLE_CUSTOMER,
-                    User::ROLE_DELIVERY_AGENT,
-                    User::ROLE_SUPPORT_AGENT,
                     true,
                     false,
                     now()->subDays(30),
@@ -57,6 +53,11 @@ class AdminDashboardService
 
         $totalUsers = (int) $statistics->total_users;
         $activeUsers = (int) $statistics->active_users;
+        $vendorStatistics = Vendor::query()
+            ->selectRaw('COUNT(*) as total_vendors')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_vendors', [Vendor::STATUS_PENDING])
+            ->toBase()
+            ->firstOrFail();
         $productStatistics = Product::query()
             ->selectRaw('COUNT(*) as total_products')
             ->selectRaw('SUM(CASE WHEN stock <= low_stock_threshold THEN 1 ELSE 0 END) as low_stock_products')
@@ -72,10 +73,9 @@ class AdminDashboardService
         return [
             'total_users' => $totalUsers,
             'total_admins' => (int) $statistics->total_admins,
-            'total_vendors' => (int) $statistics->total_vendors,
+            'total_vendors' => (int) $vendorStatistics->total_vendors,
             'total_customers' => (int) $statistics->total_customers,
-            'total_delivery_agents' => (int) $statistics->total_delivery_agents,
-            'total_support_agents' => (int) $statistics->total_support_agents,
+            'pending_vendors' => (int) $vendorStatistics->pending_vendors,
             'active_users' => $activeUsers,
             'inactive_users' => (int) $statistics->inactive_users,
             'new_users_30_days' => (int) $statistics->new_users_30_days,
@@ -100,8 +100,28 @@ class AdminDashboardService
                 'status',
                 'created_at',
             ])
+            ->with('adminRoles:id,name')
             ->latest()
             ->limit($limit)
             ->get();
+    }
+
+    /** @return list<array{name: string, administrators_count: int}> */
+    public function getAdminRoleMix(): array
+    {
+        return AdminRole::query()
+            ->select(['id', 'name'])
+            ->withCount([
+                'users as administrators_count' => fn (Builder $query): Builder => $query
+                    ->where('role', User::ROLE_ADMIN),
+            ])
+            ->orderByDesc('administrators_count')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (AdminRole $role): array => [
+                'name' => $role->name,
+                'administrators_count' => (int) $role->administrators_count,
+            ])
+            ->all();
     }
 }

@@ -132,8 +132,35 @@ export default function AdminRolesIndex({
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-5 py-4 text-sm font-semibold">
-                                        {role.users_count ?? 0}
+                                    <td className="px-5 py-4">
+                                        {role.users?.length ? (
+                                            <div className="flex max-w-sm flex-wrap gap-1.5">
+                                                {role.users
+                                                    .slice(0, 3)
+                                                    .map((administrator) => (
+                                                        <span
+                                                            key={
+                                                                administrator.id
+                                                            }
+                                                            title={
+                                                                administrator.email
+                                                            }
+                                                            className="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300"
+                                                        >
+                                                            {administrator.name}
+                                                        </span>
+                                                    ))}
+                                                {role.users.length > 3 && (
+                                                    <span className="px-1 py-1 text-xs font-semibold text-slate-400">
+                                                        +{role.users.length - 3}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <span className="text-xs font-medium text-slate-400">
+                                                No administrators assigned
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex justify-end gap-2">

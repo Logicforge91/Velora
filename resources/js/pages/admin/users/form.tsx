@@ -10,20 +10,36 @@ import {
 import type { FormEvent } from 'react';
 import AdminLayout from '@/layouts/admin-layout';
 import usersRoutes from '@/routes/admin/users';
-import type { AdminRoleOption, ManagedUser } from '@/types/admin';
+import type {
+    AccountRoleOption,
+    AdminRoleOption,
+    ManagedUser,
+} from '@/types/admin';
+
+type UserFormData = {
+    name: string;
+    email: string;
+    role: string;
+    admin_role_id: number | null;
+    status: boolean;
+    password: string;
+    password_confirmation: string;
+};
 
 export default function UserForm({
     managedUser,
+    roles,
     adminRoles,
 }: {
     managedUser: Partial<ManagedUser>;
+    roles: AccountRoleOption[];
     adminRoles: AdminRoleOption[];
 }) {
     const exists = Boolean(managedUser.id);
-    const form = useForm({
+    const form = useForm<UserFormData>({
         name: managedUser.name ?? '',
         email: managedUser.email ?? '',
-        role: 'admin',
+        role: managedUser.role ?? 'customer',
         admin_role_id:
             managedUser.admin_roles?.[0]?.id ?? adminRoles[0]?.id ?? null,
         status: managedUser.status ?? true,
@@ -47,6 +63,17 @@ export default function UserForm({
 
     const inputClass =
         'mt-2 h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-500/10 dark:border-white/10 dark:bg-white/[0.04] dark:focus:border-orange-500/40';
+    const accessValue =
+        form.data.role === 'admin'
+            ? `admin:${form.data.admin_role_id ?? ''}`
+            : form.data.role;
+    const selectableAccountRoles = roles.filter(
+        (role) =>
+            role.value === 'customer' ||
+            (exists &&
+                managedUser.role !== 'admin' &&
+                role.value === managedUser.role),
+    );
 
     return (
         <AdminLayout
@@ -126,29 +153,58 @@ export default function UserForm({
                         <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                             <span className="flex items-center gap-2">
                                 <Shield className="size-4 text-slate-400" />
-                                Role
+                                Account type & access role
                             </span>
                             <select
-                                value={form.data.admin_role_id ?? ''}
-                                onChange={(event) =>
-                                    form.setData(
-                                        'admin_role_id',
-                                        Number(event.target.value),
-                                    )
-                                }
+                                value={accessValue}
+                                onChange={(event) => {
+                                    const selectedAccess = event.target.value;
+                                    const isAdministrator =
+                                        selectedAccess.startsWith('admin:');
+
+                                    form.setData((data) => ({
+                                        ...data,
+                                        role: isAdministrator
+                                            ? 'admin'
+                                            : selectedAccess,
+                                        admin_role_id: isAdministrator
+                                            ? Number(
+                                                  selectedAccess.replace(
+                                                      'admin:',
+                                                      '',
+                                                  ),
+                                              )
+                                            : null,
+                                    }));
+                                }}
                                 className={`${inputClass} dark:bg-[#101722]`}
                                 required
                             >
-                                {adminRoles.length === 0 && (
-                                    <option value="" disabled>
-                                        Create an admin role first
-                                    </option>
-                                )}
-                                {adminRoles.map((role) => (
-                                    <option key={role.id} value={role.id}>
-                                        {role.name}
-                                    </option>
-                                ))}
+                                <optgroup label="Customer access">
+                                    {selectableAccountRoles.map((role) => (
+                                        <option
+                                            key={role.value}
+                                            value={role.value}
+                                        >
+                                            {role.label}
+                                        </option>
+                                    ))}
+                                </optgroup>
+                                <optgroup label="Administrator roles">
+                                    {adminRoles.length === 0 && (
+                                        <option value="admin:" disabled>
+                                            Create an admin role first
+                                        </option>
+                                    )}
+                                    {adminRoles.map((role) => (
+                                        <option
+                                            key={role.id}
+                                            value={`admin:${role.id}`}
+                                        >
+                                            Administrator — {role.name}
+                                        </option>
+                                    ))}
+                                </optgroup>
                             </select>
                             {form.errors.role && (
                                 <span className="mt-1.5 block text-xs font-medium text-rose-600">
@@ -161,8 +217,9 @@ export default function UserForm({
                                 </span>
                             )}
                             <span className="mt-1.5 block text-xs font-normal text-slate-500">
-                                Administrator options are managed from the Admin
-                                Roles menu.
+                                Customer is the only standard account option.
+                                All administrator options are synchronized with
+                                the Admin Roles menu.
                             </span>
                         </label>
                         <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -260,7 +317,9 @@ export default function UserForm({
                         <button
                             type="submit"
                             disabled={
-                                form.processing || adminRoles.length === 0
+                                form.processing ||
+                                (form.data.role === 'admin' &&
+                                    adminRoles.length === 0)
                             }
                             className="inline-flex h-11 items-center justify-center rounded-xl bg-orange-500 px-6 text-sm font-semibold text-white shadow-sm shadow-orange-500/20 transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
                         >
