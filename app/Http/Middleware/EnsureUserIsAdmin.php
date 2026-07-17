@@ -16,7 +16,7 @@ class EnsureUserIsAdmin
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login');
+            return redirect()->route('admin.login');
         }
 
         if (! $user->hasPermission(AccountPermission::AccessAdminDashboard)) {
@@ -30,7 +30,7 @@ class EnsureUserIsAdmin
             $request->session()->regenerateToken();
 
             return redirect()
-                ->route('login')
+                ->route('admin.login')
                 ->withErrors([
                     'email' => 'Your account has been disabled.',
                 ]);

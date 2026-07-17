@@ -25,11 +25,16 @@ use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\VendorKycDocumentController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\WarehouseInventoryController;
+use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::middleware('guest')
+    ->get('admin/login', AdminLoginController::class)
+    ->name('admin.login');
 
 Route::middleware('auth')
     ->get('/dashboard', DashboardController::class)
