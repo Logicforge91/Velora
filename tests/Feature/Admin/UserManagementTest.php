@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AccountPermission;
 use App\Enums\AccountRole;
 use App\Models\AdminRole;
 use App\Models\User;
@@ -36,7 +37,8 @@ test('administrator role dropdown matches roles configured in admin roles', func
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/users/form')
-            ->missing('roles')
+            ->has('roles', count(AccountRole::cases()))
+            ->where('managedUser.role', AccountRole::Customer->value)
             ->where('adminRoles', fn ($roles) => collect($roles)->contains(fn ($role) => $role['id'] === $operationsRole->id && $role['name'] === 'Marketplace Operations'))
         );
 
@@ -62,6 +64,27 @@ test('administrator role dropdown matches roles configured in admin roles', func
             ->has('users.data', 1)
             ->where('users.data.0.admin_roles.0.name', 'Marketplace Operations')
         );
+});
+
+test('administrators can create customers without admin roles or permissions', function () {
+    $admin = User::factory()->admin()->create();
+
+    $response = $this->actingAs($admin)->post(route('admin.users.store'), [
+        'name' => 'Customer Account',
+        'email' => 'customer@example.com',
+        'role' => AccountRole::Customer->value,
+        'admin_role_id' => null,
+        'status' => true,
+        'password' => 'correct-horse-battery-staple',
+        'password_confirmation' => 'correct-horse-battery-staple',
+    ]);
+
+    $customer = User::query()->where('email', 'customer@example.com')->firstOrFail();
+
+    $response->assertRedirect(route('admin.users.show', $customer));
+    expect($customer->isCustomer())->toBeTrue()
+        ->and($customer->adminRoles)->toBeEmpty()
+        ->and($customer->hasPermission(AccountPermission::AccessAdminDashboard))->toBeFalse();
 });
 
 test('administrators can create users and creation is recorded', function () {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\AccountPermission;
+use App\Enums\AccountRole;
 use App\Models\AdminRole;
 use App\Models\User;
 use Database\Seeders\AdminRoleSeeder;
@@ -20,7 +21,9 @@ test('legacy administrators are mapped to the new super administrator role', fun
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/admin-roles/index')
-            ->has('roles.data')
+            ->where('roles.data', fn ($roles) => collect($roles)->contains(
+                fn ($role) => collect($role['users'])->contains('id', $admin->id)
+            ))
             ->where('counts.assigned_admins', 1)
             ->where('counts.unassigned_admins', 0)
         );
@@ -73,6 +76,31 @@ test('assigned permissions are shared with the admin interface', function () {
                 AccountPermission::ViewReports->value,
             ])
         );
+});
+
+test('customers cannot inherit admin access from an attached admin role', function () {
+    $customer = User::factory()->customer()->create();
+    $adminRole = AdminRole::factory()->create([
+        'permissions' => [
+            AccountPermission::AccessAdminDashboard->value,
+            AccountPermission::ManageRoles->value,
+        ],
+    ]);
+
+    $customer->adminRoles()->attach($adminRole);
+    $customer->refresh();
+
+    expect($customer->permissions())->toBe(AccountRole::Customer->permissions())
+        ->and($customer->hasPermission(AccountPermission::AccessAdminDashboard))->toBeFalse()
+        ->and($customer->hasPermission(AccountPermission::ManageRoles))->toBeFalse();
+
+    $this->actingAs($customer)
+        ->get(route('admin.dashboard'))
+        ->assertForbidden();
+
+    $this->actingAs($customer)
+        ->get(route('admin.admin-roles.index'))
+        ->assertForbidden();
 });
 
 test('administrators cannot change their own role assignment', function () {

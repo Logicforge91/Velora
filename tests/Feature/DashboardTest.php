@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Product;
 use App\Models\User;
+use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to login from the admin dashboard', function () {
@@ -14,14 +16,22 @@ test('admins can access the admin dashboard', function () {
     $admin = User::factory()->admin()->create([
         'status' => true,
     ]);
+    Vendor::factory()->create(['status' => Vendor::STATUS_PENDING]);
+    Product::factory()->lowStock()->create();
 
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/dashboard')
-            ->has('statistics')
+            ->where('statistics.total_vendors', 1)
+            ->where('statistics.pending_vendors', 1)
+            ->where('statistics.low_stock_products', 1)
             ->has('recentUsers')
+            ->where('adminRoleMix', fn ($roles) => collect($roles)->contains(
+                fn ($role) => $role['name'] === 'Super Administrator'
+                    && $role['administrators_count'] === 1
+            ))
         );
 });
 

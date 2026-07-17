@@ -1,8 +1,23 @@
 import { Link, router } from '@inertiajs/react';
-import { Banknote, Clock3, PackageCheck, Search, Truck } from 'lucide-react';
+import {
+    Banknote,
+    Clock3,
+    PackageCheck,
+    Search,
+    ShoppingBag,
+    Truck,
+} from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import Pagination from '@/components/admin/pagination';
+import {
+    AdminEmptyState,
+    AdminFilterBar,
+    AdminPageHeader,
+    AdminPanel,
+    AdminStatusBadge,
+} from '@/components/admin/primitives';
+import StatCards from '@/components/admin/stat-cards';
 import AdminLayout from '@/layouts/admin-layout';
 import ordersRoutes from '@/routes/admin/orders';
 import type { Counts, Order, Paginated } from '@/types/admin';
@@ -57,32 +72,17 @@ export default function OrdersIndex({ orders, counts, statuses }: Props) {
 
     return (
         <AdminLayout title="Order Operations" breadcrumb="Orders / All orders">
-            <div>
-                <h2 className="text-xl font-bold">Order control centre</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                    Track fulfilment, payments and customer commitments.
-                </p>
+            <AdminPageHeader
+                title="Order control centre"
+                description="Track fulfilment, payments and customer commitments."
+            />
+            <div className="mt-6">
+                <StatCards cards={cards} />
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {cards.map(({ label, value, icon: Icon, tone }) => (
-                    <div
-                        key={label}
-                        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/5"
-                    >
-                        <div
-                            className={`grid size-10 place-items-center rounded-xl ${tone}`}
-                        >
-                            <Icon className="size-5" />
-                        </div>
-                        <p className="mt-5 text-2xl font-black">{value}</p>
-                        <p className="mt-1 text-sm text-slate-500">{label}</p>
-                    </div>
-                ))}
-            </div>
-            <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
-                <form
+            <AdminPanel className="mt-6">
+                <AdminFilterBar
                     onSubmit={submit}
-                    className="grid gap-3 border-b border-slate-200 p-4 md:grid-cols-[minmax(15rem,1fr)_13rem_13rem_auto] dark:border-white/10"
+                    className="md:grid-cols-[minmax(15rem,1fr)_13rem_13rem_auto]"
                 >
                     <label className="relative">
                         <Search className="absolute top-3 left-3 size-4 text-slate-400" />
@@ -125,7 +125,7 @@ export default function OrdersIndex({ orders, counts, statuses }: Props) {
                     <button className="rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white dark:bg-white dark:text-slate-950">
                         Apply
                     </button>
-                </form>
+                </AdminFilterBar>
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-left">
                         <thead className="bg-slate-50 text-[11px] tracking-wider text-slate-500 uppercase dark:bg-white/5">
@@ -174,20 +174,25 @@ export default function OrdersIndex({ orders, counts, statuses }: Props) {
                                         {money.format(Number(order.total))}
                                     </td>
                                     <td className="px-4 py-4">
-                                        <Badge value={order.payment_status} />
+                                        <AdminStatusBadge
+                                            value={order.payment_status}
+                                        />
                                     </td>
                                     <td className="px-5 py-4">
-                                        <Badge value={order.status} />
+                                        <AdminStatusBadge
+                                            value={order.status}
+                                        />
                                     </td>
                                 </tr>
                             ))}
                             {orders.data.length === 0 && (
                                 <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="px-6 py-14 text-center text-sm text-slate-500"
-                                    >
-                                        No orders match these filters.
+                                    <td colSpan={6} className="p-0">
+                                        <AdminEmptyState
+                                            icon={ShoppingBag}
+                                            title="No matching orders"
+                                            description="Try changing the order, payment, or search filters."
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -195,26 +200,7 @@ export default function OrdersIndex({ orders, counts, statuses }: Props) {
                     </table>
                 </div>
                 <Pagination links={orders.links} />
-            </section>
+            </AdminPanel>
         </AdminLayout>
-    );
-}
-
-function Badge({ value }: { value: string }) {
-    const tone =
-        value === 'paid' || value === 'delivered'
-            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
-            : value === 'failed' || value === 'cancelled'
-              ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
-              : value === 'shipped'
-                ? 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300'
-                : 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300';
-
-    return (
-        <span
-            className={`rounded-full px-2.5 py-1 text-xs font-bold capitalize ${tone}`}
-        >
-            {value}
-        </span>
     );
 }

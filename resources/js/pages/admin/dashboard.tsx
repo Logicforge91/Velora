@@ -22,8 +22,7 @@ type Statistics = {
     total_admins: number;
     total_vendors: number;
     total_customers: number;
-    total_delivery_agents: number;
-    total_support_agents: number;
+    pending_vendors: number;
     active_users: number;
     inactive_users: number;
     new_users_30_days: number;
@@ -42,20 +41,23 @@ type RecentUser = {
     role: string;
     status: boolean;
     created_at: string;
+    admin_roles?: { id: number; name: string }[];
 };
 
 type DashboardProps = {
     statistics: Statistics;
     recentUsers: RecentUser[];
+    adminRoleMix: { name: string; administrators_count: number }[];
 };
 
-const roleStyles = {
-    Customers: 'bg-orange-500',
-    Vendors: 'bg-violet-500',
-    'Delivery agents': 'bg-sky-500',
-    'Support agents': 'bg-emerald-500',
-    Administrators: 'bg-slate-700 dark:bg-slate-300',
-};
+const accessMixStyles = [
+    'bg-orange-500',
+    'bg-violet-500',
+    'bg-sky-500',
+    'bg-emerald-500',
+    'bg-rose-500',
+    'bg-amber-500',
+];
 
 const roleBadgeStyles: Record<string, string> = {
     admin: 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300',
@@ -70,6 +72,7 @@ const roleBadgeStyles: Record<string, string> = {
 export default function AdminDashboard({
     statistics,
     recentUsers,
+    adminRoleMix,
 }: DashboardProps) {
     const money = new Intl.NumberFormat('en-IN', {
         style: 'currency',
@@ -114,14 +117,27 @@ export default function AdminDashboard({
             trendStyle: 'text-rose-600 dark:text-rose-400',
         },
     ];
-    const roleMix = [
-        ['Customers', statistics.total_customers],
-        ['Vendors', statistics.total_vendors],
-        ['Delivery agents', statistics.total_delivery_agents],
-        ['Support agents', statistics.total_support_agents],
-        ['Administrators', statistics.total_admins],
-    ] as const;
-    const largestRole = Math.max(...roleMix.map(([, value]) => value), 1);
+    const assignedAdministrators = adminRoleMix.reduce(
+        (total, role) => total + role.administrators_count,
+        0,
+    );
+    const accessMix = [
+        { name: 'Customers', count: statistics.total_customers },
+        ...adminRoleMix.map((role) => ({
+            name: role.name,
+            count: role.administrators_count,
+        })),
+        ...(statistics.total_admins > assignedAdministrators
+            ? [
+                  {
+                      name: 'Unassigned administrators',
+                      count: statistics.total_admins - assignedAdministrators,
+                  },
+              ]
+            : []),
+    ];
+    const accessMixTotal = statistics.total_customers + statistics.total_admins;
+    const largestRole = Math.max(...accessMix.map(({ count }) => count), 1);
     const newUserRate = Math.round(
         (statistics.new_users_30_days /
             Math.max(
@@ -130,30 +146,43 @@ export default function AdminDashboard({
             )) *
             100,
     );
+    const operationalPulse = [
+        {
+            label: 'Orders awaiting review',
+            value: statistics.pending_orders,
+        },
+        {
+            label: 'Low-stock products',
+            value: statistics.low_stock_products,
+        },
+        {
+            label: 'Vendor applications',
+            value: statistics.pending_vendors,
+        },
+    ];
 
     return (
         <AdminLayout title="Commerce Overview" breadcrumb="Dashboard">
-            <section className="relative overflow-hidden rounded-[1.75rem] bg-[#111827] text-white shadow-xl shadow-slate-900/10 dark:border dark:border-white/8 dark:bg-[#111722]">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(249,115,22,0.24),transparent_28%),radial-gradient(circle_at_68%_110%,rgba(139,92,246,0.2),transparent_32%)]" />
+            <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-commerce-navy text-white shadow-[0_24px_60px_rgb(15_23_42/0.16)] ring-1 ring-slate-950/5">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(249,115,22,0.26),transparent_28%),radial-gradient(circle_at_68%_110%,rgba(216,177,89,0.18),transparent_34%)]" />
                 <div className="pointer-events-none absolute -top-20 right-[14%] size-56 rounded-full border border-white/5" />
                 <div className="pointer-events-none absolute -top-9 right-[9%] size-56 rounded-full border border-white/5" />
                 <div className="relative grid lg:grid-cols-[minmax(0,1fr)_22rem]">
                     <div className="px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
                         <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[10px] font-semibold tracking-[0.14em] text-orange-200 uppercase backdrop-blur-sm">
                             <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.1)]" />
-                            Live commerce intelligence
+                            Live retail intelligence
                         </div>
                         <h2 className="mt-5 max-w-2xl text-3xl font-semibold tracking-[-0.035em] sm:text-4xl lg:text-[2.65rem] lg:leading-[1.1]">
-                            Your marketplace,
+                            Your commerce universe,
                             <span className="text-orange-400">
                                 {' '}
-                                under control.
+                                beautifully orchestrated.
                             </span>
                         </h2>
                         <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-[15px]">
-                            Monitor account health, onboard trusted sellers, and
-                            keep your catalogue moving from one focused
-                            workspace.
+                            Run sellers, products, orders, fulfilment, and
+                            revenue from one precise executive workspace.
                         </p>
                         <div className="mt-7 flex flex-wrap gap-3">
                             <Link
@@ -188,10 +217,10 @@ export default function AdminDashboard({
                             <div
                                 className="relative grid size-28 shrink-0 place-items-center rounded-full"
                                 style={{
-                                    background: `conic-gradient(#34d399 ${statistics.active_rate}%, rgba(255,255,255,.08) 0)`,
+                                    background: `conic-gradient(#f59e0b ${statistics.active_rate}%, rgba(255,255,255,.08) 0)`,
                                 }}
                             >
-                                <div className="grid size-[5.75rem] place-items-center rounded-full bg-[#171e2a]">
+                                <div className="grid size-[5.75rem] place-items-center rounded-full bg-commerce-navy-soft shadow-inner shadow-black/20">
                                     <div className="text-center">
                                         <p className="text-2xl font-semibold tracking-tight">
                                             {statistics.active_rate}%
@@ -289,7 +318,7 @@ export default function AdminDashboard({
                                 <thead className="bg-slate-50/70 text-[10px] font-semibold tracking-[0.12em] text-slate-400 uppercase dark:bg-white/[0.025]">
                                     <tr>
                                         <th className="px-6 py-3.5 font-semibold">
-                                            Customer
+                                            User
                                         </th>
                                         <th className="px-5 py-3.5 font-semibold">
                                             Role
@@ -329,10 +358,14 @@ export default function AdminDashboard({
                                                 <span
                                                     className={`inline-flex rounded-md px-2 py-1 text-[10px] font-semibold capitalize ${roleBadgeStyles[user.role] ?? 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300'}`}
                                                 >
-                                                    {user.role.replaceAll(
-                                                        '_',
-                                                        ' ',
-                                                    )}
+                                                    {user.role === 'admin'
+                                                        ? (user.admin_roles?.[0]
+                                                              ?.name ??
+                                                          'Administrator')
+                                                        : user.role.replaceAll(
+                                                              '_',
+                                                              ' ',
+                                                          )}
                                                 </span>
                                             </td>
                                             <td className="px-5 py-4">
@@ -383,38 +416,39 @@ export default function AdminDashboard({
                     <div className="flex items-start justify-between gap-4">
                         <div>
                             <h3 className="font-semibold tracking-tight text-slate-950 dark:text-white">
-                                Audience mix
+                                Access mix
                             </h3>
                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Accounts by platform role
+                                Customers and administrator roles
                             </p>
                         </div>
                         <span className="rounded-lg bg-orange-50 px-2.5 py-1 text-[10px] font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-300">
-                            {statistics.total_users.toLocaleString()} total
+                            {accessMixTotal.toLocaleString()} accounts
                         </span>
                     </div>
                     <div className="mt-7 grid gap-5">
-                        {roleMix.map(([label, value]) => {
+                        {accessMix.map(({ name, count }, index) => {
                             const percentage = Math.round(
-                                (value / Math.max(statistics.total_users, 1)) *
-                                    100,
+                                (count / Math.max(accessMixTotal, 1)) * 100,
                             );
                             const relativeWidth = Math.max(
-                                Math.round((value / largestRole) * 100),
-                                value > 0 ? 4 : 0,
+                                Math.round((count / largestRole) * 100),
+                                count > 0 ? 4 : 0,
                             );
+                            const style =
+                                accessMixStyles[index % accessMixStyles.length];
 
                             return (
-                                <div key={label}>
+                                <div key={name}>
                                     <div className="mb-2 flex items-center justify-between gap-3 text-xs">
                                         <span className="flex items-center gap-2 font-medium text-slate-600 dark:text-slate-300">
                                             <span
-                                                className={`size-2 rounded-full ${roleStyles[label]}`}
+                                                className={`size-2 rounded-full ${style}`}
                                             />
-                                            {label}
+                                            {name}
                                         </span>
                                         <strong className="font-semibold text-slate-800 dark:text-slate-100">
-                                            {value.toLocaleString()}
+                                            {count.toLocaleString()}
                                             <span className="ml-1.5 text-[10px] font-medium text-slate-400">
                                                 {percentage}%
                                             </span>
@@ -422,7 +456,7 @@ export default function AdminDashboard({
                                     </div>
                                     <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/8">
                                         <div
-                                            className={`h-full rounded-full transition-all duration-700 ${roleStyles[label]}`}
+                                            className={`h-full rounded-full transition-all duration-700 ${style}`}
                                             style={{
                                                 width: `${relativeWidth}%`,
                                             }}
@@ -496,14 +530,10 @@ export default function AdminDashboard({
                         Operational pulse
                     </h3>
                     <p className="mt-1 text-xs text-slate-500">
-                        Current marketplace readiness
+                        Live items requiring attention
                     </p>
                     <div className="mt-5 grid gap-3">
-                        {[
-                            ['Account services', 'Operational'],
-                            ['Vendor onboarding', 'Ready'],
-                            ['Catalogue services', 'Operational'],
-                        ].map(([label, value]) => (
+                        {operationalPulse.map(({ label, value }) => (
                             <div
                                 key={label}
                                 className="flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-3.5 py-3 dark:bg-white/[0.035]"
@@ -511,11 +541,21 @@ export default function AdminDashboard({
                                 <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
                                     {label}
                                 </span>
-                                <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                                    <span className="grid size-4 place-items-center rounded-full bg-emerald-100 dark:bg-emerald-500/10">
-                                        <Check className="size-2.5" />
+                                <span
+                                    className={`inline-flex items-center gap-1.5 text-[10px] font-semibold ${value > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}
+                                >
+                                    <span
+                                        className={`grid size-4 place-items-center rounded-full ${value > 0 ? 'bg-amber-100 dark:bg-amber-500/10' : 'bg-emerald-100 dark:bg-emerald-500/10'}`}
+                                    >
+                                        {value > 0 ? (
+                                            <Clock3 className="size-2.5" />
+                                        ) : (
+                                            <Check className="size-2.5" />
+                                        )}
                                     </span>
-                                    {value}
+                                    {value > 0
+                                        ? value.toLocaleString()
+                                        : 'Clear'}
                                 </span>
                             </div>
                         ))}
