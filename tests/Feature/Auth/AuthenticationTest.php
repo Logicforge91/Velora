@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
 
-test('public registration is disabled and users are provisioned through admin routes', function () {
-    expect(Features::enabled(Features::registration()))->toBeFalse()
-        ->and(Route::has('register'))->toBeFalse()
-        ->and(Route::has('register.store'))->toBeFalse()
+test('public customer registration and admin user provisioning are available', function () {
+    expect(Features::enabled(Features::registration()))->toBeTrue()
+        ->and(Route::has('register'))->toBeTrue()
+        ->and(Route::has('register.store'))->toBeTrue()
         ->and(Route::has('admin.users.create'))->toBeTrue()
         ->and(Route::has('admin.users.store'))->toBeTrue();
 });
@@ -21,6 +21,51 @@ test('login screen can be rendered', function () {
     $response = $this->get(route('login'));
 
     $response->assertOk();
+});
+
+test('admin login screen can be rendered separately', function () {
+    $this->get(route('admin.login'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('auth/admin-login')
+            ->where('canResetPassword', true));
+});
+
+test('administrators can authenticate only through the admin portal', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->post(route('login.store'), [
+        'email' => $admin->email,
+        'password' => 'password',
+        'portal' => 'customer',
+    ])->assertSessionHasErrors('email');
+
+    $this->assertGuest();
+
+    $this->post(route('login.store'), [
+        'email' => $admin->email,
+        'password' => 'password',
+        'portal' => 'admin',
+    ])->assertRedirect(route('dashboard'));
+
+    $this->assertAuthenticatedAs($admin);
+});
+
+test('customers cannot authenticate through the admin portal', function () {
+    $customer = User::factory()->customer()->create();
+
+    $this->post(route('login.store'), [
+        'email' => $customer->email,
+        'password' => 'password',
+        'portal' => 'admin',
+    ])->assertSessionHasErrors('email');
+
+    $this->assertGuest();
+});
+
+test('admin guests are sent to the separate admin login', function () {
+    $this->get(route('admin.dashboard'))
+        ->assertRedirect(route('admin.login'));
 });
 
 test('login screen includes team invitation context', function () {
