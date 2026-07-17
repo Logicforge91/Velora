@@ -89,7 +89,7 @@ export default function SiteHeader({
                             aria-label="Wishlist"
                         >
                             <Heart className="size-5" />
-                            <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-rose-500 text-[9px] font-black text-white">
+                            <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-rose-500 text-[10px] font-black text-white">
                                 4
                             </span>
                         </Link>
@@ -99,7 +99,7 @@ export default function SiteHeader({
                             aria-label="Cart"
                         >
                             <ShoppingCart className="size-5" />
-                            <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-orange-500 text-[9px] font-black text-white">
+                            <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-orange-500 text-[10px] font-black text-white">
                                 2
                             </span>
                         </Link>

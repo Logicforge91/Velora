@@ -58,7 +58,7 @@ export default function DiscoverySection() {
                             className={`group relative min-h-64 overflow-hidden rounded-[2rem] p-6 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl motion-reduce:transform-none sm:p-8 ${edit.className}`}
                         >
                             <div className="relative z-10 max-w-sm">
-                                <span className="inline-flex items-center gap-2 text-[10px] font-black tracking-[0.18em] uppercase opacity-60">
+                                <span className="inline-flex items-center gap-2 text-[11px] font-black tracking-[0.18em] uppercase opacity-60">
                                     <Icon className="size-3.5" /> {edit.eyebrow}
                                 </span>
                                 <h3 className="mt-4 max-w-xs text-2xl font-black tracking-[-0.04em] sm:text-3xl">

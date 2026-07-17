@@ -18,7 +18,7 @@ export default function ProductBundleSection({
         <section className="overflow-hidden rounded-[2.5rem] bg-slate-950 text-white">
             <div className="grid lg:grid-cols-[1fr_320px]">
                 <div className="p-6 sm:p-9">
-                    <span className="inline-flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-orange-300 uppercase">
+                    <span className="inline-flex items-center gap-2 text-[11px] font-black tracking-[0.2em] text-orange-300 uppercase">
                         <Sparkles className="size-4" /> Complete the experience
                     </span>
                     <h2 className="mt-3 text-3xl font-black tracking-[-0.04em]">

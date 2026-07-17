@@ -16,7 +16,7 @@ export default function ProductCard({
             <div
                 className={`relative grid aspect-[4/3] place-items-center bg-gradient-to-br ${product.tone}`}
             >
-                <span className="absolute top-3 left-3 rounded-lg bg-white px-2 py-1 text-[10px] font-black text-emerald-600 shadow-sm">
+                <span className="absolute top-3 left-3 rounded-lg bg-white px-2 py-1 text-[11px] font-black text-emerald-600 shadow-sm">
                     {product.offer}
                 </span>
                 <Link
@@ -36,7 +36,7 @@ export default function ProductCard({
                 <Link
                     href={productRoute.url(product.slug)}
                     prefetch
-                    className="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 translate-y-3 items-center gap-2 rounded-full bg-slate-950/90 px-4 py-2 text-[10px] font-black whitespace-nowrap text-white opacity-0 shadow-lg backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 focus:translate-y-0 focus:opacity-100 dark:bg-white dark:text-slate-950"
+                    className="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 translate-y-3 items-center gap-2 rounded-full bg-slate-950/90 px-4 py-2 text-[11px] font-black whitespace-nowrap text-white opacity-0 shadow-lg backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 focus:translate-y-0 focus:opacity-100 dark:bg-white dark:text-slate-950"
                 >
                     <Eye className="size-3.5" /> Quick view
                 </Link>

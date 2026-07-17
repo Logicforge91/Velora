@@ -50,14 +50,14 @@ export default function MobileStorefrontNav() {
                         key={link.label}
                         href={link.href}
                         prefetch
-                        className={`relative flex min-w-0 flex-col items-center gap-1 rounded-[1rem] px-1 py-2 text-[9px] font-black transition ${link.active ? 'bg-slate-950 text-white dark:bg-orange-500' : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/5'}`}
+                        className={`relative flex min-w-0 flex-col items-center gap-1 rounded-[1rem] px-1 py-2 text-[11px] font-black transition ${link.active ? 'bg-slate-950 text-white dark:bg-orange-500' : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/5'}`}
                     >
                         <Icon
                             className={`size-4 ${link.active ? 'stroke-[2.5]' : ''}`}
                         />
                         <span className="truncate">{link.label}</span>
                         {link.label === 'Cart' && (
-                            <span className="absolute top-0.5 right-[18%] grid size-4 place-items-center rounded-full bg-orange-500 text-[8px] font-black text-white ring-2 ring-white dark:ring-slate-900">
+                            <span className="absolute top-0.5 right-[18%] grid size-4 place-items-center rounded-full bg-orange-500 text-[9px] font-black text-white ring-2 ring-white dark:ring-slate-900">
                                 2
                             </span>
                         )}

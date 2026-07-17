@@ -91,7 +91,7 @@ export default function ProductReviewSection({
         >
             <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                 <div>
-                    <p className="text-[10px] font-black tracking-[0.2em] text-orange-500 uppercase">
+                    <p className="text-[11px] font-black tracking-[0.2em] text-orange-500 uppercase">
                         Real experiences
                     </p>
                     <h2 className="mt-2 text-3xl font-black tracking-[-0.04em]">
@@ -192,7 +192,7 @@ export default function ProductReviewSection({
                     <p className="mt-3 text-xs font-bold text-slate-500">
                         Based on 1,248 verified ratings
                     </p>
-                    <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-black text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                    <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-black text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
                         <BadgeCheck className="size-3.5" /> 96% recommend this
                     </span>
                 </div>
@@ -288,12 +288,12 @@ function ReviewCard({
                     </span>
                     <div>
                         <p className="text-sm font-black">{review.name}</p>
-                        <p className="mt-0.5 flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                        <p className="mt-0.5 flex items-center gap-1 text-[11px] font-bold text-emerald-600">
                             <BadgeCheck className="size-3" /> Verified purchase
                         </p>
                     </div>
                 </div>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[11px] text-slate-400">
                     {review.date}
                 </span>
             </div>

@@ -29,7 +29,7 @@ export default function ProductRecommendationSection({
         >
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                 <div>
-                    <p className="text-[10px] font-black tracking-[0.2em] text-orange-500 uppercase">
+                    <p className="text-[11px] font-black tracking-[0.2em] text-orange-500 uppercase">
                         {eyebrow}
                     </p>
                     <h2 className="mt-2 text-2xl font-black tracking-[-0.035em] sm:text-3xl">

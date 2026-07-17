@@ -80,7 +80,7 @@ export default function HeroSection({
                     <div className="grid grid-cols-12 gap-3 sm:gap-4">
                         <article className="col-span-12 row-span-2 overflow-hidden rounded-[2rem] bg-slate-950 p-5 text-white shadow-2xl shadow-slate-950/20 sm:col-span-7 sm:p-7">
                             <div className="flex items-center justify-between">
-                                <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black tracking-wider text-orange-300 uppercase">
+                                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-black tracking-wider text-orange-300 uppercase">
                                     Editor's pick
                                 </span>
                                 <span className="flex items-center gap-1 text-xs font-bold">
@@ -91,7 +91,7 @@ export default function HeroSection({
                             <div className="grid min-h-52 place-items-center sm:min-h-64">
                                 <div className="relative grid size-36 place-items-center rounded-full bg-gradient-to-br from-orange-400 to-rose-500 sm:size-44">
                                     <Smartphone className="size-20 drop-shadow-2xl sm:size-24" />
-                                    <span className="absolute -right-2 -bottom-2 rounded-full bg-white px-3 py-2 text-[10px] font-black text-slate-950 shadow-lg">
+                                    <span className="absolute -right-2 -bottom-2 rounded-full bg-white px-3 py-2 text-[11px] font-black text-slate-950 shadow-lg">
                                         17% off
                                     </span>
                                 </div>
@@ -112,7 +112,7 @@ export default function HeroSection({
                         <article className="col-span-6 overflow-hidden rounded-[2rem] bg-gradient-to-br from-violet-200 to-fuchsia-100 p-4 text-violet-950 shadow-xl shadow-violet-950/5 sm:col-span-5 sm:p-5 dark:from-violet-500/30 dark:to-fuchsia-500/10 dark:text-white">
                             <div className="flex items-start justify-between gap-2">
                                 <div>
-                                    <p className="text-[10px] font-black tracking-wider uppercase opacity-60">
+                                    <p className="text-[11px] font-black tracking-wider uppercase opacity-60">
                                         Sound edit
                                     </p>
                                     <p className="mt-1 text-sm font-black">
@@ -131,7 +131,7 @@ export default function HeroSection({
                                 {['A', 'R', 'K', 'S'].map((letter, index) => (
                                     <span
                                         key={letter}
-                                        className="grid size-8 place-items-center rounded-full border-2 border-white bg-slate-900 text-[10px] font-black text-white dark:border-slate-900"
+                                        className="grid size-8 place-items-center rounded-full border-2 border-white bg-slate-900 text-[11px] font-black text-white dark:border-slate-900"
                                         style={{ zIndex: 4 - index }}
                                     >
                                         {letter}

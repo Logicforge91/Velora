@@ -32,7 +32,7 @@ export default function EditorialSection() {
                         <div className="absolute -top-20 -left-20 size-72 rounded-full bg-orange-500/20 blur-3xl" />
                         <div className="absolute right-0 bottom-0 size-64 rounded-full bg-violet-500/15 blur-3xl" />
                         <div className="relative">
-                            <span className="inline-flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-orange-300 uppercase">
+                            <span className="inline-flex items-center gap-2 text-[11px] font-black tracking-[0.2em] text-orange-300 uppercase">
                                 <Sparkles className="size-4" /> The human edit
                             </span>
                             <h2 className="mt-5 max-w-lg text-4xl leading-[1.02] font-black tracking-[-0.055em] sm:text-5xl">
@@ -113,7 +113,7 @@ function Metric({ value, label }: { value: string; label: string }) {
     return (
         <div>
             <p className="text-xl font-black sm:text-2xl">{value}</p>
-            <p className="mt-1 text-[10px] font-bold tracking-wide text-slate-500 uppercase">
+            <p className="mt-1 text-[11px] font-bold tracking-wide text-slate-500 uppercase">
                 {label}
             </p>
         </div>
