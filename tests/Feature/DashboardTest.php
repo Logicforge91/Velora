@@ -7,7 +7,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to login from the admin dashboard', function () {
     $this->get(route('admin.dashboard'))
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('admin.login'));
 });
 
 test('admins can access the admin dashboard', function () {
@@ -53,7 +53,7 @@ test('inactive admins cannot access the dashboard', function () {
 
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('admin.login'));
 
     $this->assertGuest();
 });

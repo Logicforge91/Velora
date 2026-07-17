@@ -23,6 +23,51 @@ test('login screen can be rendered', function () {
     $response->assertOk();
 });
 
+test('admin login screen can be rendered separately', function () {
+    $this->get(route('admin.login'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('auth/admin-login')
+            ->where('canResetPassword', true));
+});
+
+test('administrators can authenticate only through the admin portal', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->post(route('login.store'), [
+        'email' => $admin->email,
+        'password' => 'password',
+        'portal' => 'customer',
+    ])->assertSessionHasErrors('email');
+
+    $this->assertGuest();
+
+    $this->post(route('login.store'), [
+        'email' => $admin->email,
+        'password' => 'password',
+        'portal' => 'admin',
+    ])->assertRedirect(route('dashboard'));
+
+    $this->assertAuthenticatedAs($admin);
+});
+
+test('customers cannot authenticate through the admin portal', function () {
+    $customer = User::factory()->customer()->create();
+
+    $this->post(route('login.store'), [
+        'email' => $customer->email,
+        'password' => 'password',
+        'portal' => 'admin',
+    ])->assertSessionHasErrors('email');
+
+    $this->assertGuest();
+});
+
+test('admin guests are sent to the separate admin login', function () {
+    $this->get(route('admin.dashboard'))
+        ->assertRedirect(route('admin.login'));
+});
+
 test('login screen includes team invitation context', function () {
     $owner = User::factory()->create();
     $team = Team::factory()->create(['name' => 'Laravel Team']);

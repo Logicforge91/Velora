@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import admin from '@/routes/admin';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import type { TeamInvitationContext } from '@/types';
@@ -41,6 +42,7 @@ export default function Login({
             >
                 {({ processing, errors }) => (
                     <>
+                        <input type="hidden" name="portal" value="customer" />
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
@@ -110,11 +112,16 @@ export default function Login({
                     {status}
                 </div>
             )}
+
+            <p className="text-center text-sm text-muted-foreground">
+                Marketplace administrator?{' '}
+                <TextLink href={admin.login.url()}>Admin sign in</TextLink>
+            </p>
         </>
     );
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: 'Customer sign in',
+    description: 'Access your Velora shopping account',
 };

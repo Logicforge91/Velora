@@ -3,10 +3,13 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\ResetUserPassword;
+use App\Enums\AccountPermission;
 use App\Http\Responses\LoginResponse;
 use App\Models\TeamInvitation;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -41,6 +44,27 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureActions(): void
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+        Fortify::authenticateUsing(function (Request $request): ?User {
+            $user = User::query()
+                ->where('email', Str::lower($request->string(Fortify::username())->toString()))
+                ->first();
+
+            if (! $user || ! Hash::check($request->string('password')->toString(), $user->password) || ! $user->isActive()) {
+                return null;
+            }
+
+            $isAdminPortal = $request->string('portal')->toString() === 'admin';
+
+            if ($isAdminPortal) {
+                $user->loadMissing('adminRoles');
+
+                return $user->isAdmin() && $user->hasPermission(AccountPermission::AccessAdminDashboard)
+                    ? $user
+                    : null;
+            }
+
+            return $user->isAdmin() ? null : $user;
+        });
     }
 
     /**
