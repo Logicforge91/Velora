@@ -87,7 +87,7 @@ export default function ProductReviewSection({
     return (
         <section
             id="customer-reviews"
-            className="rounded-[2.5rem] border border-slate-200 bg-white p-6 sm:p-9 dark:border-white/10 dark:bg-white/[0.035]"
+            className="scroll-mt-24 rounded-[2.5rem] border border-slate-200 bg-white p-6 sm:p-9 lg:scroll-mt-36 dark:border-white/10 dark:bg-white/[0.035]"
         >
             <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                 <div>

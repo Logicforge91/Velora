@@ -4,7 +4,6 @@ import { useState } from 'react';
 import MobileStorefrontNav from '@/components/storefront/mobile-storefront-nav';
 import SiteFooter from '@/components/storefront/site-footer';
 import SiteHeader from '@/components/storefront/site-header';
-import StorefrontPageLoader from '@/components/storefront/storefront-page-loader';
 import { catalog } from '@/routes/storefront';
 
 type Props = PropsWithChildren<{
@@ -40,7 +39,6 @@ export default function StorefrontLayout({
             <main>{children}</main>
             <SiteFooter />
             <MobileStorefrontNav />
-            <StorefrontPageLoader />
         </div>
     );
 }
