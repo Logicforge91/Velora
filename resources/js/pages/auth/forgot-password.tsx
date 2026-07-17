@@ -1,6 +1,5 @@
-// Components
 import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { ArrowLeft, LoaderCircle, Mail, Send } from 'lucide-react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -14,49 +13,59 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <>
             <Head title="Forgot password" />
 
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+            <div className="flex flex-col gap-6">
+                {status && (
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+                        {status}
+                    </div>
+                )}
 
-            <div className="space-y-6">
                 <Form {...email.form()}>
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    autoComplete="off"
-                                    autoFocus
-                                    placeholder="email@example.com"
-                                />
-
+                                <Label htmlFor="email" className="font-bold">
+                                    Account email
+                                </Label>
+                                <div className="relative">
+                                    <Mail className="pointer-events-none absolute top-1/2 left-4 z-10 size-4 -translate-y-1/2 text-slate-400" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        autoComplete="email"
+                                        required
+                                        autoFocus
+                                        placeholder="you@example.com"
+                                        className="h-12 rounded-xl border-slate-200 bg-slate-50/70 pl-11 dark:border-white/10 dark:bg-white/5"
+                                    />
+                                </div>
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="my-6 flex items-center justify-start">
-                                <Button
-                                    className="w-full"
-                                    disabled={processing}
-                                    data-test="email-password-reset-link-button"
-                                >
-                                    {processing && (
-                                        <LoaderCircle className="h-4 w-4 animate-spin" />
-                                    )}
-                                    Email password reset link
-                                </Button>
-                            </div>
+                            <Button
+                                type="submit"
+                                className="mt-6 h-12 w-full rounded-xl bg-slate-950 font-black text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
+                                disabled={processing}
+                                data-test="email-password-reset-link-button"
+                            >
+                                {processing && (
+                                    <LoaderCircle className="size-4 animate-spin" />
+                                )}
+                                Send secure reset link
+                                {!processing && <Send className="size-4" />}
+                            </Button>
                         </>
                     )}
                 </Form>
 
-                <div className="space-x-1 text-center text-sm text-muted-foreground">
-                    <span>Or, return to</span>
-                    <TextLink href={login()}>log in</TextLink>
+                <div className="text-center text-sm text-slate-500 dark:text-slate-400">
+                    <TextLink
+                        href={login()}
+                        className="inline-flex items-center gap-2 font-bold text-orange-600 no-underline"
+                    >
+                        <ArrowLeft className="size-4" /> Return to sign in
+                    </TextLink>
                 </div>
             </div>
         </>
@@ -64,6 +73,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 }
 
 ForgotPassword.layout = {
-    title: 'Forgot password',
-    description: 'Enter your email to receive a password reset link',
+    title: 'Reset your password',
+    description:
+        'Enter your account email and we will send you a secure recovery link.',
 };
