@@ -5,8 +5,17 @@ use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
+
+test('public registration is disabled and users are provisioned through admin routes', function () {
+    expect(Features::enabled(Features::registration()))->toBeFalse()
+        ->and(Route::has('register'))->toBeFalse()
+        ->and(Route::has('register.store'))->toBeFalse()
+        ->and(Route::has('admin.users.create'))->toBeTrue()
+        ->and(Route::has('admin.users.store'))->toBeTrue();
+});
 
 test('login screen can be rendered', function () {
     $response = $this->get(route('login'));

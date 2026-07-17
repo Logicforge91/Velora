@@ -24,7 +24,11 @@ class AdminRoleController extends Controller
         Gate::authorize(AccountPermission::ManageRoles->value);
 
         return Inertia::render('admin/admin-roles/index', [
-            'roles' => AdminRole::query()->withCount('users')->latest()->paginate(15),
+            'roles' => AdminRole::query()
+                ->with('users:id,name,email')
+                ->withCount('users')
+                ->latest()
+                ->paginate(15),
             'counts' => [
                 'roles' => AdminRole::query()->count(),
                 'assigned_admins' => User::query()->where('role', AccountRole::Admin->value)->whereHas('adminRoles')->count(),

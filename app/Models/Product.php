@@ -86,6 +86,12 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
+    /** @return HasMany<OrderItem, $this> */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     /** @return HasOne<ProductImage, $this> */
     public function primaryImage(): HasOne
     {

@@ -1,13 +1,15 @@
 <?php
 
-use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AdminRoleController;
+use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\ApplyPriceRecommendationController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CatalogImportController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\GrowthCentreController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -43,6 +45,13 @@ Route::prefix('admin')
         Route::get('analytics', AnalyticsController::class)
             ->middleware('permission:reports.view')
             ->name('analytics');
+
+        Route::get('growth-centre', GrowthCentreController::class)
+            ->middleware('permission:reports.view')
+            ->name('growth-centre');
+        Route::patch('growth-centre/products/{product}/recommended-price', ApplyPriceRecommendationController::class)
+            ->middleware('permission:catalogue.manage')
+            ->name('growth-centre.recommended-price');
 
         Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show'])->middleware('permission:reports.view');
 

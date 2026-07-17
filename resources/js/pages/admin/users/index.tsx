@@ -16,6 +16,15 @@ import {
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import Pagination from '@/components/admin/pagination';
+import {
+    AdminConfirmDialog,
+    AdminEmptyState,
+    AdminFilterBar,
+    AdminPageHeader,
+    AdminPanel,
+    AdminStatusBadge,
+} from '@/components/admin/primitives';
+import StatCards from '@/components/admin/stat-cards';
 import AdminLayout from '@/layouts/admin-layout';
 import usersRoutes from '@/routes/admin/users';
 import type {
@@ -79,6 +88,8 @@ export default function UsersIndex({
     const [role, setRole] = useState(params.get('role') ?? '');
     const [adminRole, setAdminRole] = useState(params.get('admin_role') ?? '');
     const [status, setStatus] = useState(params.get('status') ?? '');
+    const [deletingUser, setDeletingUser] = useState<ManagedUser | null>(null);
+    const [deleting, setDeleting] = useState(false);
     const hasFilters =
         search !== '' || role !== '' || adminRole !== '' || status !== '';
 
@@ -103,64 +114,36 @@ export default function UsersIndex({
         );
     };
 
-    const deleteUser = (user: ManagedUser) => {
-        if (
-            window.confirm(
-                `Delete ${user.name}? Their history will remain available.`,
-            )
-        ) {
-            router.delete(usersRoutes.destroy.url(user.id), {
-                preserveScroll: true,
-            });
-        }
-    };
-
     return (
         <AdminLayout title="User Management" breadcrumb="Settings / Users">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                        Manage access, roles, account status, and activity from
-                        one place.
-                    </p>
-                </div>
-                <Link
-                    href={usersRoutes.create.url()}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-500/20 transition hover:bg-orange-600"
-                >
-                    <Plus className="size-4" /> Add user
-                </Link>
-            </div>
-
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {countCards.map(({ key, label, icon: Icon, tone }) => (
-                    <div
-                        key={key}
-                        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/30 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none"
+            <AdminPageHeader
+                title="People & access"
+                description="Manage account access, roles, status, and administrative history from one workspace."
+                action={
+                    <Link
+                        href={usersRoutes.create.url()}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-orange-500/20 transition hover:bg-orange-600"
                     >
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                                    {label}
-                                </p>
-                                <p className="mt-2 text-3xl font-bold tracking-tight">
-                                    {counts[key] ?? 0}
-                                </p>
-                            </div>
-                            <span
-                                className={`grid size-11 place-items-center rounded-xl ${tone}`}
-                            >
-                                <Icon className="size-5" />
-                            </span>
-                        </div>
-                    </div>
-                ))}
+                        <Plus className="size-4" /> Add user
+                    </Link>
+                }
+            />
+
+            <div className="mt-6">
+                <StatCards
+                    cards={countCards.map(({ key, label, icon, tone }) => ({
+                        label,
+                        value: counts[key] ?? 0,
+                        icon,
+                        tone,
+                    }))}
+                />
             </div>
 
-            <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/30 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none">
-                <form
+            <AdminPanel className="mt-6">
+                <AdminFilterBar
                     onSubmit={filterUsers}
-                    className="grid gap-3 border-b border-slate-200 p-4 sm:p-5 xl:grid-cols-[minmax(15rem,1fr)_12rem_13rem_11rem_auto] dark:border-white/10"
+                    className="sm:p-5 xl:grid-cols-[minmax(15rem,1fr)_12rem_13rem_11rem_auto]"
                 >
                     <label className="relative">
                         <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" />
@@ -223,7 +206,7 @@ export default function UsersIndex({
                             </button>
                         )}
                     </div>
-                </form>
+                </AdminFilterBar>
 
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-left">
@@ -285,16 +268,13 @@ export default function UsersIndex({
                                             </span>
                                         </td>
                                         <td className="px-5 py-4">
-                                            <span
-                                                className={`inline-flex items-center gap-1.5 text-xs font-semibold ${user.status ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}
-                                            >
-                                                <span
-                                                    className={`size-1.5 rounded-full ${user.status ? 'bg-emerald-500' : 'bg-slate-400'}`}
-                                                />
-                                                {user.status
-                                                    ? 'Active'
-                                                    : 'Inactive'}
-                                            </span>
+                                            <AdminStatusBadge
+                                                value={
+                                                    user.status
+                                                        ? 'active'
+                                                        : 'inactive'
+                                                }
+                                            />
                                         </td>
                                         <td className="px-5 py-4 text-sm text-slate-500 dark:text-slate-400">
                                             <span className="inline-flex items-center gap-1.5">
@@ -336,7 +316,7 @@ export default function UsersIndex({
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        deleteUser(user)
+                                                        setDeletingUser(user)
                                                     }
                                                     aria-label={`Delete ${user.name}`}
                                                     className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-300"
@@ -352,20 +332,41 @@ export default function UsersIndex({
                     </table>
                 </div>
                 {users.data.length === 0 && (
-                    <div className="grid place-items-center px-6 py-16 text-center">
-                        <span className="grid size-12 place-items-center rounded-2xl bg-slate-100 text-slate-400 dark:bg-white/5">
-                            <UsersRound className="size-5" />
-                        </span>
-                        <p className="mt-3 text-sm font-semibold">
-                            No users found
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">
-                            Try changing your search or filters.
-                        </p>
-                    </div>
+                    <AdminEmptyState
+                        icon={UsersRound}
+                        title="No users found"
+                        description="Try changing the search or account filters."
+                    />
                 )}
                 <Pagination links={users.links} />
-            </section>
+            </AdminPanel>
+
+            <AdminConfirmDialog
+                open={deletingUser !== null}
+                title="Delete user account?"
+                description={`${deletingUser?.name ?? 'This user'} will lose access immediately. Their administrative history will remain available for audit purposes.`}
+                confirmLabel="Delete user"
+                processing={deleting}
+                onOpenChange={(open) => {
+                    if (!open && !deleting) {
+                        setDeletingUser(null);
+                    }
+                }}
+                onConfirm={() => {
+                    if (!deletingUser) {
+                        return;
+                    }
+
+                    setDeleting(true);
+                    router.delete(usersRoutes.destroy.url(deletingUser.id), {
+                        preserveScroll: true,
+                        onFinish: () => {
+                            setDeleting(false);
+                            setDeletingUser(null);
+                        },
+                    });
+                }}
+            />
         </AdminLayout>
     );
 }
