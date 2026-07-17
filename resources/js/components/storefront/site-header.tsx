@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import {
-    ChevronDown,
+    ArrowRight,
     Heart,
     Menu,
     Search,
@@ -48,7 +48,10 @@ export default function SiteHeader({
     const selectCategory = (category: string) => {
         onCategoryChange(category);
         setMobileMenuOpen(false);
-        scrollToStorefrontSection('#deals');
+
+        if (!onSearchSubmit) {
+            scrollToStorefrontSection('#deals');
+        }
     };
 
     return (
@@ -56,8 +59,7 @@ export default function SiteHeader({
             <div className="bg-slate-950 px-4 py-2.5 text-center text-xs font-semibold text-white dark:bg-orange-500">
                 <span className="inline-flex items-center gap-2">
                     <Sparkles className="size-3.5 text-amber-300" />
-                    Festive offers are live — save up to 70% across top
-                    categories
+                    New-season edit is live · Free delivery on your first order
                 </span>
             </div>
             <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/85 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/85">
@@ -83,10 +85,13 @@ export default function SiteHeader({
                     <nav className="ml-auto hidden items-center gap-2 sm:flex">
                         <Link
                             href={wishlist.url()}
-                            className="grid size-10 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-orange-500 dark:text-slate-300 dark:hover:bg-white/5"
+                            className="relative grid size-10 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-orange-500 dark:text-slate-300 dark:hover:bg-white/5"
                             aria-label="Wishlist"
                         >
                             <Heart className="size-5" />
+                            <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-rose-500 text-[9px] font-black text-white">
+                                4
+                            </span>
                         </Link>
                         <Link
                             href={cart.url()}
@@ -95,7 +100,7 @@ export default function SiteHeader({
                         >
                             <ShoppingCart className="size-5" />
                             <span className="absolute top-1 right-1 grid size-4 place-items-center rounded-full bg-orange-500 text-[9px] font-black text-white">
-                                0
+                                2
                             </span>
                         </Link>
                         <Link
@@ -137,7 +142,7 @@ export default function SiteHeader({
                         href={catalog.url()}
                         className="flex items-center gap-1 text-orange-600"
                     >
-                        More categories <ChevronDown className="size-3.5" />
+                        All categories <ArrowRight className="size-3.5" />
                     </Link>
                 </div>
                 {mobileMenuOpen && (

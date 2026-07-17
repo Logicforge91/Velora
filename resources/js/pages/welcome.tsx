@@ -11,6 +11,7 @@ import MembershipSection from '@/components/storefront/membership-section';
 import MobileStorefrontNav from '@/components/storefront/mobile-storefront-nav';
 import SiteFooter from '@/components/storefront/site-footer';
 import SiteHeader from '@/components/storefront/site-header';
+import StorefrontPageLoader from '@/components/storefront/storefront-page-loader';
 import TrustStrip from '@/components/storefront/trust-strip';
 
 export default function Welcome() {
@@ -64,6 +65,7 @@ export default function Welcome() {
                 </main>
                 <SiteFooter />
                 <MobileStorefrontNav />
+                <StorefrontPageLoader />
             </div>
         </>
     );

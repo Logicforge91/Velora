@@ -57,7 +57,9 @@ export default function MobileStorefrontNav() {
                         />
                         <span className="truncate">{link.label}</span>
                         {link.label === 'Cart' && (
-                            <span className="absolute top-1 right-[22%] size-2 rounded-full bg-orange-500 ring-2 ring-white dark:ring-slate-900" />
+                            <span className="absolute top-0.5 right-[18%] grid size-4 place-items-center rounded-full bg-orange-500 text-[8px] font-black text-white ring-2 ring-white dark:ring-slate-900">
+                                2
+                            </span>
                         )}
                     </Link>
                 );
