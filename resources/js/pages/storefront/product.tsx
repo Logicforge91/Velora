@@ -1,6 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import {
-    BadgeCheck,
     ChevronRight,
     Heart,
     PackageCheck,
@@ -10,7 +9,9 @@ import {
     Truck,
 } from 'lucide-react';
 import { money, products } from '@/components/storefront/catalog';
-import ProductCard from '@/components/storefront/product-card';
+import ProductBundleSection from '@/components/storefront/product-bundle-section';
+import ProductRecommendationSection from '@/components/storefront/product-recommendation-section';
+import ProductReviewSection from '@/components/storefront/product-review-section';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { cart, catalog, wishlist } from '@/routes/storefront';
 
@@ -18,9 +19,19 @@ export default function Product({ productSlug }: { productSlug: string }) {
     const selectedProduct =
         products.find((item) => item.slug === productSlug) ?? products[0];
     const Icon = selectedProduct.icon;
-    const relatedProducts = products
-        .filter((item) => item.id !== selectedProduct.id)
-        .slice(0, 3);
+    const alternativeProducts = products.filter(
+        (item) => item.id !== selectedProduct.id,
+    );
+    const suggestedProducts = alternativeProducts.slice(0, 3);
+    const moreProducts = [...alternativeProducts].reverse().slice(0, 3);
+    const recentlyViewedProducts = [
+        ...alternativeProducts.slice(2),
+        ...alternativeProducts.slice(0, 2),
+    ].slice(0, 3);
+    const bundleProducts = [
+        selectedProduct,
+        ...alternativeProducts.slice(0, 2),
+    ];
 
     return (
         <StorefrontLayout>
@@ -123,19 +134,29 @@ export default function Product({ productSlug }: { productSlug: string }) {
                     </div>
                 </section>
 
-                <section className="mt-20">
-                    <div className="flex items-center gap-2">
-                        <BadgeCheck className="size-5 text-orange-500" />
-                        <h2 className="text-2xl font-black">
-                            You may also like
-                        </h2>
-                    </div>
-                    <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                        {relatedProducts.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                </section>
+                <div className="mt-20 grid gap-20">
+                    <ProductBundleSection products={bundleProducts} />
+                    <ProductReviewSection product={selectedProduct} />
+                    <ProductRecommendationSection
+                        eyebrow="Picked around your taste"
+                        title="Suggested for you"
+                        description="Thoughtful recommendations inspired by the product you are viewing."
+                        products={suggestedProducts}
+                    />
+                    <ProductRecommendationSection
+                        eyebrow="Keep discovering"
+                        title="More for you"
+                        description="Fresh finds across categories, prices, and everyday moments."
+                        products={moreProducts}
+                        tone="soft"
+                    />
+                    <ProductRecommendationSection
+                        eyebrow="Back to your browsing"
+                        title="Recently viewed"
+                        description="A quick way back to products that caught your attention."
+                        products={recentlyViewedProducts}
+                    />
+                </div>
             </div>
         </StorefrontLayout>
     );

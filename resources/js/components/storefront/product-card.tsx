@@ -1,8 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Eye, Heart, ShoppingCart, Star } from 'lucide-react';
 import { money } from '@/components/storefront/catalog';
 import type { StorefrontProduct } from '@/components/storefront/catalog';
-import { product as productRoute } from '@/routes/storefront';
+import { cart, product as productRoute, wishlist } from '@/routes/storefront';
 
 export default function ProductCard({
     product,
@@ -19,19 +19,26 @@ export default function ProductCard({
                 <span className="absolute top-3 left-3 rounded-lg bg-white px-2 py-1 text-[10px] font-black text-emerald-600 shadow-sm">
                     {product.offer}
                 </span>
-                <button
-                    type="button"
+                <Link
+                    href={wishlist.url()}
                     className="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-white/90 text-slate-500 shadow-sm transition hover:text-rose-500"
                     aria-label={`Save ${product.name}`}
                 >
                     <Heart className="size-4" />
-                </button>
+                </Link>
                 <Link
                     href={productRoute.url(product.slug)}
                     prefetch
                     aria-label={`View ${product.name}`}
                 >
                     <Icon className="size-20 transition duration-300 group-hover:scale-110 group-hover:-rotate-3" />
+                </Link>
+                <Link
+                    href={productRoute.url(product.slug)}
+                    prefetch
+                    className="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 translate-y-3 items-center gap-2 rounded-full bg-slate-950/90 px-4 py-2 text-[10px] font-black whitespace-nowrap text-white opacity-0 shadow-lg backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 focus:translate-y-0 focus:opacity-100 dark:bg-white dark:text-slate-950"
+                >
+                    <Eye className="size-3.5" /> Quick view
                 </Link>
             </div>
             <div className="p-4">
@@ -63,13 +70,13 @@ export default function ProductCard({
                             {money.format(product.original)}
                         </span>
                     </div>
-                    <button
-                        type="button"
+                    <Link
+                        href={cart.url()}
                         className="grid size-10 place-items-center rounded-full bg-slate-950 text-white transition hover:bg-orange-500 dark:bg-orange-500"
                         aria-label={`Add ${product.name} to cart`}
                     >
                         <ShoppingCart className="size-4" />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </article>

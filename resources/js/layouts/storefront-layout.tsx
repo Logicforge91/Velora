@@ -1,6 +1,7 @@
 import { router, usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
+import MobileStorefrontNav from '@/components/storefront/mobile-storefront-nav';
 import SiteFooter from '@/components/storefront/site-footer';
 import SiteHeader from '@/components/storefront/site-header';
 import { catalog } from '@/routes/storefront';
@@ -21,7 +22,7 @@ export default function StorefrontLayout({
     const updateQuery = onQueryChange ?? setLocalQuery;
 
     return (
-        <div className="min-h-screen bg-[#f8f8f6] font-sans text-slate-950 antialiased dark:bg-slate-950 dark:text-white">
+        <div className="min-h-screen bg-[#f8f8f6] pb-20 font-sans text-slate-950 antialiased sm:pb-0 dark:bg-slate-950 dark:text-white">
             <SiteHeader
                 isAuthenticated={Boolean(auth.user)}
                 query={activeQuery}
@@ -37,6 +38,7 @@ export default function StorefrontLayout({
             />
             <main>{children}</main>
             <SiteFooter />
+            <MobileStorefrontNav />
         </div>
     );
 }
