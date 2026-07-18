@@ -18,7 +18,7 @@ class ProductAttributeFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->unique()->words(2, true);
+        $name = fake()->unique()->lexify('attribute_????');
 
         return ['code' => Str::slug($name, '_'), 'name' => Str::headline($name), 'data_type' => 'text', 'is_filterable' => true, 'status' => true];
     }

@@ -74,16 +74,38 @@ const navigationSections = [
                 icon: BarChart3,
                 permission: 'reports.view',
             },
+        ],
+    },
+    {
+        label: 'Orders & Returns',
+        icon: ShoppingBag,
+        items: [
             {
-                label: 'Growth Centre',
-                href: admin.growthCentre.url(),
-                icon: Sparkles,
-                permission: 'reports.view',
+                label: 'All Orders',
+                href: admin.orders.index.url(),
+                icon: ShoppingBag,
+                permission: 'orders.manage',
+                badge: 'Live',
+                searchText: 'sales purchases order processing dispatch',
+            },
+            {
+                label: 'Returns & Claims',
+                href: admin.returns.index.url(),
+                icon: Undo2,
+                permission: 'orders.manage',
+                searchText: 'returns replacements claims rma reverse logistics',
+            },
+            {
+                label: 'Shipments',
+                href: admin.shipments.index.url(),
+                icon: Truck,
+                permission: 'orders.manage',
+                searchText: 'fulfilment tracking delivery dispatch carrier',
             },
         ],
     },
     {
-        label: 'Catalog',
+        label: 'Catalog & Listings',
         icon: Package,
         items: [
             {
@@ -91,18 +113,22 @@ const navigationSections = [
                 href: admin.products.index.url(),
                 icon: Package,
                 permission: 'catalogue.manage',
-            },
-            {
-                label: 'Variants',
-                href: admin.productVariants.index.url(),
-                icon: Layers3,
-                permission: 'catalogue.manage',
+                searchText: 'catalog products sku listing content',
             },
             {
                 label: 'Seller Listings',
                 href: admin.sellerListings.index.url(),
                 icon: Store,
                 permission: 'catalogue.manage',
+                badge: 'Buy box',
+                searchText: 'marketplace offers buy box seller sku commission',
+            },
+            {
+                label: 'Variants',
+                href: admin.productVariants.index.url(),
+                icon: Layers3,
+                permission: 'catalogue.manage',
+                searchText: 'product options size color variant sku',
             },
             {
                 label: 'Categories',
@@ -121,42 +147,21 @@ const navigationSections = [
                 href: admin.catalogImports.index.url(),
                 icon: FileSpreadsheet,
                 permission: 'catalogue.manage',
+                searchText: 'csv excel bulk upload catalogue import',
             },
         ],
     },
     {
-        label: 'Sales',
-        icon: ShoppingBag,
+        label: 'Inventory & Delivery',
+        icon: Warehouse,
         items: [
             {
-                label: 'Orders',
-                href: admin.orders.index.url(),
-                icon: ShoppingBag,
-                permission: 'orders.manage',
-            },
-            {
-                label: 'Promotions',
-                href: admin.coupons.index.url(),
-                icon: BadgePercent,
+                label: 'Inventory Control',
+                href: admin.inventoryOperations.index.url(),
+                icon: ArrowDownUp,
                 permission: 'catalogue.manage',
-            },
-            {
-                label: 'Reviews',
-                href: admin.reviews.index.url(),
-                icon: MessageSquareText,
-                permission: 'catalogue.manage',
-            },
-        ],
-    },
-    {
-        label: 'Operations',
-        icon: Truck,
-        items: [
-            {
-                label: 'Shipments',
-                href: admin.shipments.index.url(),
-                icon: Truck,
-                permission: 'orders.manage',
+                badge: 'Live',
+                searchText: 'stock ledger reservations movements warehouse',
             },
             {
                 label: 'Warehouses',
@@ -165,28 +170,41 @@ const navigationSections = [
                 permission: 'catalogue.manage',
             },
             {
-                label: 'Inventory Control',
-                href: admin.inventoryOperations.index.url(),
-                icon: ArrowDownUp,
-                permission: 'catalogue.manage',
-            },
-            {
                 label: 'Delivery Coverage',
                 href: admin.serviceAreas.index.url(),
                 icon: MapPinned,
                 permission: 'catalogue.manage',
+                badge: 'Pincode',
+                searchText: 'pincode serviceability cod express delivery',
+            },
+        ],
+    },
+    {
+        label: 'Growth & Quality',
+        icon: Sparkles,
+        items: [
+            {
+                label: 'Growth Intelligence',
+                href: admin.growthCentre.url(),
+                icon: BarChart3,
+                permission: 'reports.view',
+                badge: 'AI',
+                searchText: 'growth pricing recommendations intelligence',
             },
             {
-                label: 'Returns',
-                href: admin.returns.index.url(),
-                icon: Undo2,
-                permission: 'orders.manage',
+                label: 'Promotions',
+                href: admin.coupons.index.url(),
+                icon: BadgePercent,
+                permission: 'catalogue.manage',
+                searchText: 'coupons campaigns offers discounts marketing',
             },
             {
-                label: 'Support',
-                href: admin.support.index.url(),
-                icon: Headphones,
-                permission: 'support.requests.manage',
+                label: 'Ratings & Reviews',
+                href: admin.reviews.index.url(),
+                icon: MessageSquareText,
+                permission: 'catalogue.manage',
+                searchText:
+                    'ratings reviews moderation quality customer feedback',
             },
         ],
     },
@@ -201,10 +219,12 @@ const navigationSections = [
                 permission: 'payments.manage',
             },
             {
-                label: 'Refunds',
+                label: 'Refund Operations',
                 href: admin.paymentRefunds.index.url(),
                 icon: CircleDollarSign,
                 permission: 'payments.manage',
+                badge: 'Live',
+                searchText: 'refund approval reconciliation payment gateway',
             },
             {
                 label: 'GST Invoices',
@@ -221,21 +241,36 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Accounts',
+        label: 'Marketplace Network',
         icon: Users,
         items: [
             {
-                label: 'Vendors',
+                label: 'Sellers',
                 href: admin.vendors.index.url(),
                 icon: Store,
                 permission: 'vendors.manage',
+                searchText: 'vendors merchants sellers onboarding kyc',
             },
             {
-                label: 'Users',
+                label: 'Customers & Staff',
                 href: admin.users.index.url(),
                 icon: Users,
                 permission: 'users.manage',
+                searchText: 'users customers staff agents accounts',
             },
+            {
+                label: 'Customer Support',
+                href: admin.support.index.url(),
+                icon: Headphones,
+                permission: 'support.requests.manage',
+                searchText: 'support tickets cases messages complaints',
+            },
+        ],
+    },
+    {
+        label: 'Governance',
+        icon: ShieldCheck,
+        items: [
             {
                 label: 'Admin Roles',
                 href: admin.adminRoles.index.url(),
@@ -250,6 +285,17 @@ const navigationSections = [
             },
         ],
     },
+];
+
+const navigationSectionOrder = [
+    'Overview',
+    'Orders & Returns',
+    'Catalog & Listings',
+    'Inventory & Delivery',
+    'Growth & Quality',
+    'Finance',
+    'Marketplace Network',
+    'Governance',
 ];
 
 type Props = PropsWithChildren<{
@@ -273,7 +319,12 @@ export default function AdminLayout({
                 grantedPermissions.has(item.permission as AccountPermission),
             ),
         }))
-        .filter((section) => section.items.length > 0);
+        .filter((section) => section.items.length > 0)
+        .sort(
+            (first, second) =>
+                navigationSectionOrder.indexOf(first.label) -
+                navigationSectionOrder.indexOf(second.label),
+        );
     const activeSectionLabel = permittedNavigationSections.find((section) =>
         section.items.some(
             (item) =>
@@ -296,6 +347,10 @@ export default function AdminLayout({
         activeSectionLabel ?? 'Overview',
     );
     const pendingCount = Number(pendingVendorCount ?? 0);
+    const quickOperations = permittedNavigationSections
+        .flatMap((section) => section.items)
+        .filter((item) => 'badge' in item)
+        .slice(0, 4);
     const searchableNavigation = permittedNavigationSections.flatMap(
         (section) =>
             section.items.map((item) => ({
@@ -311,9 +366,13 @@ export default function AdminLayout({
         }
 
         return searchableNavigation
-            .filter((item) =>
-                `${item.label} ${item.section}`.toLowerCase().includes(query),
-            )
+            .filter((item) => {
+                const searchText = 'searchText' in item ? item.searchText : '';
+
+                return `${item.label} ${item.section} ${searchText}`
+                    .toLowerCase()
+                    .includes(query);
+            })
             .slice(0, 8);
     })();
 
@@ -591,6 +650,46 @@ export default function AdminLayout({
                             </span>
                         </div>
                     </div>
+                    {quickOperations.length > 0 && (
+                        <div className="mt-3 rounded-2xl border border-orange-400/15 bg-gradient-to-br from-orange-500/10 to-amber-400/5 p-3">
+                            <div className="flex items-center justify-between gap-3 px-1">
+                                <div className="flex items-center gap-2">
+                                    <Sparkles className="size-3.5 text-orange-400" />
+                                    <p className="text-[10px] font-bold tracking-[0.14em] text-orange-200 uppercase">
+                                        Quick operations
+                                    </p>
+                                </div>
+                                <span className="rounded-full bg-orange-400/15 px-2 py-0.5 text-[9px] font-bold text-orange-300">
+                                    {quickOperations.length}
+                                </span>
+                            </div>
+                            <div className="mt-3 grid grid-cols-2 gap-2">
+                                {quickOperations.map((item) => {
+                                    const Icon = item.icon;
+
+                                    return (
+                                        <Link
+                                            key={item.label}
+                                            href={item.href}
+                                            prefetch
+                                            onClick={() =>
+                                                setSidebarOpen(false)
+                                            }
+                                            className="group flex items-center gap-2 rounded-xl border border-white/6 bg-white/[0.045] px-2.5 py-2 text-[10px] font-semibold text-slate-300 transition hover:border-orange-400/20 hover:bg-orange-400/10 hover:text-white"
+                                        >
+                                            <Icon className="size-3.5 shrink-0 text-orange-400" />
+                                            <span className="truncate">
+                                                {item.label.replace(
+                                                    ' Operations',
+                                                    '',
+                                                )}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -618,7 +717,8 @@ export default function AdminLayout({
                                         >
                                             <SectionIcon className="size-[18px]" />
                                         </span>
-                                        {section.label === 'Accounts' &&
+                                        {section.label ===
+                                            'Marketplace Network' &&
                                             pendingCount > 0 && (
                                                 <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-400 ring-2 ring-[#111827] dark:ring-[#0d121c]" />
                                             )}
@@ -647,7 +747,8 @@ export default function AdminLayout({
                                         <span className="min-w-0 flex-1 truncate text-left">
                                             {section.label}
                                         </span>
-                                        {section.label === 'Accounts' &&
+                                        {section.label ===
+                                            'Marketplace Network' &&
                                             pendingCount > 0 && (
                                                 <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
                                                     {pendingCount > 99
@@ -655,6 +756,12 @@ export default function AdminLayout({
                                                         : pendingCount}
                                                 </span>
                                             )}
+                                        {section.label !==
+                                            'Marketplace Network' && (
+                                            <span className="rounded-full bg-white/[0.055] px-1.5 py-0.5 text-[9px] font-bold text-slate-500">
+                                                {section.items.length}
+                                            </span>
+                                        )}
                                         <ChevronDown className="size-4 shrink-0 text-slate-500 transition-transform duration-200 group-hover:text-slate-300 group-data-[state=open]:rotate-180" />
                                     </CollapsibleTrigger>
                                     <CollapsibleContent className="overflow-hidden">
@@ -688,7 +795,7 @@ export default function AdminLayout({
                                                             {item.label}
                                                         </span>
                                                         {item.label ===
-                                                            'Vendors' &&
+                                                            'Sellers' &&
                                                         pendingCount > 0 ? (
                                                             <span
                                                                 className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${active ? 'bg-white text-orange-600' : 'bg-amber-400 text-slate-950'}`}
@@ -697,6 +804,14 @@ export default function AdminLayout({
                                                                 99
                                                                     ? '99+'
                                                                     : pendingCount}
+                                                            </span>
+                                                        ) : 'badge' in item ? (
+                                                            <span
+                                                                className={`rounded-full px-1.5 py-0.5 text-[8px] font-black tracking-wide uppercase ${active ? 'bg-white/20 text-white' : 'bg-orange-400/10 text-orange-300'}`}
+                                                            >
+                                                                {String(
+                                                                    item.badge,
+                                                                )}
                                                             </span>
                                                         ) : (
                                                             active && (
