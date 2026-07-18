@@ -592,7 +592,7 @@ export default function AdminLayout({
 }: Props) {
     const { auth, errors, flash, pendingVendorCount } = usePage().props;
     const { url } = usePage();
-    const currentPath = url.split('?')[0];
+    const currentPath = url.split(/[?#]/)[0];
     const grantedPermissions = new Set<AccountPermission>(auth.permissions);
     const permittedNavigationSections = navigationSections
         .map((section) => ({
@@ -607,14 +607,6 @@ export default function AdminLayout({
                 navigationSectionOrder.indexOf(first.label) -
                 navigationSectionOrder.indexOf(second.label),
         );
-    const activeSectionLabel = permittedNavigationSections.find((section) =>
-        section.items.some(
-            (item) =>
-                currentPath === item.href ||
-                (item.href !== admin.dashboard.url() &&
-                    currentPath.startsWith(item.href)),
-        ),
-    )?.label;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
         typeof window === 'undefined'
@@ -623,16 +615,41 @@ export default function AdminLayout({
     );
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [sidebarQuery, setSidebarQuery] = useState('');
     const [activeSearchIndex, setActiveSearchIndex] = useState(0);
+    const [activeHash, setActiveHash] = useState(() =>
+        typeof window === 'undefined' ? '' : window.location.hash,
+    );
+    const [isDesktop, setIsDesktop] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const isNavigationItemActive = (item: { href: string }) => {
+        const [itemUrl, itemHash = ''] = item.href.split('#');
+        const [itemPath, itemQuery = ''] = itemUrl.split('?');
+        const [currentUrl] = url.split('#');
+
+        if (itemHash !== '') {
+            return currentPath === itemPath && activeHash === `#${itemHash}`;
+        }
+
+        if (itemQuery !== '') {
+            return currentUrl === itemUrl;
+        }
+
+        return (
+            (currentPath === itemPath &&
+                currentUrl === itemPath &&
+                activeHash === '') ||
+            (itemPath !== admin.dashboard.url() &&
+                currentPath.startsWith(`${itemPath}/`))
+        );
+    };
+    const activeSectionLabel = permittedNavigationSections.find((section) =>
+        section.items.some(isNavigationItemActive),
+    )?.label;
     const [openSection, setOpenSection] = useState<string | null>(
         activeSectionLabel ?? 'Dashboard',
     );
     const pendingCount = Number(pendingVendorCount ?? 0);
-    const quickOperations = permittedNavigationSections
-        .flatMap((section) => section.items)
-        .filter((item) => 'badge' in item)
-        .slice(0, 4);
     const searchableNavigation = permittedNavigationSections.flatMap(
         (section) =>
             section.items.map((item) => ({
@@ -657,6 +674,32 @@ export default function AdminLayout({
             })
             .slice(0, 8);
     })();
+    const normalizedSidebarQuery = sidebarQuery.trim().toLowerCase();
+    const visibleNavigationSections = permittedNavigationSections
+        .map((section) => {
+            if (normalizedSidebarQuery === '') {
+                return section;
+            }
+
+            const sectionMatches = section.label
+                .toLowerCase()
+                .includes(normalizedSidebarQuery);
+
+            return {
+                ...section,
+                items: sectionMatches
+                    ? section.items
+                    : section.items.filter((item) => {
+                          const searchText =
+                              'searchText' in item ? item.searchText : '';
+
+                          return `${item.label} ${searchText}`
+                              .toLowerCase()
+                              .includes(normalizedSidebarQuery);
+                      }),
+            };
+        })
+        .filter((section) => section.items.length > 0);
 
     const closeSearch = () => {
         setSearchOpen(false);
@@ -685,6 +728,28 @@ export default function AdminLayout({
 
         return () => document.removeEventListener('keydown', onKeyDown);
     }, []);
+
+    useEffect(() => {
+        const desktopMedia = window.matchMedia('(min-width: 1024px)');
+        const updateDesktopState = () => setIsDesktop(desktopMedia.matches);
+        const updateHash = () => setActiveHash(window.location.hash);
+
+        updateDesktopState();
+        updateHash();
+        desktopMedia.addEventListener('change', updateDesktopState);
+        window.addEventListener('hashchange', updateHash);
+
+        return () => {
+            desktopMedia.removeEventListener('change', updateDesktopState);
+            window.removeEventListener('hashchange', updateHash);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (activeSectionLabel) {
+            setOpenSection(activeSectionLabel);
+        }
+    }, [activeSectionLabel]);
 
     useEffect(() => {
         const root = document.documentElement;
@@ -914,74 +979,54 @@ export default function AdminLayout({
                 </div>
 
                 <div
-                    className={`px-4 pb-5 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
+                    className={`px-3 pb-3 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
                 >
-                    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.065] p-4 shadow-inner shadow-white/[0.025]">
-                        <div className="absolute -top-8 -right-6 size-20 rounded-full bg-commerce-gold/15 blur-2xl" />
-                        <div className="relative flex items-center justify-between gap-3">
-                            <div>
-                                <p className="text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
-                                    Storefront status
-                                </p>
-                                <p className="mt-1.5 text-sm font-semibold">
-                                    Online & accepting orders
-                                </p>
-                            </div>
-                            <span className="grid size-9 place-items-center rounded-xl bg-emerald-400/10 text-emerald-400">
-                                <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_5px_rgba(52,211,153,0.1)]" />
+                    <label className="relative block">
+                        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" />
+                        <input
+                            type="search"
+                            value={sidebarQuery}
+                            onChange={(event) =>
+                                setSidebarQuery(event.target.value)
+                            }
+                            placeholder="Filter navigation..."
+                            aria-label="Filter admin navigation"
+                            className="h-10 w-full rounded-xl border border-white/8 bg-white/[0.055] pr-9 pl-9 text-xs text-white transition outline-none placeholder:text-slate-500 focus:border-orange-400/30 focus:bg-white/[0.08] focus:ring-2 focus:ring-orange-400/10"
+                        />
+                        {sidebarQuery && (
+                            <button
+                                type="button"
+                                onClick={() => setSidebarQuery('')}
+                                className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-white/10 hover:text-white"
+                                aria-label="Clear navigation filter"
+                            >
+                                <X className="size-3.5" />
+                            </button>
+                        )}
+                    </label>
+                    <div className="mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-semibold text-slate-500">
+                        <span className="flex items-center gap-2">
+                            <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,0.1)]" />
+                            Storefront online
+                        </span>
+                        {pendingCount > 0 && (
+                            <span className="text-amber-300">
+                                {pendingCount} seller pending
                             </span>
-                        </div>
+                        )}
                     </div>
-                    {quickOperations.length > 0 && (
-                        <div className="mt-3 rounded-2xl border border-orange-400/15 bg-gradient-to-br from-orange-500/10 to-amber-400/5 p-3">
-                            <div className="flex items-center justify-between gap-3 px-1">
-                                <div className="flex items-center gap-2">
-                                    <Sparkles className="size-3.5 text-orange-400" />
-                                    <p className="text-[10px] font-bold tracking-[0.14em] text-orange-200 uppercase">
-                                        Quick operations
-                                    </p>
-                                </div>
-                                <span className="rounded-full bg-orange-400/15 px-2 py-0.5 text-[9px] font-bold text-orange-300">
-                                    {quickOperations.length}
-                                </span>
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2">
-                                {quickOperations.map((item) => {
-                                    const Icon = item.icon;
-
-                                    return (
-                                        <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            prefetch
-                                            onClick={() =>
-                                                setSidebarOpen(false)
-                                            }
-                                            className="group flex items-center gap-2 rounded-xl border border-white/6 bg-white/[0.045] px-2.5 py-2 text-[10px] font-semibold text-slate-300 transition hover:border-orange-400/20 hover:bg-orange-400/10 hover:text-white"
-                                        >
-                                            <Icon className="size-3.5 shrink-0 text-orange-400" />
-                                            <span className="truncate">
-                                                {item.label.replace(
-                                                    ' Operations',
-                                                    '',
-                                                )}
-                                            </span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <div className="grid gap-1.5">
-                        {permittedNavigationSections.map((section) => {
+                        {visibleNavigationSections.map((section) => {
                             const sectionActive =
                                 activeSectionLabel === section.label;
                             const SectionIcon = section.icon;
+                            const compactSidebar =
+                                isDesktop && sidebarCollapsed;
 
-                            if (sidebarCollapsed) {
+                            if (compactSidebar) {
                                 return (
                                     <button
                                         key={section.label}
@@ -1008,15 +1053,56 @@ export default function AdminLayout({
                                 );
                             }
 
+                            if (section.items.length === 1) {
+                                const item = section.items[0];
+                                const active = isNavigationItemActive(item);
+
+                                return (
+                                    <Link
+                                        key={section.label}
+                                        href={item.href}
+                                        prefetch
+                                        onClick={() => setSidebarOpen(false)}
+                                        className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${active ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                    >
+                                        <span
+                                            className={`grid size-8 place-items-center rounded-lg transition ${active ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
+                                        >
+                                            <SectionIcon className="size-[18px]" />
+                                        </span>
+                                        <span className="min-w-0 flex-1 truncate text-left">
+                                            {normalizedSidebarQuery
+                                                ? item.label
+                                                : section.label}
+                                        </span>
+                                        {'badge' in item && (
+                                            <span
+                                                className={`rounded-full px-1.5 py-0.5 text-[8px] font-black tracking-wide uppercase ${active ? 'bg-white/20 text-white' : 'bg-orange-400/10 text-orange-300'}`}
+                                            >
+                                                {String(item.badge)}
+                                            </span>
+                                        )}
+                                        {active && (
+                                            <ChevronRight className="size-3.5 text-orange-100" />
+                                        )}
+                                    </Link>
+                                );
+                            }
+
                             return (
                                 <Collapsible
                                     key={section.label}
-                                    open={openSection === section.label}
-                                    onOpenChange={(open) =>
-                                        setOpenSection(
-                                            open ? section.label : null,
-                                        )
+                                    open={
+                                        normalizedSidebarQuery !== '' ||
+                                        openSection === section.label
                                     }
+                                    onOpenChange={(open) => {
+                                        if (normalizedSidebarQuery === '') {
+                                            setOpenSection(
+                                                open ? section.label : null,
+                                            );
+                                        }
+                                    }}
                                 >
                                     <CollapsibleTrigger
                                         className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${sectionActive ? 'bg-white/[0.06] text-white' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
@@ -1050,12 +1136,9 @@ export default function AdminLayout({
                                         <div className="mt-1 ml-7 grid gap-1 border-l border-white/8 pl-3">
                                             {section.items.map((item) => {
                                                 const active =
-                                                    currentPath === item.href ||
-                                                    (item.href !==
-                                                        admin.dashboard.url() &&
-                                                        currentPath.startsWith(
-                                                            item.href,
-                                                        ));
+                                                    isNavigationItemActive(
+                                                        item,
+                                                    );
                                                 const Icon = item.icon;
 
                                                 return (
@@ -1108,6 +1191,21 @@ export default function AdminLayout({
                                 </Collapsible>
                             );
                         })}
+                        {visibleNavigationSections.length === 0 && (
+                            <div className="rounded-xl border border-dashed border-white/10 px-4 py-8 text-center">
+                                <Search className="mx-auto size-5 text-slate-600" />
+                                <p className="mt-2 text-xs font-semibold text-slate-400">
+                                    No navigation matches
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => setSidebarQuery('')}
+                                    className="mt-2 text-[10px] font-bold text-orange-400"
+                                >
+                                    Clear filter
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </nav>
 
