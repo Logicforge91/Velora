@@ -4,13 +4,13 @@ import {
     Heart,
     Menu,
     Search,
-    ShoppingBag,
     ShoppingCart,
     Sparkles,
     X,
 } from 'lucide-react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import {
     categories,
     scrollToStorefrontSection,
@@ -63,7 +63,10 @@ export default function SiteHeader({
                     New-season edit is live · Free delivery on your first order
                 </span>
             </div>
-            <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/85 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/85">
+            <header
+                data-storefront-header
+                className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/95 shadow-sm shadow-slate-950/5 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/95"
+            >
                 <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
                     <Link
                         href={home.url()}
@@ -71,7 +74,7 @@ export default function SiteHeader({
                         aria-label="Velora home"
                     >
                         <span className="grid size-10 place-items-center rounded-2xl bg-gradient-to-br from-orange-500 to-rose-500 text-white shadow-lg shadow-orange-500/20">
-                            <ShoppingBag className="size-5" />
+                            <AppLogoIcon className="size-6" />
                         </span>
                         <span className="text-xl font-black tracking-[-0.04em]">
                             Velora
@@ -83,7 +86,7 @@ export default function SiteHeader({
                         onSubmit={submitSearch}
                         className="relative hidden min-w-0 flex-1 md:block"
                     />
-                    <nav className="ml-auto hidden items-center gap-2 sm:flex">
+                    <nav className="ml-auto hidden items-center gap-2 lg:flex">
                         <Link
                             href={wishlist.url()}
                             className="relative grid size-10 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-orange-500 dark:text-slate-300 dark:hover:bg-white/5"
@@ -118,7 +121,7 @@ export default function SiteHeader({
                     <button
                         type="button"
                         onClick={() => setMobileMenuOpen((open) => !open)}
-                        className="ml-auto grid size-10 place-items-center rounded-xl border border-slate-200 sm:hidden dark:border-white/10"
+                        className="ml-auto grid size-10 place-items-center rounded-xl border border-slate-200 lg:hidden dark:border-white/10"
                         aria-label="Toggle menu"
                     >
                         {mobileMenuOpen ? (
@@ -149,7 +152,7 @@ export default function SiteHeader({
                     </Link>
                 </div>
                 {mobileMenuOpen && (
-                    <div className="border-t border-slate-100 p-4 sm:hidden dark:border-white/10">
+                    <div className="border-t border-slate-100 p-4 lg:hidden dark:border-white/10">
                         <SearchForm
                             query={query}
                             onQueryChange={onQueryChange}

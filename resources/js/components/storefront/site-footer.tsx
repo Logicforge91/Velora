@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { ArrowUpRight, ShoppingBag } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import { cart, catalog, checkout, wishlist } from '@/routes/storefront';
 
@@ -59,9 +60,10 @@ export default function SiteFooter() {
                     <Link
                         href={home.url()}
                         className="flex items-center gap-2.5 text-white"
+                        aria-label="Velora home"
                     >
                         <span className="grid size-10 place-items-center rounded-2xl bg-gradient-to-br from-orange-500 to-rose-500">
-                            <ShoppingBag className="size-4" />
+                            <AppLogoIcon className="size-6" />
                         </span>
                         <span className="text-xl font-black tracking-tight">
                             Velora

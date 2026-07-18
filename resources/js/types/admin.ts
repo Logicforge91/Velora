@@ -203,6 +203,27 @@ export type Product = {
     primary_image?: { id: number; url: string; path: string } | null;
 };
 
+export type ProductVariantAttribute = {
+    name: string;
+    value: string;
+};
+
+export type ProductVariant = {
+    id: number;
+    product_id: number;
+    name: string;
+    sku: string;
+    attributes: ProductVariantAttribute[];
+    price: string;
+    compare_at_price: string | null;
+    stock: number;
+    low_stock_threshold: number;
+    status: boolean;
+    is_default: boolean;
+    created_at: string;
+    product?: Pick<Product, 'id' | 'name' | 'sku'>;
+};
+
 export type OrderItem = {
     id: number;
     product_id: number | null;

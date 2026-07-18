@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use Database\Factories\StoreFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Store extends Model
 {
+    /** @use HasFactory<StoreFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'code', 'name', 'type', 'contact_name', 'contact_phone', 'address',
         'city', 'state', 'postal_code', 'capacity', 'priority', 'status',

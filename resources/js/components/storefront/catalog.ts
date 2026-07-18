@@ -144,5 +144,26 @@ export const money = new Intl.NumberFormat('en-IN', {
 });
 
 export function scrollToStorefrontSection(selector: string): void {
-    document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth' });
+    const section = document.querySelector<HTMLElement>(selector);
+
+    if (!section) {
+        return;
+    }
+
+    const header = document.querySelector<HTMLElement>(
+        '[data-storefront-header]',
+    );
+    const headerOffset = header?.offsetHeight ?? 0;
+    const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    window.scrollTo({
+        top:
+            section.getBoundingClientRect().top +
+            window.scrollY -
+            headerOffset -
+            16,
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    });
 }

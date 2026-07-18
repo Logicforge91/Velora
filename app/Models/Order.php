@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\OrderFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
+    /** @use HasFactory<OrderFactory> */
+    use HasFactory;
+
     public const STATUS_PENDING = 'pending';
 
     public const STATUS_PROCESSING = 'processing';
@@ -26,12 +31,27 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'shipping_address',
+        'billing_address',
+        'coupon_id',
+        'currency',
         'subtotal',
         'shipping_total',
         'discount_total',
+        'tax_total',
+        'gift_wrap_total',
+        'savings_total',
         'total',
         'customer_note',
+        'source',
+        'channel',
+        'ip_address',
+        'user_agent',
+        'gift_message',
+        'cancellation_reason',
         'placed_at',
+        'confirmed_at',
+        'cancelled_at',
+        'delivered_at',
     ];
 
     protected $attributes = [
@@ -40,6 +60,12 @@ class Order extends Model
         'payment_status' => 'pending',
         'shipping_total' => 0,
         'discount_total' => 0,
+        'tax_total' => 0,
+        'gift_wrap_total' => 0,
+        'savings_total' => 0,
+        'currency' => 'INR',
+        'source' => 'web',
+        'channel' => 'marketplace',
     ];
 
     protected static function booted(): void
@@ -60,11 +86,18 @@ class Order extends Model
     {
         return [
             'shipping_address' => 'array',
+            'billing_address' => 'array',
             'subtotal' => 'decimal:2',
             'shipping_total' => 'decimal:2',
             'discount_total' => 'decimal:2',
+            'tax_total' => 'decimal:2',
+            'gift_wrap_total' => 'decimal:2',
+            'savings_total' => 'decimal:2',
             'total' => 'decimal:2',
             'placed_at' => 'datetime',
+            'confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+            'delivered_at' => 'datetime',
         ];
     }
 
@@ -72,6 +105,12 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
+    }
+
+    /** @return BelongsTo<Coupon, $this> */
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 
     /** @return HasMany<OrderItem, $this> */

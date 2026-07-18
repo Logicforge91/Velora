@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\GrowthCentreController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ProductVariantController;
 use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettlementController;
@@ -109,6 +110,10 @@ Route::prefix('admin')
             ->middleware('permission:catalogue.manage');
 
         Route::resource('products', AdminProductController::class)
+            ->except('show')
+            ->middleware('permission:catalogue.manage');
+
+        Route::resource('product-variants', ProductVariantController::class)
             ->except('show')
             ->middleware('permission:catalogue.manage');
 
