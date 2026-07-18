@@ -69,12 +69,26 @@ class WarehouseOperationsService
                 'store_id' => $warehouse->id,
                 'product_id' => $product->id,
             ]);
+            $beforeQuantity = (int) $inventory->on_hand;
 
             if ((int) $data['reserved'] > (int) $data['on_hand']) {
                 throw ValidationException::withMessages(['reserved' => 'Reserved stock cannot exceed on-hand stock.']);
             }
 
             $inventory->fill([...$data, 'updated_by' => $actor->id])->save();
+
+            if ($beforeQuantity !== (int) $inventory->on_hand) {
+                $inventory->movements()->create([
+                    'type' => 'adjustment',
+                    'quantity' => (int) $inventory->on_hand - $beforeQuantity,
+                    'before_quantity' => $beforeQuantity,
+                    'after_quantity' => (int) $inventory->on_hand,
+                    'reason' => 'Manual warehouse adjustment',
+                    'created_by' => $actor->id,
+                    'occurred_at' => now(),
+                ]);
+            }
+
             $product->update([
                 'stock' => (int) Inventory::query()->where('product_id', $product->id)->sum('on_hand'),
             ]);

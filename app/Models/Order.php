@@ -143,6 +143,18 @@ class Order extends Model
         return $this->hasOne(Shipment::class);
     }
 
+    /** @return HasMany<OrderStatusHistory, $this> */
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(OrderStatusHistory::class)->latest('occurred_at');
+    }
+
+    /** @return HasMany<InventoryReservation, $this> */
+    public function inventoryReservations(): HasMany
+    {
+        return $this->hasMany(InventoryReservation::class);
+    }
+
     /** @return list<string> */
     public static function statuses(): array
     {

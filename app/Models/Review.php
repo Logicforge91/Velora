@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\ReviewFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Review extends Model
 {
+    /** @use HasFactory<ReviewFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'product_id', 'user_id', 'order_item_id', 'rating', 'title', 'body',
         'status', 'is_verified_purchase', 'helpful_count', 'unhelpful_count',
@@ -56,5 +62,11 @@ class Review extends Model
     public function orderItem(): BelongsTo
     {
         return $this->belongsTo(OrderItem::class);
+    }
+
+    /** @return HasMany<ReviewVote, $this> */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(ReviewVote::class);
     }
 }

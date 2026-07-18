@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\VendorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vendor extends Model
 {
-    /** @use HasFactory<\Database\Factories\VendorFactory> */
+    /** @use HasFactory<VendorFactory> */
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
@@ -66,6 +67,12 @@ class Vendor extends Model
         return $this->hasMany(Product::class);
     }
 
+    /** @return HasMany<SellerListing, $this> */
+    public function sellerListings(): HasMany
+    {
+        return $this->hasMany(SellerListing::class);
+    }
+
     /** @return HasMany<Settlement, $this> */
     public function settlements(): HasMany
     {
@@ -73,13 +80,22 @@ class Vendor extends Model
     }
 
     /** @return HasMany<VendorKycDocument, $this> */
-    public function kycDocuments(): HasMany { return $this->hasMany(VendorKycDocument::class); }
+    public function kycDocuments(): HasMany
+    {
+        return $this->hasMany(VendorKycDocument::class);
+    }
 
     /** @return HasMany<VendorReviewEvent, $this> */
-    public function reviewEvents(): HasMany { return $this->hasMany(VendorReviewEvent::class)->latest(); }
+    public function reviewEvents(): HasMany
+    {
+        return $this->hasMany(VendorReviewEvent::class)->latest();
+    }
 
     /** @return BelongsTo<User, $this> */
-    public function kycVerifiedBy(): BelongsTo { return $this->belongsTo(User::class, 'kyc_verified_by')->withTrashed(); }
+    public function kycVerifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'kyc_verified_by')->withTrashed();
+    }
 
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo

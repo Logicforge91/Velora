@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             AdminRoleSeeder::class,
             AdminUserSeeder::class,
             ProductSeeder::class,
+            AdvancedMarketplaceSeeder::class,
         ]);
     }
 }

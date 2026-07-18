@@ -165,4 +165,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(Wishlist::class);
     }
+
+    /** @return HasMany<CouponRedemption, $this> */
+    public function couponRedemptions(): HasMany
+    {
+        return $this->hasMany(CouponRedemption::class);
+    }
+
+    /** @return HasMany<ProductQuestion, $this> */
+    public function productQuestions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class);
+    }
+
+    /** @return HasMany<ProductAnswer, $this> */
+    public function productAnswers(): HasMany
+    {
+        return $this->hasMany(ProductAnswer::class);
+    }
+
+    /** @return HasMany<ReviewVote, $this> */
+    public function reviewVotes(): HasMany
+    {
+        return $this->hasMany(ReviewVote::class);
+    }
 }

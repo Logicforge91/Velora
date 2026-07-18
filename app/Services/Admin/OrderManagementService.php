@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +59,7 @@ class OrderManagementService
         ];
     }
 
-    public function updateStatus(Order $order, string $status, string $paymentStatus): Order
+    public function updateStatus(Order $order, User $actor, string $status, string $paymentStatus): Order
     {
         $transitions = [
             Order::STATUS_PENDING => [Order::STATUS_PENDING, Order::STATUS_PROCESSING, Order::STATUS_CANCELLED],
@@ -74,10 +75,20 @@ class OrderManagementService
             ]);
         }
 
-        DB::transaction(fn () => $order->update([
-            'status' => $status,
-            'payment_status' => $paymentStatus,
-        ]));
+        DB::transaction(function () use ($order, $actor, $status, $paymentStatus): void {
+            $fromStatus = $order->status;
+            $order->update(['status' => $status, 'payment_status' => $paymentStatus]);
+
+            if ($fromStatus !== $status) {
+                $order->statusHistories()->create([
+                    'from_status' => $fromStatus,
+                    'to_status' => $status,
+                    'payment_status' => $paymentStatus,
+                    'changed_by' => $actor->id,
+                    'occurred_at' => now(),
+                ]);
+            }
+        });
 
         return $order->fresh(['user', 'items']);
     }

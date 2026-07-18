@@ -374,6 +374,99 @@ export type Warehouse = {
     inventories?: WarehouseInventory[];
 };
 
+export type SellerListing = {
+    id: number;
+    seller_sku: string;
+    condition: string;
+    mrp: string;
+    selling_price: string;
+    stock: number;
+    reserved: number;
+    commission_rate: string;
+    is_buy_box_winner: boolean;
+    status: 'draft' | 'pending' | 'active' | 'suspended' | 'rejected';
+    rejection_reason: string | null;
+    vendor: { id: number; business_name: string };
+    product: { id: number; name: string; sku: string };
+    variant?: { id: number; name: string; sku: string } | null;
+    store?: { id: number; name: string; code: string } | null;
+};
+
+export type InventoryMovement = {
+    id: number;
+    uuid: string;
+    type: string;
+    quantity: number;
+    before_quantity: number;
+    after_quantity: number;
+    reason: string | null;
+    occurred_at: string;
+    inventory: WarehouseInventory & {
+        variant?: { id: number; name: string; sku: string } | null;
+        store: { id: number; name: string; code: string };
+    };
+    creator?: { id: number; name: string } | null;
+};
+
+export type InventoryReservation = {
+    id: number;
+    uuid: string;
+    quantity: number;
+    status: 'active' | 'released' | 'expired' | 'converted';
+    expires_at: string | null;
+    released_at: string | null;
+    release_reason: string | null;
+    inventory: WarehouseInventory & {
+        variant?: { id: number; name: string; sku: string } | null;
+        store: { id: number; name: string; code: string };
+    };
+    order?: { id: number; number: string } | null;
+};
+
+export type PaymentRefund = {
+    id: number;
+    number: string;
+    provider_reference: string | null;
+    amount: string;
+    reason_code: string;
+    reason_details: string | null;
+    status:
+        | 'requested'
+        | 'approved'
+        | 'processing'
+        | 'completed'
+        | 'failed'
+        | 'rejected';
+    failure_reason: string | null;
+    requested_at: string;
+    payment: Payment;
+    return_case?: { id: number; number: string } | null;
+    requester?: { id: number; name: string } | null;
+    processor?: { id: number; name: string } | null;
+};
+
+export type ServiceArea = {
+    id: number;
+    store_id: number | null;
+    postal_code: string;
+    city: string | null;
+    district: string | null;
+    state: string;
+    country_code: string;
+    prepaid_available: boolean;
+    cod_available: boolean;
+    express_available: boolean;
+    minimum_delivery_days: number;
+    maximum_delivery_days: number;
+    shipping_charge: string;
+    free_shipping_threshold: string | null;
+    cod_charge: string;
+    daily_capacity: number | null;
+    status: 'active' | 'inactive';
+    cutoff_time: string | null;
+    store?: { id: number; name: string; code: string } | null;
+};
+
 export type Settlement = {
     id: number;
     number: string;
