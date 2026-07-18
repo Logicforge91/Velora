@@ -36,6 +36,24 @@ class Product extends Model
         'low_stock_threshold',
         'status',
         'is_featured',
+        'product_type',
+        'barcode',
+        'hsn_code',
+        'tax_rate',
+        'weight_kg',
+        'dimensions',
+        'specifications',
+        'shipping_class',
+        'country_of_origin',
+        'manufacturer',
+        'warranty',
+        'return_window_days',
+        'replacement_window_days',
+        'cod_eligible',
+        'free_shipping',
+        'seo_title',
+        'seo_description',
+        'published_at',
     ];
 
     protected $attributes = [
@@ -43,6 +61,13 @@ class Product extends Model
         'low_stock_threshold' => 5,
         'status' => self::STATUS_DRAFT,
         'is_featured' => false,
+        'product_type' => 'physical',
+        'tax_rate' => 0,
+        'shipping_class' => 'standard',
+        'return_window_days' => 7,
+        'replacement_window_days' => 7,
+        'cod_eligible' => true,
+        'free_shipping' => false,
     ];
 
     protected function casts(): array
@@ -53,6 +78,15 @@ class Product extends Model
             'stock' => 'integer',
             'low_stock_threshold' => 'integer',
             'is_featured' => 'boolean',
+            'tax_rate' => 'decimal:2',
+            'weight_kg' => 'decimal:3',
+            'dimensions' => 'array',
+            'specifications' => 'array',
+            'return_window_days' => 'integer',
+            'replacement_window_days' => 'integer',
+            'cod_eligible' => 'boolean',
+            'free_shipping' => 'boolean',
+            'published_at' => 'datetime',
         ];
     }
 
@@ -86,10 +120,58 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
+    /** @return HasMany<ProductVariant, $this> */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
     /** @return HasMany<OrderItem, $this> */
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /** @return HasMany<CartItem, $this> */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    /** @return HasMany<WishlistItem, $this> */
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    /** @return HasMany<Inventory, $this> */
+    public function inventories(): HasMany
+    {
+        return $this->hasMany(Inventory::class);
+    }
+
+    /** @return HasMany<SellerListing, $this> */
+    public function sellerListings(): HasMany
+    {
+        return $this->hasMany(SellerListing::class);
+    }
+
+    /** @return HasMany<PriceHistory, $this> */
+    public function priceHistories(): HasMany
+    {
+        return $this->hasMany(PriceHistory::class);
+    }
+
+    /** @return HasMany<ProductAttributeValue, $this> */
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValue::class);
+    }
+
+    /** @return HasMany<ProductQuestion, $this> */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class);
     }
 
     /** @return HasOne<ProductImage, $this> */

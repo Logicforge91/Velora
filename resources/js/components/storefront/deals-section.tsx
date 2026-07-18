@@ -22,7 +22,7 @@ export default function DealsSection({
     return (
         <section
             id="deals"
-            className="border-y border-slate-200 bg-white py-20 dark:border-white/10 dark:bg-white/[0.025]"
+            className="scroll-mt-24 border-y border-slate-200 bg-white py-20 lg:scroll-mt-36 dark:border-white/10 dark:bg-white/[0.025]"
         >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
