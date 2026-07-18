@@ -57,55 +57,228 @@ import { logout } from '@/routes';
 import admin from '@/routes/admin';
 import type { AccountPermission } from '@/types/auth';
 
+const dashboardSection = (section: string) =>
+    `${admin.dashboard.url()}#${section}`;
+
 const navigationSections = [
     {
-        label: 'Overview',
+        label: 'Dashboard',
         icon: LayoutDashboard,
         items: [
             {
-                label: 'Dashboard',
+                label: 'Business Overview',
                 href: admin.dashboard.url(),
                 icon: LayoutDashboard,
                 permission: 'admin.dashboard.view',
+                searchText:
+                    'dashboard today orders gmv revenue active sellers pending approvals returns low stock fulfilment performance activities',
             },
             {
-                label: 'Analytics',
-                href: admin.analytics.url(),
-                icon: BarChart3,
-                permission: 'reports.view',
+                label: 'Today’s Orders',
+                href: dashboardSection('todays-orders'),
+                icon: ShoppingBag,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Gross Merchandise Value',
+                href: dashboardSection('gross-merchandise-value'),
+                icon: CircleDollarSign,
+                permission: 'admin.dashboard.view',
+                searchText: 'gmv gross order value',
+            },
+            {
+                label: 'Net Revenue',
+                href: dashboardSection('net-revenue'),
+                icon: Banknote,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Active Sellers',
+                href: dashboardSection('active-sellers'),
+                icon: Store,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Active Customers',
+                href: dashboardSection('active-customers'),
+                icon: Users,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Pending Approvals',
+                href: dashboardSection('pending-approvals'),
+                icon: ShieldCheck,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Returns Summary',
+                href: dashboardSection('returns-summary'),
+                icon: Undo2,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Low-stock Alerts',
+                href: dashboardSection('low-stock-alerts'),
+                icon: Boxes,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Fulfilment Performance',
+                href: dashboardSection('fulfilment-performance'),
+                icon: Truck,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Recent Activities',
+                href: dashboardSection('recent-activities'),
+                icon: ScrollText,
+                permission: 'admin.dashboard.view',
             },
         ],
     },
     {
-        label: 'Orders & Returns',
-        icon: ShoppingBag,
+        label: 'Marketplace / Sellers',
+        icon: Store,
         items: [
             {
-                label: 'All Orders',
-                href: admin.orders.index.url(),
-                icon: ShoppingBag,
-                permission: 'orders.manage',
-                badge: 'Live',
-                searchText: 'sales purchases order processing dispatch',
+                label: 'All Sellers',
+                href: admin.vendors.index.url(),
+                icon: Store,
+                permission: 'vendors.manage',
+                searchText:
+                    'seller management vendors merchants directory all sellers',
             },
             {
-                label: 'Returns & Claims',
-                href: admin.returns.index.url(),
-                icon: Undo2,
-                permission: 'orders.manage',
-                searchText: 'returns replacements claims rma reverse logistics',
+                label: 'Add Seller',
+                href: admin.vendors.create.url(),
+                icon: Users,
+                permission: 'vendors.manage',
+                searchText: 'create invite onboard new seller',
             },
             {
-                label: 'Shipments',
-                href: admin.shipments.index.url(),
-                icon: Truck,
-                permission: 'orders.manage',
-                searchText: 'fulfilment tracking delivery dispatch carrier',
+                label: 'Seller Applications',
+                href: admin.vendors.index.url({
+                    query: { status: 'pending', view: 'applications' },
+                }),
+                icon: FileSpreadsheet,
+                permission: 'vendors.manage',
+                searchText: 'onboarding applications review queue',
+            },
+            {
+                label: 'Pending Approvals',
+                href: admin.vendors.index.url({
+                    query: { status: 'pending' },
+                }),
+                icon: ShieldCheck,
+                permission: 'vendors.manage',
+            },
+            {
+                label: 'KYC Verification',
+                href: admin.vendors.index.url({
+                    query: { kyc_status: 'in_review' },
+                }),
+                icon: ShieldCheck,
+                permission: 'vendors.manage',
+                badge: 'Review',
+                searchText:
+                    'documents identity gst pan bank proof verification',
+            },
+            {
+                label: 'Approved Sellers',
+                href: admin.vendors.index.url({
+                    query: { status: 'approved' },
+                }),
+                icon: Store,
+                permission: 'vendors.manage',
+            },
+            {
+                label: 'Rejected Sellers',
+                href: admin.vendors.index.url({
+                    query: { status: 'rejected' },
+                }),
+                icon: Store,
+                permission: 'vendors.manage',
+            },
+            {
+                label: 'Suspended Sellers',
+                href: admin.vendors.index.url({
+                    query: { status: 'suspended' },
+                }),
+                icon: Store,
+                permission: 'vendors.manage',
+            },
+            {
+                label: 'Seller Documents',
+                href: admin.vendors.index.url({
+                    query: { kyc_status: 'in_review', view: 'documents' },
+                }),
+                icon: ScrollText,
+                permission: 'vendors.manage',
+                searchText: 'kyc document checklist files',
+            },
+            {
+                label: 'Seller Bank Accounts',
+                href: admin.vendors.index.url({
+                    query: { view: 'bank-accounts' },
+                }),
+                icon: WalletCards,
+                permission: 'payments.manage',
+                searchText: 'beneficiary ifsc payout account banking',
+            },
+            {
+                label: 'Seller Warehouses',
+                href: admin.warehouses.index.url({
+                    query: { view: 'sellers' },
+                }),
+                icon: Warehouse,
+                permission: 'catalogue.manage',
+            },
+            {
+                label: 'Seller Performance',
+                href: admin.growthCentre.url({
+                    query: { view: 'seller-performance' },
+                }),
+                icon: BarChart3,
+                permission: 'reports.view',
+                searchText: 'sales returns activity quality performance',
+            },
+            {
+                label: 'Seller Score',
+                href: admin.growthCentre.url({
+                    query: { view: 'seller-score' },
+                }),
+                icon: Sparkles,
+                permission: 'reports.view',
+            },
+            {
+                label: 'Seller Violations',
+                href: admin.vendors.index.url({
+                    query: { risk_level: 'high', view: 'violations' },
+                }),
+                icon: ShieldCheck,
+                permission: 'vendors.manage',
+                searchText: 'risk fraud policy penalties violations',
+            },
+            {
+                label: 'Seller Agreements',
+                href: admin.vendors.index.url({
+                    query: { view: 'agreements' },
+                }),
+                icon: ReceiptText,
+                permission: 'vendors.manage',
+            },
+            {
+                label: 'Seller Subscriptions',
+                href: admin.vendors.index.url({
+                    query: { view: 'subscriptions' },
+                }),
+                icon: BadgePercent,
+                permission: 'vendors.manage',
             },
         ],
     },
     {
-        label: 'Catalog & Listings',
+        label: 'Catalogue',
         icon: Package,
         items: [
             {
@@ -114,14 +287,6 @@ const navigationSections = [
                 icon: Package,
                 permission: 'catalogue.manage',
                 searchText: 'catalog products sku listing content',
-            },
-            {
-                label: 'Seller Listings',
-                href: admin.sellerListings.index.url(),
-                icon: Store,
-                permission: 'catalogue.manage',
-                badge: 'Buy box',
-                searchText: 'marketplace offers buy box seller sku commission',
             },
             {
                 label: 'Variants',
@@ -152,8 +317,53 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Inventory & Delivery',
-        icon: Warehouse,
+        label: 'Listings',
+        icon: Layers3,
+        items: [
+            {
+                label: 'Seller Listings',
+                href: admin.sellerListings.index.url(),
+                icon: Store,
+                permission: 'catalogue.manage',
+                badge: 'Buy box',
+                searchText:
+                    'active inactive blocked out of stock seller listings approvals pricing mrp image content violations restricted products history marketplace offers buy box seller sku commission',
+            },
+        ],
+    },
+    {
+        label: 'Pricing & Offers',
+        icon: BadgePercent,
+        items: [
+            {
+                label: 'Pricing Intelligence',
+                href: admin.growthCentre.url(),
+                icon: BarChart3,
+                permission: 'reports.view',
+                badge: 'AI',
+                searchText:
+                    'growth pricing recommendations intelligence price approvals dynamic pricing mrp special scheduled prices deal zone flash festival sales',
+            },
+        ],
+    },
+    {
+        label: 'Orders',
+        icon: ShoppingBag,
+        items: [
+            {
+                label: 'Order Management',
+                href: admin.orders.index.url(),
+                icon: ShoppingBag,
+                permission: 'orders.manage',
+                badge: 'Live',
+                searchText:
+                    'all new confirmed ready pack packed dispatch shipped delivery delivered cancelled failed hold fraud bulk processing timeline exceptions sales purchases',
+            },
+        ],
+    },
+    {
+        label: 'Inventory',
+        icon: ArrowDownUp,
         items: [
             {
                 label: 'Inventory Control',
@@ -161,13 +371,36 @@ const navigationSections = [
                 icon: ArrowDownUp,
                 permission: 'catalogue.manage',
                 badge: 'Live',
-                searchText: 'stock ledger reservations movements warehouse',
+                searchText:
+                    'inventory overview seller warehouse available reserved damaged low stock out of stock adjustments transfers reconciliation history import export alerts stock ledger movements',
             },
+        ],
+    },
+    {
+        label: 'Warehouses & Fulfilment',
+        icon: Warehouse,
+        items: [
             {
                 label: 'Warehouses',
                 href: admin.warehouses.index.url(),
                 icon: Warehouse,
                 permission: 'catalogue.manage',
+                searchText:
+                    'all seller warehouses fulfilment centres pickup locations picklists packing lists dispatch batches shipping labels manifest handover sla delays exceptions',
+            },
+        ],
+    },
+    {
+        label: 'Logistics',
+        icon: Truck,
+        items: [
+            {
+                label: 'Shipments',
+                href: admin.shipments.index.url(),
+                icon: Truck,
+                permission: 'orders.manage',
+                searchText:
+                    'all shipments courier partners shipping methods zones rates hubs pickup tracking delivery attempts undelivered lost damaged sla reverse logistics fulfilment dispatch carrier',
             },
             {
                 label: 'Delivery Coverage',
@@ -175,48 +408,22 @@ const navigationSections = [
                 icon: MapPinned,
                 permission: 'catalogue.manage',
                 badge: 'Pincode',
-                searchText: 'pincode serviceability cod express delivery',
-            },
-        ],
-    },
-    {
-        label: 'Growth & Quality',
-        icon: Sparkles,
-        items: [
-            {
-                label: 'Growth Intelligence',
-                href: admin.growthCentre.url(),
-                icon: BarChart3,
-                permission: 'reports.view',
-                badge: 'AI',
-                searchText: 'growth pricing recommendations intelligence',
-            },
-            {
-                label: 'Promotions',
-                href: admin.coupons.index.url(),
-                icon: BadgePercent,
-                permission: 'catalogue.manage',
-                searchText: 'coupons campaigns offers discounts marketing',
-            },
-            {
-                label: 'Ratings & Reviews',
-                href: admin.reviews.index.url(),
-                icon: MessageSquareText,
-                permission: 'catalogue.manage',
                 searchText:
-                    'ratings reviews moderation quality customer feedback',
+                    'pincode serviceable serviceability zones shipping rates cod express delivery',
             },
         ],
     },
     {
-        label: 'Finance',
-        icon: WalletCards,
+        label: 'Returns, RTO & Refunds',
+        icon: Undo2,
         items: [
             {
-                label: 'Payments',
-                href: admin.payments.index.url(),
-                icon: WalletCards,
-                permission: 'payments.manage',
+                label: 'Returns & Claims',
+                href: admin.returns.index.url(),
+                icon: Undo2,
+                permission: 'orders.manage',
+                searchText:
+                    'return requests pending approved rejected pickup returned replacements return origin rto reasons disputes policies analytics claims rma reverse logistics',
             },
             {
                 label: 'Refund Operations',
@@ -224,78 +431,153 @@ const navigationSections = [
                 icon: CircleDollarSign,
                 permission: 'payments.manage',
                 badge: 'Live',
-                searchText: 'refund approval reconciliation payment gateway',
+                searchText:
+                    'refund requests pending processed partial refunds approval reconciliation payment gateway',
+            },
+        ],
+    },
+    {
+        label: 'Payments & Settlements',
+        icon: WalletCards,
+        items: [
+            {
+                label: 'Payment Transactions',
+                href: admin.payments.index.url(),
+                icon: WalletCards,
+                permission: 'payments.manage',
+                searchText:
+                    'payments transactions gateways reconciliation payout collection charges',
+            },
+            {
+                label: 'Seller Settlements',
+                href: admin.settlements.index.url(),
+                icon: Banknote,
+                permission: 'payments.manage',
+                searchText:
+                    'upcoming completed held settlements payouts commission marketplace fees penalties reconciliation',
             },
             {
                 label: 'GST Invoices',
                 href: admin.taxInvoices.index.url(),
                 icon: ReceiptText,
                 permission: 'payments.manage',
-            },
-            {
-                label: 'Settlements',
-                href: admin.settlements.index.url(),
-                icon: Banknote,
-                permission: 'payments.manage',
+                searchText:
+                    'invoices credit debit notes tds gst reports tax documents',
             },
         ],
     },
     {
-        label: 'Marketplace Network',
+        label: 'Customers',
         icon: Users,
         items: [
-            {
-                label: 'Sellers',
-                href: admin.vendors.index.url(),
-                icon: Store,
-                permission: 'vendors.manage',
-                searchText: 'vendors merchants sellers onboarding kyc',
-            },
             {
                 label: 'Customers & Staff',
                 href: admin.users.index.url(),
                 icon: Users,
                 permission: 'users.manage',
-                searchText: 'users customers staff agents accounts',
-            },
-            {
-                label: 'Customer Support',
-                href: admin.support.index.url(),
-                icon: Headphones,
-                permission: 'support.requests.manage',
-                searchText: 'support tickets cases messages complaints',
+                searchText:
+                    'all active new blocked customers addresses groups segments orders returns wishlist carts wallet loyalty login history complaints risk profile users staff agents accounts',
             },
         ],
     },
     {
-        label: 'Governance',
+        label: 'Marketing & Advertising',
+        icon: Sparkles,
+        items: [
+            {
+                label: 'Promotions & Coupons',
+                href: admin.coupons.index.url(),
+                icon: BadgePercent,
+                permission: 'catalogue.manage',
+                searchText:
+                    'marketing advertising dashboard campaigns sponsored banner seller ads coupons promotions festival email sms push abandoned carts referral affiliate segments performance offers discounts',
+            },
+        ],
+    },
+    {
+        label: 'Reviews & Questions',
+        icon: MessageSquareText,
+        items: [
+            {
+                label: 'Ratings & Reviews',
+                href: admin.reviews.index.url(),
+                icon: MessageSquareText,
+                permission: 'catalogue.manage',
+                searchText:
+                    'product seller reviews pending approved rejected reported questions answers moderation analytics quality customer feedback',
+            },
+        ],
+    },
+    {
+        label: 'Customer Support',
+        icon: Headphones,
+        items: [
+            {
+                label: 'Support & Disputes',
+                href: admin.support.index.url(),
+                icon: Headphones,
+                permission: 'support.requests.manage',
+                searchText:
+                    'support dashboard customer seller tickets order payment delivery return complaints escalated priorities agents canned responses sla dispute resolution cases messages',
+            },
+        ],
+    },
+    {
+        label: 'Reports & Analytics',
+        icon: BarChart3,
+        items: [
+            {
+                label: 'Marketplace Analytics',
+                href: admin.analytics.url(),
+                icon: BarChart3,
+                permission: 'reports.view',
+                searchText:
+                    'sales orders revenue products categories brands sellers customers inventory fulfilment logistics returns rto refunds settlements commission tax campaigns conversion profitability custom report builder',
+            },
+        ],
+    },
+    {
+        label: 'Administration',
         icon: ShieldCheck,
         items: [
             {
-                label: 'Admin Roles',
+                label: 'Roles & Permissions',
                 href: admin.adminRoles.index.url(),
                 icon: ShieldCheck,
                 permission: 'roles.manage',
+                searchText:
+                    'admin users teams departments roles permissions approval workflows access control 2fa ip restrictions',
             },
             {
                 label: 'Audit Logs',
                 href: admin.auditLogs.index.url(),
                 icon: ScrollText,
                 permission: 'reports.view',
+                searchText:
+                    'activity logs login history audit logs api users access tokens administration governance',
             },
         ],
     },
 ];
 
 const navigationSectionOrder = [
-    'Overview',
-    'Orders & Returns',
-    'Catalog & Listings',
-    'Inventory & Delivery',
-    'Growth & Quality',
-    'Finance',
-    'Marketplace Network',
-    'Governance',
+    'Dashboard',
+    'Marketplace / Sellers',
+    'Catalogue',
+    'Listings',
+    'Pricing & Offers',
+    'Orders',
+    'Inventory',
+    'Warehouses & Fulfilment',
+    'Logistics',
+    'Returns, RTO & Refunds',
+    'Payments & Settlements',
+    'Customers',
+    'Marketing & Advertising',
+    'Reviews & Questions',
+    'Customer Support',
+    'Reports & Analytics',
+    'Administration',
 ];
 
 type Props = PropsWithChildren<{
@@ -344,7 +626,7 @@ export default function AdminLayout({
     const [activeSearchIndex, setActiveSearchIndex] = useState(0);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const [openSection, setOpenSection] = useState<string | null>(
-        activeSectionLabel ?? 'Overview',
+        activeSectionLabel ?? 'Dashboard',
     );
     const pendingCount = Number(pendingVendorCount ?? 0);
     const quickOperations = permittedNavigationSections
@@ -718,7 +1000,7 @@ export default function AdminLayout({
                                             <SectionIcon className="size-[18px]" />
                                         </span>
                                         {section.label ===
-                                            'Marketplace Network' &&
+                                            'Marketplace / Sellers' &&
                                             pendingCount > 0 && (
                                                 <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-400 ring-2 ring-[#111827] dark:ring-[#0d121c]" />
                                             )}
@@ -748,7 +1030,7 @@ export default function AdminLayout({
                                             {section.label}
                                         </span>
                                         {section.label ===
-                                            'Marketplace Network' &&
+                                            'Marketplace / Sellers' &&
                                             pendingCount > 0 && (
                                                 <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
                                                     {pendingCount > 99
@@ -757,7 +1039,7 @@ export default function AdminLayout({
                                                 </span>
                                             )}
                                         {section.label !==
-                                            'Marketplace Network' && (
+                                            'Marketplace / Sellers' && (
                                             <span className="rounded-full bg-white/[0.055] px-1.5 py-0.5 text-[9px] font-bold text-slate-500">
                                                 {section.items.length}
                                             </span>
@@ -795,7 +1077,7 @@ export default function AdminLayout({
                                                             {item.label}
                                                         </span>
                                                         {item.label ===
-                                                            'Sellers' &&
+                                                            'Pending Approvals' &&
                                                         pendingCount > 0 ? (
                                                             <span
                                                                 className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${active ? 'bg-white text-orange-600' : 'bg-amber-400 text-slate-950'}`}

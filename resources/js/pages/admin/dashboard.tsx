@@ -81,6 +81,8 @@ export default function AdminDashboard({
     });
     const cards = [
         {
+            id: 'gross-merchandise-value',
+            relatedAnchors: ['net-revenue'],
             label: 'Gross order value',
             value: money.format(statistics.gross_revenue),
             note: `${statistics.total_orders} marketplace orders`,
@@ -90,6 +92,8 @@ export default function AdminDashboard({
             trendStyle: 'text-emerald-600 dark:text-emerald-400',
         },
         {
+            id: 'low-stock-alerts',
+            relatedAnchors: [],
             label: 'Product catalogue',
             value: statistics.total_products,
             note: `${statistics.low_stock_products} stock alerts`,
@@ -99,6 +103,8 @@ export default function AdminDashboard({
             trendStyle: 'text-emerald-600 dark:text-emerald-400',
         },
         {
+            id: 'todays-orders',
+            relatedAnchors: ['returns-summary', 'fulfilment-performance'],
             label: 'Orders requiring action',
             value: statistics.pending_orders,
             note: 'Awaiting fulfilment review',
@@ -108,6 +114,8 @@ export default function AdminDashboard({
             trendStyle: 'text-violet-600 dark:text-violet-400',
         },
         {
+            id: 'active-sellers',
+            relatedAnchors: ['active-customers', 'pending-approvals'],
             label: 'Marketplace network',
             value: statistics.total_vendors,
             note: `${statistics.total_customers} registered customers`,
@@ -163,7 +171,10 @@ export default function AdminDashboard({
 
     return (
         <AdminLayout title="Commerce Overview" breadcrumb="Dashboard">
-            <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-commerce-navy text-white shadow-[0_24px_60px_rgb(15_23_42/0.16)] ring-1 ring-slate-950/5">
+            <section
+                id="business-overview"
+                className="relative scroll-mt-24 overflow-hidden rounded-[2rem] border border-white/10 bg-commerce-navy text-white shadow-[0_24px_60px_rgb(15_23_42/0.16)] ring-1 ring-slate-950/5"
+            >
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(249,115,22,0.26),transparent_28%),radial-gradient(circle_at_68%_110%,rgba(216,177,89,0.18),transparent_34%)]" />
                 <div className="pointer-events-none absolute -top-20 right-[14%] size-56 rounded-full border border-white/5" />
                 <div className="pointer-events-none absolute -top-9 right-[9%] size-56 rounded-full border border-white/5" />
@@ -260,6 +271,8 @@ export default function AdminDashboard({
                 {cards.map(
                     ({
                         label,
+                        id,
+                        relatedAnchors,
                         value,
                         note,
                         icon: Icon,
@@ -268,8 +281,16 @@ export default function AdminDashboard({
                     }) => (
                         <article
                             key={label}
-                            className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40 dark:border-white/8 dark:bg-white/[0.035] dark:hover:border-white/15 dark:hover:shadow-none"
+                            id={id}
+                            className="group relative scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40 dark:border-white/8 dark:bg-white/[0.035] dark:hover:border-white/15 dark:hover:shadow-none"
                         >
+                            {relatedAnchors.map((anchor) => (
+                                <span
+                                    key={anchor}
+                                    id={anchor}
+                                    className="absolute top-0 left-0 scroll-mt-24"
+                                />
+                            ))}
                             <div className="flex items-start justify-between gap-4">
                                 <div>
                                     <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
@@ -297,7 +318,10 @@ export default function AdminDashboard({
             </section>
 
             <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(20rem,0.75fr)]">
-                <article className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/8 dark:bg-white/[0.035]">
+                <article
+                    id="recent-activities"
+                    className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/8 dark:bg-white/[0.035]"
+                >
                     <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-5 sm:px-6 dark:border-white/8">
                         <div>
                             <h3 className="font-semibold tracking-tight text-slate-950 dark:text-white">

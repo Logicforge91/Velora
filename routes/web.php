@@ -100,6 +100,8 @@ Route::prefix('admin')
             ->middleware('permission:vendors.manage')
             ->group(function (): void {
                 Route::get('/', 'index')->name('index');
+                Route::get('create', 'create')->name('create');
+                Route::post('/', 'store')->name('store');
                 Route::get('{vendor}', 'show')->name('show');
                 Route::patch('{vendor}/approve', 'approve')->name('approve');
                 Route::patch('{vendor}/reject', 'reject')->name('reject');
