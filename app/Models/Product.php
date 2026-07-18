@@ -150,6 +150,18 @@ class Product extends Model
         return $this->hasMany(Inventory::class);
     }
 
+    /** @return HasMany<SellerListing, $this> */
+    public function sellerListings(): HasMany
+    {
+        return $this->hasMany(SellerListing::class);
+    }
+
+    /** @return HasMany<PriceHistory, $this> */
+    public function priceHistories(): HasMany
+    {
+        return $this->hasMany(PriceHistory::class);
+    }
+
     /** @return HasOne<ProductImage, $this> */
     public function primaryImage(): HasOne
     {

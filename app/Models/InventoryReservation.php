@@ -36,18 +36,33 @@ class InventoryReservation extends Model
     }
 
     /** @return BelongsTo<Inventory, $this> */
-    public function inventory(): BelongsTo { return $this->belongsTo(Inventory::class); }
+    public function inventory(): BelongsTo
+    {
+        return $this->belongsTo(Inventory::class);
+    }
 
     /** @return BelongsTo<Cart, $this> */
-    public function cart(): BelongsTo { return $this->belongsTo(Cart::class); }
+    public function cart(): BelongsTo
+    {
+        return $this->belongsTo(Cart::class);
+    }
 
     /** @return BelongsTo<Order, $this> */
-    public function order(): BelongsTo { return $this->belongsTo(Order::class); }
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
 
     /** @return BelongsTo<OrderItem, $this> */
-    public function orderItem(): BelongsTo { return $this->belongsTo(OrderItem::class); }
+    public function orderItem(): BelongsTo
+    {
+        return $this->belongsTo(OrderItem::class);
+    }
 
-    /** @param Builder<InventoryReservation> $query @return Builder<InventoryReservation> */
+    /**
+     * @param  Builder<InventoryReservation>  $query
+     * @return Builder<InventoryReservation>
+     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active')

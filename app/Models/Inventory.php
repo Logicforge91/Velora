@@ -6,6 +6,7 @@ use Database\Factories\InventoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Inventory extends Model
 {
@@ -63,6 +64,18 @@ class Inventory extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by')->withTrashed();
+    }
+
+    /** @return HasMany<InventoryMovement, $this> */
+    public function movements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class)->latest('occurred_at');
+    }
+
+    /** @return HasMany<InventoryReservation, $this> */
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(InventoryReservation::class);
     }
 
     public function available(): int

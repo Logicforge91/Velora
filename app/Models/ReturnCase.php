@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReturnCase extends Model
 {
@@ -69,6 +70,12 @@ class ReturnCase extends Model
     public function processor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by')->withTrashed();
+    }
+
+    /** @return HasMany<PaymentRefund, $this> */
+    public function paymentRefunds(): HasMany
+    {
+        return $this->hasMany(PaymentRefund::class);
     }
 
     /** @return list<string> */

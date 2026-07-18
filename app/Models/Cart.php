@@ -79,6 +79,12 @@ class Cart extends Model
         return $this->hasMany(CartItem::class);
     }
 
+    /** @return HasMany<InventoryReservation, $this> */
+    public function inventoryReservations(): HasMany
+    {
+        return $this->hasMany(InventoryReservation::class);
+    }
+
     /**
      * @param  Builder<Cart>  $query
      * @return Builder<Cart>

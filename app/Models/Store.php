@@ -34,4 +34,16 @@ class Store extends Model
     {
         return $this->hasMany(Inventory::class);
     }
+
+    /** @return HasMany<SellerListing, $this> */
+    public function sellerListings(): HasMany
+    {
+        return $this->hasMany(SellerListing::class);
+    }
+
+    /** @return HasMany<ServiceArea, $this> */
+    public function serviceAreas(): HasMany
+    {
+        return $this->hasMany(ServiceArea::class);
+    }
 }
