@@ -87,4 +87,10 @@ class ProductVariant extends Model
     {
         return $this->hasMany(PriceHistory::class);
     }
+
+    /** @return HasMany<ProductAttributeValue, $this> */
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValue::class);
+    }
 }

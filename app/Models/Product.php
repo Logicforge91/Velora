@@ -162,6 +162,18 @@ class Product extends Model
         return $this->hasMany(PriceHistory::class);
     }
 
+    /** @return HasMany<ProductAttributeValue, $this> */
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValue::class);
+    }
+
+    /** @return HasMany<ProductQuestion, $this> */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class);
+    }
+
     /** @return HasOne<ProductImage, $this> */
     public function primaryImage(): HasOne
     {
