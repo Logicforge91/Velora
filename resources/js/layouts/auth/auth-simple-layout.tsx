@@ -3,10 +3,10 @@ import {
     ArrowLeft,
     BadgeCheck,
     ShieldCheck,
-    ShoppingBag,
     Sparkles,
     Truck,
 } from 'lucide-react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
@@ -30,7 +30,7 @@ export default function AuthSimpleLayout({
                         className="relative z-10 flex w-fit items-center gap-3 text-xl font-black tracking-[-0.04em]"
                     >
                         <span className="grid size-11 place-items-center rounded-2xl bg-orange-500 shadow-lg shadow-orange-500/25">
-                            <ShoppingBag className="size-5" />
+                            <AppLogoIcon className="size-7" />
                         </span>
                         {String(name)}
                     </Link>
@@ -83,7 +83,7 @@ export default function AuthSimpleLayout({
                                 className="mb-7 flex items-center gap-2.5 font-black tracking-[-0.04em] lg:hidden"
                             >
                                 <span className="grid size-9 place-items-center rounded-xl bg-orange-500 text-white">
-                                    <ShoppingBag className="size-4" />
+                                    <AppLogoIcon className="size-5" />
                                 </span>
                                 {String(name)}
                             </Link>

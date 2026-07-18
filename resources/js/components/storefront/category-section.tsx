@@ -8,7 +8,7 @@ export default function CategorySection() {
     return (
         <section
             id="categories"
-            className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8"
+            className="mx-auto max-w-7xl scroll-mt-24 px-4 py-14 sm:px-6 lg:scroll-mt-36 lg:px-8"
         >
             <SectionTitle
                 eyebrow="Shop your way"
