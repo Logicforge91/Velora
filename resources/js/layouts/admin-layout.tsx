@@ -12,6 +12,7 @@ import {
     FileSpreadsheet,
     Command,
     LayoutDashboard,
+    Layers3,
     LogOut,
     Menu,
     MessageSquareText,
@@ -86,6 +87,12 @@ const navigationSections = [
                 label: 'Products',
                 href: admin.products.index.url(),
                 icon: Package,
+                permission: 'catalogue.manage',
+            },
+            {
+                label: 'Variants',
+                href: admin.productVariants.index.url(),
+                icon: Layers3,
                 permission: 'catalogue.manage',
             },
             {
