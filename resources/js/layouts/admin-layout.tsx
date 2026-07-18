@@ -1,6 +1,7 @@
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
+    ArrowDownUp,
     BarChart3,
     BadgePercent,
     Banknote,
@@ -9,12 +10,14 @@ import {
     ChevronDown,
     ChevronRight,
     CircleHelp,
+    CircleDollarSign,
     FileSpreadsheet,
     Command,
     LayoutDashboard,
     Layers3,
     LogOut,
     Menu,
+    MapPinned,
     MessageSquareText,
     Headphones,
     Package,
@@ -96,6 +99,12 @@ const navigationSections = [
                 permission: 'catalogue.manage',
             },
             {
+                label: 'Seller Listings',
+                href: admin.sellerListings.index.url(),
+                icon: Store,
+                permission: 'catalogue.manage',
+            },
+            {
                 label: 'Categories',
                 href: admin.categories.index.url(),
                 icon: Boxes,
@@ -156,6 +165,18 @@ const navigationSections = [
                 permission: 'catalogue.manage',
             },
             {
+                label: 'Inventory Control',
+                href: admin.inventoryOperations.index.url(),
+                icon: ArrowDownUp,
+                permission: 'catalogue.manage',
+            },
+            {
+                label: 'Delivery Coverage',
+                href: admin.serviceAreas.index.url(),
+                icon: MapPinned,
+                permission: 'catalogue.manage',
+            },
+            {
                 label: 'Returns',
                 href: admin.returns.index.url(),
                 icon: Undo2,
@@ -177,6 +198,12 @@ const navigationSections = [
                 label: 'Payments',
                 href: admin.payments.index.url(),
                 icon: WalletCards,
+                permission: 'payments.manage',
+            },
+            {
+                label: 'Refunds',
+                href: admin.paymentRefunds.index.url(),
+                icon: CircleDollarSign,
                 permission: 'payments.manage',
             },
             {

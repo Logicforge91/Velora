@@ -15,7 +15,10 @@ use Illuminate\Validation\ValidationException;
 
 class MarketplaceOperationsService
 {
-    /** @param array<string, mixed> $filters @return LengthAwarePaginator<int, SellerListing> */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, SellerListing>
+     */
     public function sellerListings(array $filters): LengthAwarePaginator
     {
         $search = trim((string) ($filters['search'] ?? ''));
@@ -54,6 +57,13 @@ class MarketplaceOperationsService
             $oldPrice = $listing->selling_price;
             $status = $data['status'];
 
+            if ($data['is_buy_box_winner']) {
+                SellerListing::query()
+                    ->where('product_id', $listing->product_id)
+                    ->whereKeyNot($listing->id)
+                    ->update(['is_buy_box_winner' => false]);
+            }
+
             $listing->update([
                 ...$data,
                 'published_at' => $status === 'active' ? ($listing->published_at ?? now()) : $listing->published_at,
@@ -78,7 +88,10 @@ class MarketplaceOperationsService
         });
     }
 
-    /** @param array<string, mixed> $filters @return LengthAwarePaginator<int, InventoryMovement> */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, InventoryMovement>
+     */
     public function inventoryMovements(array $filters): LengthAwarePaginator
     {
         $search = trim((string) ($filters['search'] ?? ''));
@@ -97,7 +110,10 @@ class MarketplaceOperationsService
             ->withQueryString();
     }
 
-    /** @param array<string, mixed> $filters @return LengthAwarePaginator<int, InventoryReservation> */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, InventoryReservation>
+     */
     public function inventoryReservations(array $filters): LengthAwarePaginator
     {
         $status = (string) ($filters['reservation_status'] ?? '');
@@ -127,7 +143,10 @@ class MarketplaceOperationsService
         });
     }
 
-    /** @param array<string, mixed> $filters @return LengthAwarePaginator<int, PaymentRefund> */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, PaymentRefund>
+     */
     public function paymentRefunds(array $filters): LengthAwarePaginator
     {
         $search = trim((string) ($filters['search'] ?? ''));
@@ -162,7 +181,8 @@ class MarketplaceOperationsService
     public function updatePaymentRefund(PaymentRefund $refund, User $actor, array $data): PaymentRefund
     {
         return DB::transaction(function () use ($refund, $actor, $data): PaymentRefund {
-            $refund = PaymentRefund::query()->lockForUpdate()->with('payment')->findOrFail($refund->id);
+            $refund = PaymentRefund::query()->lockForUpdate()->findOrFail($refund->id);
+            $payment = $refund->payment()->lockForUpdate()->firstOrFail();
             $transitions = [
                 'requested' => ['requested', 'approved', 'rejected'],
                 'approved' => ['approved', 'processing', 'rejected'],
@@ -184,22 +204,25 @@ class MarketplaceOperationsService
             ]);
 
             if ($data['status'] === 'completed') {
-                $refundedAmount = (float) $refund->payment->refunds()->where('status', 'completed')->sum('amount');
+                $refundedAmount = (float) $payment->refunds()->where('status', 'completed')->sum('amount');
 
-                if ($refundedAmount > (float) $refund->payment->amount) {
+                if ($refundedAmount > (float) $payment->amount) {
                     throw ValidationException::withMessages(['status' => 'Completed refunds cannot exceed the captured payment.']);
                 }
 
-                $paymentStatus = $refundedAmount >= (float) $refund->payment->amount ? 'refunded' : 'partially_refunded';
-                $refund->payment->update(['refunded_amount' => $refundedAmount, 'status' => $paymentStatus, 'refunded_at' => now()]);
-                $refund->payment->order()->update(['payment_status' => 'refunded']);
+                $paymentStatus = $refundedAmount >= (float) $payment->amount ? 'refunded' : 'partially_refunded';
+                $payment->update(['refunded_amount' => $refundedAmount, 'status' => $paymentStatus, 'refunded_at' => now()]);
+                $payment->order()->update(['payment_status' => 'refunded']);
             }
 
             return $refund->fresh(['payment.order.user', 'returnCase', 'requester', 'processor']);
         });
     }
 
-    /** @param array<string, mixed> $filters @return LengthAwarePaginator<int, ServiceArea> */
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, ServiceArea>
+     */
     public function serviceAreas(array $filters): LengthAwarePaginator
     {
         $search = trim((string) ($filters['search'] ?? ''));

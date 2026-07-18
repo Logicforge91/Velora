@@ -2,28 +2,16 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\ServiceArea;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateServiceAreaRequest extends FormRequest
+class UpdateServiceAreaRequest extends StoreServiceAreaRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return false;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
+    /** @return array<string, ValidationRule|array<mixed>|string> */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $serviceArea = $this->route('service_area');
+
+        return $this->rulesForServiceArea($serviceArea instanceof ServiceArea ? $serviceArea->id : null);
     }
 }

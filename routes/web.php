@@ -10,12 +10,16 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GrowthCentreController;
+use App\Http\Controllers\Admin\InventoryOperationController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\PaymentRefundController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ProductVariantController;
 use App\Http\Controllers\Admin\ReturnController as AdminReturnController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\SellerListingController;
+use App\Http\Controllers\Admin\ServiceAreaController;
 use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\SupportMessageController;
@@ -117,6 +121,10 @@ Route::prefix('admin')
             ->except('show')
             ->middleware('permission:catalogue.manage');
 
+        Route::resource('seller-listings', SellerListingController::class)
+            ->only(['index', 'update'])
+            ->middleware('permission:catalogue.manage');
+
         Route::resource('orders', OrderController::class)
             ->only(['index', 'show', 'update'])
             ->middleware('permission:orders.manage');
@@ -130,6 +138,10 @@ Route::prefix('admin')
             ->middleware('permission:catalogue.manage');
 
         Route::resource('payments', AdminPaymentController::class)
+            ->only(['index', 'update'])
+            ->middleware('permission:payments.manage');
+
+        Route::resource('payment-refunds', PaymentRefundController::class)
             ->only(['index', 'update'])
             ->middleware('permission:payments.manage');
 
@@ -154,6 +166,17 @@ Route::prefix('admin')
             ->middleware('permission:catalogue.manage')
             ->name('warehouses.inventory.update');
         Route::resource('warehouses', WarehouseController::class)->middleware('permission:catalogue.manage');
+
+        Route::get('inventory-operations', [InventoryOperationController::class, 'index'])
+            ->middleware('permission:catalogue.manage')
+            ->name('inventory-operations.index');
+        Route::patch('inventory-reservations/{inventoryReservation}/release', [InventoryOperationController::class, 'release'])
+            ->middleware('permission:catalogue.manage')
+            ->name('inventory-reservations.release');
+
+        Route::resource('service-areas', ServiceAreaController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middleware('permission:catalogue.manage');
 
         Route::get('users/{user}/history', [UserController::class, 'history'])
             ->middleware('permission:users.manage')
