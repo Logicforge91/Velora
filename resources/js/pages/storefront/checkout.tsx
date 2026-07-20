@@ -8,6 +8,7 @@ import {
     ShieldCheck,
 } from 'lucide-react';
 import { money, products } from '@/components/storefront/catalog';
+import ProductImage from '@/components/storefront/product-image';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import { cart } from '@/routes/storefront';
 
@@ -108,18 +109,15 @@ export default function Checkout() {
                         </div>
                         <div className="mt-6 grid gap-4">
                             {checkoutProducts.map((product) => {
-                                const Icon = product.icon;
-
                                 return (
                                     <div
                                         key={product.id}
                                         className="flex items-center gap-3"
                                     >
-                                        <span
-                                            className={`grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${product.tone}`}
-                                        >
-                                            <Icon className="size-8" />
-                                        </span>
+                                        <ProductImage
+                                            product={product}
+                                            className="size-16 shrink-0 rounded-2xl"
+                                        />
                                         <div className="min-w-0 flex-1">
                                             <p className="truncate text-sm font-black">
                                                 {product.name}

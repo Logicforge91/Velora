@@ -8,6 +8,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import { money, products } from '@/components/storefront/catalog';
+import ProductImage from '@/components/storefront/product-image';
 import StorefrontLayout from '@/layouts/storefront-layout';
 import {
     catalog,
@@ -44,8 +45,6 @@ export default function Cart() {
                 <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_380px]">
                     <div className="grid gap-4">
                         {cartProducts.map((product) => {
-                            const Icon = product.icon;
-
                             return (
                                 <article
                                     key={product.id}
@@ -53,9 +52,12 @@ export default function Cart() {
                                 >
                                     <Link
                                         href={productRoute.url(product.slug)}
-                                        className={`grid size-32 shrink-0 place-items-center rounded-[1.25rem] bg-gradient-to-br ${product.tone}`}
+                                        className="size-32 shrink-0 overflow-hidden rounded-[1.25rem]"
                                     >
-                                        <Icon className="size-16" />
+                                        <ProductImage
+                                            product={product}
+                                            className="size-full"
+                                        />
                                     </Link>
                                     <div className="min-w-0 flex-1">
                                         <p className="text-xs font-bold text-slate-400">
