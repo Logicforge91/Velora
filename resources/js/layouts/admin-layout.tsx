@@ -588,6 +588,14 @@ const navigationSections = [
         icon: ShieldCheck,
         items: [
             {
+                label: 'Administration Overview',
+                href: admin.administration.url(),
+                icon: ShieldCheck,
+                permission: 'roles.manage',
+                searchText:
+                    'admin users teams departments roles permissions approval workflows activity logs login history audit logs api users access tokens two factor authentication ip restrictions governance',
+            },
+            {
                 label: 'Integrations',
                 href: admin.integrations.index.url(),
                 icon: Plug,

@@ -37,4 +37,17 @@ class UpdateIntegrationRequest extends FormRequest
             'credentials.*' => ['nullable', 'string', 'max:4096'],
         ];
     }
+
+    /** @return array{provider: string, enabled: bool, configuration: array<string, mixed>, credentials: array<string, mixed>} */
+    public function integration(): array
+    {
+        $validated = $this->validated();
+
+        return [
+            'provider' => (string) $validated['provider'],
+            'enabled' => (bool) $validated['enabled'],
+            'configuration' => (array) $validated['configuration'],
+            'credentials' => (array) $validated['credentials'],
+        ];
+    }
 }

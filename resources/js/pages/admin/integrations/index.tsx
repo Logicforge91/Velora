@@ -372,6 +372,7 @@ function IntegrationForm({
                                             const next = new Set(
                                                 visibleSecrets,
                                             );
+
                                             if (visible) {
                                                 next.delete(key);
                                             } else {

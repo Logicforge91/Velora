@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property array<string, mixed>|null $configuration
+ * @property array<string, mixed>|null $credentials
+ */
 class Integration extends Model
 {
     /** @use HasFactory<IntegrationFactory> */

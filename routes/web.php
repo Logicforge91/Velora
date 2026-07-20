@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdministrationController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ApplyPriceRecommendationController;
@@ -73,6 +74,10 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('dashboard', AdminDashboardController::class)
             ->name('dashboard');
+
+        Route::get('administration', AdministrationController::class)
+            ->middleware('permission:roles.manage')
+            ->name('administration');
 
         Route::get('analytics', AnalyticsController::class)
             ->middleware('permission:reports.view')

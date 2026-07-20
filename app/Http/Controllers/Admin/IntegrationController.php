@@ -24,7 +24,7 @@ class IntegrationController extends Controller
 
     public function update(UpdateIntegrationRequest $request, string $category): RedirectResponse
     {
-        $this->service->update($category, $request->validated(), $request->user());
+        $this->service->update($category, $request->integration(), $request->user());
 
         return back()->with('success', 'Integration settings updated successfully.');
     }
