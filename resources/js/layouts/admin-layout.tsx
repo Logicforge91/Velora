@@ -23,6 +23,7 @@ import {
     Package,
     PanelLeftClose,
     PanelLeftOpen,
+    Plug,
     ReceiptText,
     Search,
     Sparkles,
@@ -586,6 +587,14 @@ const navigationSections = [
         label: 'Administration',
         icon: ShieldCheck,
         items: [
+            {
+                label: 'Integrations',
+                href: admin.integrations.index.url(),
+                icon: Plug,
+                permission: 'roles.manage',
+                searchText:
+                    'payment gateways shipping partners sms email whatsapp gst erp crm analytics social login oauth api credentials webhooks integration logs',
+            },
             {
                 label: 'System Settings',
                 href: admin.systemSettings.index.url(),

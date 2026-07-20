@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GrowthCentreController;
+use App\Http\Controllers\Admin\IntegrationController;
 use App\Http\Controllers\Admin\InventoryOperationController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
@@ -196,6 +197,15 @@ Route::prefix('admin')
                 Route::delete('operations/cache', 'clearCache')->name('cache.clear');
                 Route::post('operations/backups', 'backup')->name('backups.store');
                 Route::patch('{group}', 'update')->name('update');
+            });
+
+        Route::controller(IntegrationController::class)
+            ->prefix('integrations')
+            ->name('integrations.')
+            ->middleware('permission:roles.manage')
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::patch('{category}', 'update')->name('update');
             });
     });
 
