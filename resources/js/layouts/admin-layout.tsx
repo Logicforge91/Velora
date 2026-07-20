@@ -80,28 +80,17 @@ const navigationSections = [
                 permission: 'admin.dashboard.view',
             },
             {
-                label: 'Gross Merchandise Value',
+                label: 'GMV and Net Revenue',
                 href: dashboardSection('gross-merchandise-value'),
                 icon: CircleDollarSign,
                 permission: 'admin.dashboard.view',
-                searchText: 'gmv gross order value',
-            },
-            {
-                label: 'Net Revenue',
-                href: dashboardSection('net-revenue'),
-                icon: Banknote,
-                permission: 'admin.dashboard.view',
+                searchText:
+                    'gross merchandise value gmv net revenue sales finance',
             },
             {
                 label: 'Active Sellers',
                 href: dashboardSection('active-sellers'),
                 icon: Store,
-                permission: 'admin.dashboard.view',
-            },
-            {
-                label: 'Active Customers',
-                href: dashboardSection('active-customers'),
-                icon: Users,
                 permission: 'admin.dashboard.view',
             },
             {
@@ -137,7 +126,7 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Marketplace / Sellers',
+        label: 'Seller Management',
         icon: Store,
         items: [
             {
@@ -165,14 +154,6 @@ const navigationSections = [
                 searchText: 'onboarding applications review queue',
             },
             {
-                label: 'Pending Approvals',
-                href: admin.vendors.index.url({
-                    query: { status: 'pending' },
-                }),
-                icon: ShieldCheck,
-                permission: 'vendors.manage',
-            },
-            {
                 label: 'KYC Verification',
                 href: admin.vendors.index.url({
                     query: { kyc_status: 'in_review' },
@@ -184,28 +165,14 @@ const navigationSections = [
                     'documents identity gst pan bank proof verification',
             },
             {
-                label: 'Approved Sellers',
+                label: 'Approved / Rejected / Suspended Sellers',
                 href: admin.vendors.index.url({
-                    query: { status: 'approved' },
+                    query: { view: 'status' },
                 }),
                 icon: Store,
                 permission: 'vendors.manage',
-            },
-            {
-                label: 'Rejected Sellers',
-                href: admin.vendors.index.url({
-                    query: { status: 'rejected' },
-                }),
-                icon: Store,
-                permission: 'vendors.manage',
-            },
-            {
-                label: 'Suspended Sellers',
-                href: admin.vendors.index.url({
-                    query: { status: 'suspended' },
-                }),
-                icon: Store,
-                permission: 'vendors.manage',
+                searchText:
+                    'approved rejected suspended sellers status moderation',
             },
             {
                 label: 'Seller Documents',
@@ -217,7 +184,7 @@ const navigationSections = [
                 searchText: 'kyc document checklist files',
             },
             {
-                label: 'Seller Bank Accounts',
+                label: 'Bank Accounts',
                 href: admin.vendors.index.url({
                     query: { view: 'bank-accounts' },
                 }),
@@ -226,7 +193,7 @@ const navigationSections = [
                 searchText: 'beneficiary ifsc payout account banking',
             },
             {
-                label: 'Seller Warehouses',
+                label: 'Warehouses',
                 href: admin.warehouses.index.url({
                     query: { view: 'sellers' },
                 }),
@@ -234,24 +201,17 @@ const navigationSections = [
                 permission: 'catalogue.manage',
             },
             {
-                label: 'Seller Performance',
+                label: 'Performance Score',
                 href: admin.growthCentre.url({
                     query: { view: 'seller-performance' },
                 }),
                 icon: BarChart3,
                 permission: 'reports.view',
-                searchText: 'sales returns activity quality performance',
+                searchText:
+                    'seller sales returns activity quality performance score',
             },
             {
-                label: 'Seller Score',
-                href: admin.growthCentre.url({
-                    query: { view: 'seller-score' },
-                }),
-                icon: Sparkles,
-                permission: 'reports.view',
-            },
-            {
-                label: 'Seller Violations',
+                label: 'Violations',
                 href: admin.vendors.index.url({
                     query: { risk_level: 'high', view: 'violations' },
                 }),
@@ -260,7 +220,7 @@ const navigationSections = [
                 searchText: 'risk fraud policy penalties violations',
             },
             {
-                label: 'Seller Agreements',
+                label: 'Agreements',
                 href: admin.vendors.index.url({
                     query: { view: 'agreements' },
                 }),
@@ -268,7 +228,7 @@ const navigationSections = [
                 permission: 'vendors.manage',
             },
             {
-                label: 'Seller Subscriptions',
+                label: 'Subscriptions',
                 href: admin.vendors.index.url({
                     query: { view: 'subscriptions' },
                 }),
@@ -278,22 +238,58 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Catalogue',
+        label: 'Catalogue Management',
         icon: Package,
         items: [
             {
-                label: 'Products',
+                label: 'All Products',
                 href: admin.products.index.url(),
                 icon: Package,
                 permission: 'catalogue.manage',
                 searchText: 'catalog products sku listing content',
             },
             {
-                label: 'Variants',
-                href: admin.productVariants.index.url(),
+                label: 'Add Product',
+                href: admin.products.create.url(),
+                icon: Package,
+                permission: 'catalogue.manage',
+                searchText: 'create new product catalogue item sku',
+            },
+            {
+                label: 'Listing Requests',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'requests' },
+                }),
+                icon: FileSpreadsheet,
+                permission: 'catalogue.manage',
+                searchText: 'seller listing applications review requests',
+            },
+            {
+                label: 'Pending / Approved / Rejected Listings',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'status' },
+                }),
                 icon: Layers3,
                 permission: 'catalogue.manage',
-                searchText: 'product options size color variant sku',
+                searchText: 'listing status pending approved rejected',
+            },
+            {
+                label: 'Quality Check',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'quality-check' },
+                }),
+                icon: ShieldCheck,
+                permission: 'catalogue.manage',
+                searchText: 'listing content image data quality validation',
+            },
+            {
+                label: 'Product Moderation',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'moderation' },
+                }),
+                icon: ShieldCheck,
+                permission: 'catalogue.manage',
+                searchText: 'approve block restrict product listing moderation',
             },
             {
                 label: 'Categories',
@@ -308,26 +304,75 @@ const navigationSections = [
                 permission: 'catalogue.manage',
             },
             {
-                label: 'Bulk Imports',
-                href: admin.catalogImports.index.url(),
+                label: 'Attributes',
+                href: admin.productVariants.index.url({
+                    query: { view: 'attributes' },
+                }),
+                icon: Tags,
+                permission: 'catalogue.manage',
+                searchText: 'product attributes options size colour material',
+            },
+            {
+                label: 'Variants',
+                href: admin.productVariants.index.url(),
+                icon: Layers3,
+                permission: 'catalogue.manage',
+                searchText: 'product options size color variant sku',
+            },
+            {
+                label: 'Specifications',
+                href: admin.products.index.url({
+                    query: { view: 'specifications' },
+                }),
+                icon: ScrollText,
+                permission: 'catalogue.manage',
+                searchText: 'product technical details specifications',
+            },
+            {
+                label: 'Media',
+                href: admin.products.index.url({
+                    query: { view: 'media' },
+                }),
                 icon: FileSpreadsheet,
                 permission: 'catalogue.manage',
-                searchText: 'csv excel bulk upload catalogue import',
+                searchText: 'product images video gallery media',
             },
-        ],
-    },
-    {
-        label: 'Listings',
-        icon: Layers3,
-        items: [
             {
-                label: 'Seller Listings',
-                href: admin.sellerListings.index.url(),
-                icon: Store,
+                label: 'Bundles',
+                href: admin.products.index.url({
+                    query: { view: 'bundles' },
+                }),
+                icon: Boxes,
                 permission: 'catalogue.manage',
-                badge: 'Buy box',
+                searchText: 'product bundle combo kit grouped products',
+            },
+            {
+                label: 'Bulk Upload',
+                href: admin.catalogImports.index.url({
+                    query: { view: 'upload' },
+                }),
+                icon: FileSpreadsheet,
+                permission: 'catalogue.manage',
+                searchText: 'csv excel bulk product upload catalogue import',
+            },
+            {
+                label: 'Import / Export',
+                href: admin.catalogImports.index.url({
+                    query: { view: 'import-export' },
+                }),
+                icon: ArrowDownUp,
+                permission: 'catalogue.manage',
+                searchText: 'csv excel catalogue data import export download',
+            },
+            {
+                label: 'Duplicate Detection',
+                href: admin.products.index.url({
+                    query: { view: 'duplicates' },
+                }),
+                icon: Search,
+                permission: 'catalogue.manage',
                 searchText:
-                    'active inactive blocked out of stock seller listings approvals pricing mrp image content violations restricted products history marketplace offers buy box seller sku commission',
+                    'duplicate similar matching product detection merge',
             },
         ],
     },
@@ -746,12 +791,6 @@ export default function AdminLayout({
     }, []);
 
     useEffect(() => {
-        if (activeSectionLabel) {
-            setOpenSection(activeSectionLabel);
-        }
-    }, [activeSectionLabel]);
-
-    useEffect(() => {
         const root = document.documentElement;
         const restoreDarkTheme = root.classList.contains('dark');
 
@@ -1151,7 +1190,7 @@ export default function AdminLayout({
                                                                 false,
                                                             )
                                                         }
-                                                        className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition ${active ? 'bg-[#f97316] text-white shadow-md shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                                        className={`group flex items-center gap-2.5 rounded-lg px-2.5 font-medium transition ${section.items.length > 8 ? 'py-1.5 text-xs' : 'py-2 text-[13px]'} ${active ? 'bg-[#f97316] text-white shadow-md shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
                                                     >
                                                         <Icon
                                                             className={`size-4 shrink-0 ${active ? 'text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
