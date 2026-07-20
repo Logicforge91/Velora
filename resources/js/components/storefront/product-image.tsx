@@ -13,10 +13,14 @@ export default function ProductImage({
             role="img"
             aria-label={product.name}
             className={cn(
-                'block bg-[url(/images/storefront/velora-product-grid.png)] bg-[length:300%_200%] bg-no-repeat',
+                'block bg-[length:300%_200%] bg-no-repeat',
                 className,
             )}
-            style={{ backgroundPosition: product.imagePosition }}
+            style={{
+                backgroundImage:
+                    "url('/images/storefront/velora-product-grid.png')",
+                backgroundPosition: product.imagePosition,
+            }}
         />
     );
 }

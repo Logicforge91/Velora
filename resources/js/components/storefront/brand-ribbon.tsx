@@ -26,8 +26,10 @@ export default function BrandRibbon() {
                                 <span
                                     role="img"
                                     aria-label={`${brand.label} collection`}
-                                    className="size-8 rounded-full bg-[url(/images/storefront/velora-product-grid.png)] bg-[length:300%_200%] bg-no-repeat ring-1 ring-slate-950/5"
+                                    className="size-8 rounded-full bg-[length:300%_200%] bg-no-repeat ring-1 ring-slate-950/5"
                                     style={{
+                                        backgroundImage:
+                                            "url('/images/storefront/velora-product-grid.png')",
                                         backgroundPosition: brand.imagePosition,
                                     }}
                                 />

@@ -29,8 +29,10 @@ export default function CategorySection() {
                             <span
                                 role="img"
                                 aria-label={category.label}
-                                className="block aspect-square rounded-[1.1rem] bg-[url(/images/storefront/velora-product-grid.png)] bg-[length:300%_200%] bg-no-repeat transition duration-500 group-hover:scale-[1.03]"
+                                className="block aspect-square rounded-[1.1rem] bg-[length:300%_200%] bg-no-repeat transition duration-500 group-hover:scale-[1.03]"
                                 style={{
+                                    backgroundImage:
+                                        "url('/images/storefront/velora-product-grid.png')",
                                     backgroundPosition: category.imagePosition,
                                 }}
                             />
