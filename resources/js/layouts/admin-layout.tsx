@@ -28,6 +28,7 @@ import {
     Sparkles,
     ScrollText,
     ShieldCheck,
+    Settings2,
     ShoppingBag,
     Store,
     Tags,
@@ -585,6 +586,14 @@ const navigationSections = [
         label: 'Administration',
         icon: ShieldCheck,
         items: [
+            {
+                label: 'System Settings',
+                href: admin.systemSettings.index.url(),
+                icon: Settings2,
+                permission: 'roles.manage',
+                searchText:
+                    'general marketplace seller product order inventory return commission payment shipping tax currency language country seo cache queue scheduled jobs database backup maintenance mode system logs',
+            },
             {
                 label: 'Roles & Permissions',
                 href: admin.adminRoles.index.url(),

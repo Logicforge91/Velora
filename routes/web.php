@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\SupportMessageController;
 use App\Http\Controllers\Admin\SupportTicketController;
+use App\Http\Controllers\Admin\SystemSettingController;
 use App\Http\Controllers\Admin\TaxInvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
@@ -185,6 +186,17 @@ Route::prefix('admin')
             ->name('users.history');
 
         Route::resource('users', UserController::class)->middleware('permission:users.manage');
+
+        Route::controller(SystemSettingController::class)
+            ->prefix('system-settings')
+            ->name('system-settings.')
+            ->middleware('permission:roles.manage')
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::delete('operations/cache', 'clearCache')->name('cache.clear');
+                Route::post('operations/backups', 'backup')->name('backups.store');
+                Route::patch('{group}', 'update')->name('update');
+            });
     });
 
 Route::middleware('auth')->group(function () {
