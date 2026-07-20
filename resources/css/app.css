@@ -226,12 +226,29 @@
     #nprogress .bar {
         @apply bg-orange-500 shadow-[0_0_12px_rgb(249_115_22/0.55)];
     }
+
+    [data-storefront-shell] :is(a, button, input):focus-visible {
+        @apply ring-2 ring-orange-500/40 ring-offset-2 ring-offset-[#f8f7f4] outline-none dark:ring-offset-slate-950;
+    }
+
+    [data-storefront-shell] img {
+        @apply select-none;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     [data-admin-shell] *,
     [data-admin-shell] *::before,
     [data-admin-shell] *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+
+    [data-storefront-shell] *,
+    [data-storefront-shell] *::before,
+    [data-storefront-shell] *::after {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;

@@ -57,26 +57,30 @@ export default function SiteHeader({
 
     return (
         <>
-            <div className="bg-slate-950 px-4 py-2.5 text-center text-xs font-semibold text-white dark:bg-orange-500">
-                <span className="inline-flex items-center gap-2">
-                    <Sparkles className="size-3.5 text-amber-300" />
-                    New-season edit is live · Free delivery on your first order
+            <div className="overflow-hidden bg-slate-950 px-4 py-2 text-center text-[11px] font-bold tracking-wide text-white dark:bg-orange-600">
+                <span className="inline-flex max-w-full items-center gap-2 whitespace-nowrap">
+                    <Sparkles className="size-3.5 text-orange-300 dark:text-white" />
+                    The summer edit is live
+                    <span className="hidden text-white/35 sm:inline">•</span>
+                    <span className="hidden sm:inline">
+                        Free delivery on your first order
+                    </span>
                 </span>
             </div>
             <header
                 data-storefront-header
-                className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/95 shadow-sm shadow-slate-950/5 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/95"
+                className="sticky top-0 z-50 border-b border-slate-950/10 bg-[#f8f7f4]/90 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/90"
             >
-                <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto flex h-[4.5rem] max-w-[90rem] items-center gap-4 px-4 sm:px-6 lg:px-8">
                     <Link
                         href={home.url()}
                         className="flex shrink-0 items-center gap-2.5"
                         aria-label="Velora home"
                     >
-                        <span className="grid size-10 place-items-center rounded-2xl bg-gradient-to-br from-orange-500 to-rose-500 text-white shadow-lg shadow-orange-500/20">
+                        <span className="grid size-9 place-items-center rounded-full bg-orange-600 text-white shadow-lg shadow-orange-500/15">
                             <AppLogoIcon className="size-6" />
                         </span>
-                        <span className="text-xl font-black tracking-[-0.04em]">
+                        <span className="text-xl font-black tracking-[-0.055em]">
                             Velora
                         </span>
                     </Link>
@@ -131,7 +135,7 @@ export default function SiteHeader({
                         )}
                     </button>
                 </div>
-                <div className="mx-auto hidden max-w-7xl items-center justify-between border-t border-slate-100 px-4 py-2.5 text-xs font-bold text-slate-600 lg:flex dark:border-white/5 dark:text-slate-300">
+                <div className="mx-auto hidden max-w-[90rem] items-center justify-between border-t border-slate-950/5 px-8 py-2.5 text-xs font-bold text-slate-600 lg:flex dark:border-white/5 dark:text-slate-300">
                     <div className="flex items-center gap-7">
                         {categories.slice(0, 5).map((category) => (
                             <button
@@ -231,7 +235,7 @@ function SearchForm({
                         ? 'Search products'
                         : 'Search for products, brands and categories'
                 }
-                className={`${compact ? 'h-10 bg-slate-100 pl-9 dark:bg-white/5' : 'h-12 border border-slate-200 bg-slate-100/70 pr-28 pl-11 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100 dark:border-white/10 dark:bg-white/5 dark:focus:ring-orange-500/10'} w-full rounded-full pr-3 text-sm transition outline-none`}
+                className={`${compact ? 'h-10 bg-white pl-9 dark:bg-white/5' : 'h-11 border border-slate-950/10 bg-white/70 pr-28 pl-11 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100 dark:border-white/10 dark:bg-white/5 dark:focus:ring-orange-500/10'} w-full rounded-full pr-3 text-sm transition outline-none`}
             />
             {!compact && (
                 <button className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full bg-slate-950 px-5 py-2 text-xs font-bold text-white transition hover:bg-orange-500 dark:bg-orange-500">

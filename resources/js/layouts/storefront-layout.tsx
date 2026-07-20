@@ -22,7 +22,10 @@ export default function StorefrontLayout({
     const updateQuery = onQueryChange ?? setLocalQuery;
 
     return (
-        <div className="min-h-screen bg-[#f8f8f6] pb-20 font-sans text-slate-950 antialiased sm:pb-0 dark:bg-slate-950 dark:text-white">
+        <div
+            data-storefront-shell
+            className="min-h-screen bg-[#f8f7f4] pb-20 font-sans text-slate-950 antialiased sm:pb-0 dark:bg-slate-950 dark:text-white"
+        >
             <SiteHeader
                 isAuthenticated={Boolean(auth.user)}
                 query={activeQuery}

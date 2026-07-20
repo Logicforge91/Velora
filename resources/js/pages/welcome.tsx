@@ -40,7 +40,10 @@ export default function Welcome() {
     return (
         <>
             <Head title="Discover what's next" />
-            <div className="min-h-screen bg-[#f8f8f6] pb-20 font-sans text-slate-950 antialiased sm:pb-0 dark:bg-slate-950 dark:text-white">
+            <div
+                data-storefront-shell
+                className="min-h-screen bg-[#f8f7f4] pb-20 font-sans text-slate-950 antialiased sm:pb-0 dark:bg-slate-950 dark:text-white"
+            >
                 <SiteHeader
                     isAuthenticated={Boolean(auth.user)}
                     query={query}

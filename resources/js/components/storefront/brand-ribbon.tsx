@@ -1,6 +1,12 @@
 import { BadgeCheck, CircleDot, Sparkles } from 'lucide-react';
 
-const labels = ['NOVA', 'STUDIO', 'PULSE', 'AIRBOOK', 'MODERN HOME'];
+const brands = [
+    { label: 'NOVA', imagePosition: '0% 0%' },
+    { label: 'STUDIO', imagePosition: '50% 0%' },
+    { label: 'PULSE', imagePosition: '0% 100%' },
+    { label: 'AIRBOOK', imagePosition: '50% 100%' },
+    { label: 'MODERN HOME', imagePosition: '100% 100%' },
+];
 
 export default function BrandRibbon() {
     return (
@@ -11,13 +17,23 @@ export default function BrandRibbon() {
                     Curated brands, verified quality
                 </div>
                 <div className="flex max-w-full items-center gap-5 overflow-hidden text-sm font-black tracking-[0.18em] text-slate-300 sm:gap-8 dark:text-slate-700">
-                    {labels.map((label, index) => (
+                    {brands.map((brand, index) => (
                         <span
-                            key={label}
+                            key={brand.label}
                             className="flex shrink-0 items-center gap-5 sm:gap-8"
                         >
-                            {label}
-                            {index < labels.length - 1 && (
+                            <span className="flex items-center gap-2.5 text-slate-500 dark:text-slate-300">
+                                <span
+                                    role="img"
+                                    aria-label={`${brand.label} collection`}
+                                    className="size-8 rounded-full bg-[url(/images/storefront/velora-product-grid.png)] bg-[length:300%_200%] bg-no-repeat ring-1 ring-slate-950/5"
+                                    style={{
+                                        backgroundPosition: brand.imagePosition,
+                                    }}
+                                />
+                                {brand.label}
+                            </span>
+                            {index < brands.length - 1 && (
                                 <CircleDot className="size-2 text-orange-400" />
                             )}
                         </span>

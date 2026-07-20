@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { Check, Plus, ShoppingBag, Sparkles } from 'lucide-react';
 import { money } from '@/components/storefront/catalog';
 import type { StorefrontProduct } from '@/components/storefront/catalog';
+import ProductImage from '@/components/storefront/product-image';
 import { cart, product as productRoute } from '@/routes/storefront';
 
 export default function ProductBundleSection({
@@ -30,8 +31,6 @@ export default function ProductBundleSection({
                     </p>
                     <div className="mt-7 flex gap-3 overflow-x-auto pb-2">
                         {products.map((product, index) => {
-                            const Icon = product.icon;
-
                             return (
                                 <div
                                     key={product.id}
@@ -47,11 +46,10 @@ export default function ProductBundleSection({
                                         prefetch
                                         className="w-36 rounded-[1.5rem] bg-white/10 p-3 transition hover:bg-white/15 sm:w-44"
                                     >
-                                        <span
-                                            className={`grid aspect-square place-items-center rounded-[1rem] bg-gradient-to-br ${product.tone}`}
-                                        >
-                                            <Icon className="size-12 sm:size-16" />
-                                        </span>
+                                        <ProductImage
+                                            product={product}
+                                            className="aspect-square rounded-[1rem]"
+                                        />
                                         <p className="mt-3 truncate text-xs font-black">
                                             {product.name}
                                         </p>
