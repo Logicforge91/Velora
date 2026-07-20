@@ -23,11 +23,13 @@ import {
     Package,
     PanelLeftClose,
     PanelLeftOpen,
+    Plug,
     ReceiptText,
     Search,
     Sparkles,
     ScrollText,
     ShieldCheck,
+    Settings2,
     ShoppingBag,
     Store,
     Tags,
@@ -585,6 +587,30 @@ const navigationSections = [
         label: 'Administration',
         icon: ShieldCheck,
         items: [
+            {
+                label: 'Administration Overview',
+                href: admin.administration.url(),
+                icon: ShieldCheck,
+                permission: 'roles.manage',
+                searchText:
+                    'admin users teams departments roles permissions approval workflows activity logs login history audit logs api users access tokens two factor authentication ip restrictions governance',
+            },
+            {
+                label: 'Integrations',
+                href: admin.integrations.index.url(),
+                icon: Plug,
+                permission: 'roles.manage',
+                searchText:
+                    'payment gateways shipping partners sms email whatsapp gst erp crm analytics social login oauth api credentials webhooks integration logs',
+            },
+            {
+                label: 'System Settings',
+                href: admin.systemSettings.index.url(),
+                icon: Settings2,
+                permission: 'roles.manage',
+                searchText:
+                    'general marketplace seller product order inventory return commission payment shipping tax currency language country seo cache queue scheduled jobs database backup maintenance mode system logs',
+            },
             {
                 label: 'Roles & Permissions',
                 href: admin.adminRoles.index.url(),

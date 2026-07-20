@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdministrationController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ApplyPriceRecommendationController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GrowthCentreController;
+use App\Http\Controllers\Admin\IntegrationController;
 use App\Http\Controllers\Admin\InventoryOperationController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
@@ -24,6 +26,7 @@ use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\SupportMessageController;
 use App\Http\Controllers\Admin\SupportTicketController;
+use App\Http\Controllers\Admin\SystemSettingController;
 use App\Http\Controllers\Admin\TaxInvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
@@ -71,6 +74,10 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('dashboard', AdminDashboardController::class)
             ->name('dashboard');
+
+        Route::get('administration', AdministrationController::class)
+            ->middleware('permission:roles.manage')
+            ->name('administration');
 
         Route::get('analytics', AnalyticsController::class)
             ->middleware('permission:reports.view')
@@ -185,6 +192,26 @@ Route::prefix('admin')
             ->name('users.history');
 
         Route::resource('users', UserController::class)->middleware('permission:users.manage');
+
+        Route::controller(SystemSettingController::class)
+            ->prefix('system-settings')
+            ->name('system-settings.')
+            ->middleware('permission:roles.manage')
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::delete('operations/cache', 'clearCache')->name('cache.clear');
+                Route::post('operations/backups', 'backup')->name('backups.store');
+                Route::patch('{group}', 'update')->name('update');
+            });
+
+        Route::controller(IntegrationController::class)
+            ->prefix('integrations')
+            ->name('integrations.')
+            ->middleware('permission:roles.manage')
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::patch('{category}', 'update')->name('update');
+            });
     });
 
 Route::middleware('auth')->group(function () {
