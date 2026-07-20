@@ -41,11 +41,19 @@ class MarketplaceOperationsService
     /** @return array<string, int> */
     public function sellerListingCounts(): array
     {
+        $counts = SellerListing::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as active', ['active'])
+            ->selectRaw('SUM(CASE WHEN status IN (?, ?) THEN 1 ELSE 0 END) as pending', ['draft', 'pending'])
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as suspended', ['suspended'])
+            ->toBase()
+            ->firstOrFail();
+
         return [
-            'total' => SellerListing::query()->count(),
-            'active' => SellerListing::query()->where('status', 'active')->count(),
-            'pending' => SellerListing::query()->whereIn('status', ['draft', 'pending'])->count(),
-            'suspended' => SellerListing::query()->where('status', 'suspended')->count(),
+            'total' => (int) $counts->total,
+            'active' => (int) $counts->active,
+            'pending' => (int) $counts->pending,
+            'suspended' => (int) $counts->suspended,
         ];
     }
 
@@ -169,11 +177,19 @@ class MarketplaceOperationsService
     /** @return array<string, int|float> */
     public function paymentRefundCounts(): array
     {
+        $counts = PaymentRefund::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as requested', ['requested'])
+            ->selectRaw('SUM(CASE WHEN status IN (?, ?) THEN 1 ELSE 0 END) as processing', ['approved', 'processing'])
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = ? THEN amount ELSE 0 END), 0) as completed_amount', ['completed'])
+            ->toBase()
+            ->firstOrFail();
+
         return [
-            'total' => PaymentRefund::query()->count(),
-            'requested' => PaymentRefund::query()->where('status', 'requested')->count(),
-            'processing' => PaymentRefund::query()->whereIn('status', ['approved', 'processing'])->count(),
-            'completed_amount' => (float) PaymentRefund::query()->where('status', 'completed')->sum('amount'),
+            'total' => (int) $counts->total,
+            'requested' => (int) $counts->requested,
+            'processing' => (int) $counts->processing,
+            'completed_amount' => (float) $counts->completed_amount,
         ];
     }
 
