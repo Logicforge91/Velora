@@ -37,10 +37,7 @@ export default function VendorsIndex({
     };
 
     return (
-        <AdminLayout
-            title="Seller Onboarding"
-            breadcrumb="Marketplace / Sellers"
-        >
+        <AdminLayout title="Sellers" breadcrumb="Marketplace / Sellers">
             <AdminPageHeader
                 title="Seller verification center"
                 description="Review business identity, KYC completeness, risk signals and activation readiness."

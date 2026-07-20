@@ -39,7 +39,7 @@ export default function Index({
     };
 
     return (
-        <AdminLayout title="Customer Support" breadcrumb="Operations / Support">
+        <AdminLayout title="Support" breadcrumb="Operations / Support">
             <div className="flex justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-black">
