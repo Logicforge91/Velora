@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { money, products } from '@/components/storefront/catalog';
 import ProductBundleSection from '@/components/storefront/product-bundle-section';
+import ProductImage from '@/components/storefront/product-image';
 import ProductRecommendationSection from '@/components/storefront/product-recommendation-section';
 import ProductReviewSection from '@/components/storefront/product-review-section';
 import StorefrontLayout from '@/layouts/storefront-layout';
@@ -18,7 +19,6 @@ import { cart, catalog, wishlist } from '@/routes/storefront';
 export default function Product({ productSlug }: { productSlug: string }) {
     const selectedProduct =
         products.find((item) => item.slug === productSlug) ?? products[0];
-    const Icon = selectedProduct.icon;
     const alternativeProducts = products.filter(
         (item) => item.id !== selectedProduct.id,
     );
@@ -51,13 +51,14 @@ export default function Product({ productSlug }: { productSlug: string }) {
                 </nav>
 
                 <section className="mt-6 grid gap-10 lg:grid-cols-2">
-                    <div
-                        className={`relative grid min-h-[430px] place-items-center overflow-hidden rounded-[2.5rem] bg-gradient-to-br ${selectedProduct.tone}`}
-                    >
+                    <div className="relative min-h-[430px] overflow-hidden rounded-[2.5rem] bg-slate-100">
+                        <ProductImage
+                            product={selectedProduct}
+                            className="absolute inset-0 size-full"
+                        />
                         <span className="absolute top-6 left-6 rounded-full bg-white px-3 py-1.5 text-xs font-black text-emerald-600 shadow-sm">
                             {selectedProduct.offer}
                         </span>
-                        <Icon className="size-44 drop-shadow-xl sm:size-56" />
                     </div>
                     <div className="py-3">
                         <p className="text-xs font-black tracking-[0.18em] text-orange-500 uppercase">

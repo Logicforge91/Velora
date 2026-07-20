@@ -1,18 +1,23 @@
 import { Link } from '@inertiajs/react';
 import {
+    Activity,
     ArrowRight,
     ArrowUpRight,
+    BadgeIndianRupee,
+    Banknote,
     Boxes,
     Check,
     ChevronRight,
-    CircleUserRound,
     Clock3,
     PackageCheck,
     Plus,
+    RotateCcw,
     ShieldCheck,
     Store,
     Tags,
     TrendingUp,
+    Truck,
+    UserCheck,
 } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import admin from '@/routes/admin';
@@ -23,6 +28,9 @@ type Statistics = {
     total_vendors: number;
     total_customers: number;
     pending_vendors: number;
+    pending_approvals: number;
+    active_sellers: number;
+    active_customers: number;
     active_users: number;
     inactive_users: number;
     new_users_30_days: number;
@@ -30,24 +38,33 @@ type Statistics = {
     total_products: number;
     low_stock_products: number;
     total_orders: number;
+    today_orders: number;
     pending_orders: number;
     gross_revenue: number;
-};
-
-type RecentUser = {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    status: boolean;
-    created_at: string;
-    admin_roles?: { id: number; name: string }[];
+    net_revenue: number;
+    total_returns: number;
+    pending_returns: number;
+    returned_value: number;
+    fulfilled_shipments: number;
+    active_shipments: number;
+    fulfilment_rate: number;
 };
 
 type DashboardProps = {
     statistics: Statistics;
-    recentUsers: RecentUser[];
+    recentActivities: RecentActivity[];
     adminRoleMix: { name: string; administrators_count: number }[];
+};
+
+type RecentActivity = {
+    id: number;
+    category: string;
+    action: string;
+    severity: string;
+    description: string;
+    succeeded: boolean;
+    occurred_at: string;
+    actor?: { id: number; name: string; email: string } | null;
 };
 
 const accessMixStyles = [
@@ -59,19 +76,9 @@ const accessMixStyles = [
     'bg-amber-500',
 ];
 
-const roleBadgeStyles: Record<string, string> = {
-    admin: 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300',
-    vendor: 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-300',
-    customer: 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',
-    delivery_agent:
-        'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
-    support_agent:
-        'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
-};
-
 export default function AdminDashboard({
     statistics,
-    recentUsers,
+    recentActivities,
     adminRoleMix,
 }: DashboardProps) {
     const money = new Intl.NumberFormat('en-IN', {
@@ -81,40 +88,94 @@ export default function AdminDashboard({
     });
     const cards = [
         {
-            label: 'Gross order value',
-            value: money.format(statistics.gross_revenue),
-            note: `${statistics.total_orders} marketplace orders`,
-            icon: TrendingUp,
-            iconStyle:
-                'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-300',
-            trendStyle: 'text-emerald-600 dark:text-emerald-400',
-        },
-        {
-            label: 'Product catalogue',
-            value: statistics.total_products,
-            note: `${statistics.low_stock_products} stock alerts`,
-            icon: Boxes,
-            iconStyle:
-                'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300',
-            trendStyle: 'text-emerald-600 dark:text-emerald-400',
-        },
-        {
-            label: 'Orders requiring action',
-            value: statistics.pending_orders,
-            note: 'Awaiting fulfilment review',
+            id: 'todays-orders',
+            label: 'Today’s orders',
+            value: statistics.today_orders,
+            note: `${statistics.pending_orders} orders require action`,
             icon: PackageCheck,
             iconStyle:
                 'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300',
             trendStyle: 'text-violet-600 dark:text-violet-400',
         },
         {
-            label: 'Marketplace network',
-            value: statistics.total_vendors,
+            id: 'gross-merchandise-value',
+            label: 'Gross merchandise value',
+            value: money.format(statistics.gross_revenue),
+            note: `${statistics.total_orders} marketplace orders`,
+            icon: BadgeIndianRupee,
+            iconStyle:
+                'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-300',
+            trendStyle: 'text-emerald-600 dark:text-emerald-400',
+        },
+        {
+            id: 'net-revenue',
+            label: 'Net revenue',
+            value: money.format(statistics.net_revenue),
+            note: `${money.format(statistics.returned_value)} returned value`,
+            icon: Banknote,
+            iconStyle:
+                'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300',
+            trendStyle: 'text-emerald-600 dark:text-emerald-400',
+        },
+        {
+            id: 'active-sellers',
+            label: 'Active sellers',
+            value: statistics.active_sellers,
+            note: `${statistics.total_vendors} total seller profiles`,
+            icon: Store,
+            iconStyle:
+                'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300',
+            trendStyle: 'text-sky-600 dark:text-sky-400',
+        },
+        {
+            id: 'active-customers',
+            label: 'Active customers',
+            value: statistics.active_customers,
             note: `${statistics.total_customers} registered customers`,
-            icon: Clock3,
+            icon: UserCheck,
+            iconStyle:
+                'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
+            trendStyle: 'text-indigo-600 dark:text-indigo-400',
+        },
+        {
+            id: 'pending-approvals',
+            label: 'Pending approvals',
+            value: statistics.pending_approvals,
+            note: `${statistics.pending_vendors} seller applications`,
+            icon: ShieldCheck,
+            iconStyle:
+                'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300',
+            trendStyle: 'text-amber-600 dark:text-amber-400',
+        },
+        {
+            id: 'returns-summary',
+            label: 'Returns summary',
+            value: statistics.total_returns,
+            note: `${statistics.pending_returns} returns in progress`,
+            icon: RotateCcw,
             iconStyle:
                 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300',
             trendStyle: 'text-rose-600 dark:text-rose-400',
+        },
+        {
+            id: 'low-stock-alerts',
+            label: 'Low-stock alerts',
+            value: statistics.low_stock_products,
+            note: `${statistics.total_products} products monitored`,
+            icon: Boxes,
+            iconStyle:
+                'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300',
+            trendStyle: 'text-emerald-600 dark:text-emerald-400',
+        },
+        {
+            id: 'fulfilment-performance',
+            label: 'Fulfilment performance',
+            value: `${statistics.fulfilment_rate}%`,
+            note: `${statistics.fulfilled_shipments} delivered · ${statistics.active_shipments} active`,
+            icon: Truck,
+            iconStyle:
+                'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-300',
+            trendStyle: 'text-cyan-600 dark:text-cyan-400',
         },
     ];
     const assignedAdministrators = adminRoleMix.reduce(
@@ -162,8 +223,11 @@ export default function AdminDashboard({
     ];
 
     return (
-        <AdminLayout title="Commerce Overview" breadcrumb="Dashboard">
-            <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-commerce-navy text-white shadow-[0_24px_60px_rgb(15_23_42/0.16)] ring-1 ring-slate-950/5">
+        <AdminLayout title="Overview" breadcrumb="Dashboard">
+            <section
+                id="business-overview"
+                className="relative scroll-mt-24 overflow-hidden rounded-[2rem] border border-white/10 bg-commerce-navy text-white shadow-[0_24px_60px_rgb(15_23_42/0.16)] ring-1 ring-slate-950/5"
+            >
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(249,115,22,0.26),transparent_28%),radial-gradient(circle_at_68%_110%,rgba(216,177,89,0.18),transparent_34%)]" />
                 <div className="pointer-events-none absolute -top-20 right-[14%] size-56 rounded-full border border-white/5" />
                 <div className="pointer-events-none absolute -top-9 right-[9%] size-56 rounded-full border border-white/5" />
@@ -256,10 +320,11 @@ export default function AdminDashboard({
                 </div>
             </section>
 
-            <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {cards.map(
                     ({
                         label,
+                        id,
                         value,
                         note,
                         icon: Icon,
@@ -268,7 +333,8 @@ export default function AdminDashboard({
                     }) => (
                         <article
                             key={label}
-                            className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40 dark:border-white/8 dark:bg-white/[0.035] dark:hover:border-white/15 dark:hover:shadow-none"
+                            id={id}
+                            className="group relative scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40 dark:border-white/8 dark:bg-white/[0.035] dark:hover:border-white/15 dark:hover:shadow-none"
                         >
                             <div className="flex items-start justify-between gap-4">
                                 <div>
@@ -297,14 +363,18 @@ export default function AdminDashboard({
             </section>
 
             <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(20rem,0.75fr)]">
-                <article className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/8 dark:bg-white/[0.035]">
+                <article
+                    id="recent-activities"
+                    className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/8 dark:bg-white/[0.035]"
+                >
                     <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-5 sm:px-6 dark:border-white/8">
                         <div>
                             <h3 className="font-semibold tracking-tight text-slate-950 dark:text-white">
-                                Recent registrations
+                                Recent activities
                             </h3>
                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                New accounts joining your marketplace
+                                Latest administrative changes across the
+                                marketplace
                             </p>
                         </div>
                         <span className="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-semibold text-emerald-700 sm:inline-flex dark:bg-emerald-500/10 dark:text-emerald-300">
@@ -312,100 +382,61 @@ export default function AdminDashboard({
                             Live updates
                         </span>
                     </div>
-                    {recentUsers.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[650px] text-left">
-                                <thead className="bg-slate-50/70 text-[10px] font-semibold tracking-[0.12em] text-slate-400 uppercase dark:bg-white/[0.025]">
-                                    <tr>
-                                        <th className="px-6 py-3.5 font-semibold">
-                                            User
-                                        </th>
-                                        <th className="px-5 py-3.5 font-semibold">
-                                            Role
-                                        </th>
-                                        <th className="px-5 py-3.5 font-semibold">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3.5 text-right font-semibold">
-                                            Joined
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-white/6">
-                                    {recentUsers.map((user) => (
-                                        <tr
-                                            key={user.id}
-                                            className="group transition hover:bg-slate-50/80 dark:hover:bg-white/[0.025]"
-                                        >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-600 text-xs font-bold text-white shadow-sm dark:from-slate-700 dark:to-slate-800">
-                                                        {user.name
-                                                            .charAt(0)
-                                                            .toUpperCase()}
-                                                    </span>
-                                                    <div className="min-w-0">
-                                                        <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-                                                            {user.name}
-                                                        </p>
-                                                        <p className="truncate text-[11px] text-slate-400">
-                                                            {user.email}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                <span
-                                                    className={`inline-flex rounded-md px-2 py-1 text-[10px] font-semibold capitalize ${roleBadgeStyles[user.role] ?? 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300'}`}
-                                                >
-                                                    {user.role === 'admin'
-                                                        ? (user.admin_roles?.[0]
-                                                              ?.name ??
-                                                          'Administrator')
-                                                        : user.role.replaceAll(
-                                                              '_',
-                                                              ' ',
-                                                          )}
-                                                </span>
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                <span
-                                                    className={`inline-flex items-center gap-1.5 text-xs font-medium ${user.status ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}
-                                                >
-                                                    <span
-                                                        className={`size-1.5 rounded-full ${user.status ? 'bg-emerald-500' : 'bg-rose-500'}`}
-                                                    />
-                                                    {user.status
-                                                        ? 'Active'
-                                                        : 'Inactive'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right text-[11px] font-medium text-slate-400">
+                    {recentActivities.length > 0 ? (
+                        <div className="divide-y divide-slate-100 dark:divide-white/6">
+                            {recentActivities.map((activity) => (
+                                <div
+                                    key={activity.id}
+                                    className="flex items-start gap-3 px-5 py-4 transition hover:bg-slate-50/80 sm:px-6 dark:hover:bg-white/[0.025]"
+                                >
+                                    <span
+                                        className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl ${activity.succeeded ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300'}`}
+                                    >
+                                        <Activity className="size-4" />
+                                    </span>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                                {activity.description}
+                                            </p>
+                                            <time className="text-[10px] font-medium text-slate-400">
                                                 {new Date(
-                                                    user.created_at,
-                                                ).toLocaleDateString(
-                                                    undefined,
-                                                    {
-                                                        day: 'numeric',
-                                                        month: 'short',
-                                                        year: 'numeric',
-                                                    },
+                                                    activity.occurred_at,
+                                                ).toLocaleString(undefined, {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    hour: 'numeric',
+                                                    minute: '2-digit',
+                                                })}
+                                            </time>
+                                        </div>
+                                        <p className="mt-1 text-[11px] text-slate-500">
+                                            {activity.actor?.name ?? 'System'} ·{' '}
+                                            <span className="capitalize">
+                                                {activity.category.replaceAll(
+                                                    '_',
+                                                    ' ',
+                                                )}{' '}
+                                                /{' '}
+                                                {activity.action.replaceAll(
+                                                    '_',
+                                                    ' ',
                                                 )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : (
                         <div className="grid min-h-64 place-items-center px-6 text-center">
                             <div>
-                                <CircleUserRound className="mx-auto size-9 text-slate-300" />
+                                <Activity className="mx-auto size-9 text-slate-300" />
                                 <p className="mt-3 text-sm font-semibold">
-                                    No registrations yet
+                                    No recent activity
                                 </p>
                                 <p className="mt-1 text-xs text-slate-500">
-                                    New accounts will appear here.
+                                    Administrative changes will appear here.
                                 </p>
                             </div>
                         </div>

@@ -39,7 +39,7 @@ export default function InventoryOperationsIndex({
 
     return (
         <AdminLayout
-            title="Inventory Control"
+            title="Inventory"
             breadcrumb="Operations / Inventory Control"
         >
             <div>
