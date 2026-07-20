@@ -588,6 +588,14 @@ const navigationSections = [
         icon: ShieldCheck,
         items: [
             {
+                label: 'Notifications',
+                href: admin.notifications.index.url(),
+                icon: Bell,
+                permission: 'roles.manage',
+                searchText:
+                    'admin seller customer notifications email sms push whatsapp templates rules history failed notifications',
+            },
+            {
                 label: 'Administration Overview',
                 href: admin.administration.url(),
                 icon: ShieldCheck,

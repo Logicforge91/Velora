@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GrowthCentreController;
 use App\Http\Controllers\Admin\IntegrationController;
 use App\Http\Controllers\Admin\InventoryOperationController;
+use App\Http\Controllers\Admin\NotificationManagementController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PaymentRefundController;
@@ -211,6 +212,16 @@ Route::prefix('admin')
             ->group(function (): void {
                 Route::get('/', 'index')->name('index');
                 Route::patch('{category}', 'update')->name('update');
+            });
+
+        Route::controller(NotificationManagementController::class)
+            ->prefix('notifications')
+            ->name('notifications.')
+            ->middleware('permission:roles.manage')
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::post('templates', 'storeTemplate')->name('templates.store');
+                Route::post('rules', 'storeRule')->name('rules.store');
             });
     });
 
