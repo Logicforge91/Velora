@@ -29,6 +29,7 @@ import {
     Sparkles,
     ScrollText,
     ShieldCheck,
+    ShieldAlert,
     Settings2,
     ShoppingBag,
     Store,
@@ -40,6 +41,7 @@ import {
     Warehouse,
     X,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
@@ -62,7 +64,22 @@ import type { AccountPermission } from '@/types/auth';
 const dashboardSection = (section: string) =>
     `${admin.dashboard.url()}#${section}`;
 
-const navigationSections = [
+type NavigationItem = {
+    label: string;
+    href: string;
+    icon: LucideIcon;
+    permission: string;
+    badge?: string;
+    searchText?: string;
+};
+
+type NavigationSection = {
+    label: string;
+    icon: LucideIcon;
+    items: NavigationItem[];
+};
+
+const navigationSections: NavigationSection[] = [
     {
         label: 'Dashboard',
         icon: LayoutDashboard,
@@ -137,7 +154,7 @@ const navigationSections = [
                 icon: Store,
                 permission: 'vendors.manage',
                 searchText:
-                    'seller management vendors merchants directory all sellers',
+                    'seller management vendors merchants directory all sellers status documents bank accounts warehouses violations agreements plans subscriptions performance',
             },
             {
                 label: 'New Seller',
@@ -248,7 +265,8 @@ const navigationSections = [
                 href: admin.products.index.url(),
                 icon: Package,
                 permission: 'catalogue.manage',
-                searchText: 'catalog products sku listing content',
+                searchText:
+                    'catalog products sku listing content specifications media bundles duplicates',
             },
             {
                 label: 'New Product',
@@ -258,13 +276,12 @@ const navigationSections = [
                 searchText: 'create new product catalogue item sku',
             },
             {
-                label: 'Listing Requests',
-                href: admin.sellerListings.index.url({
-                    query: { view: 'requests' },
-                }),
+                label: 'Listings',
+                href: admin.sellerListings.index.url(),
                 icon: FileSpreadsheet,
                 permission: 'catalogue.manage',
-                searchText: 'seller listing applications review requests',
+                searchText:
+                    'seller listing applications review requests status quality moderation pending approved rejected',
             },
             {
                 label: 'Listing Status',
@@ -349,13 +366,12 @@ const navigationSections = [
                 searchText: 'product bundle combo kit grouped products',
             },
             {
-                label: 'Bulk Upload',
-                href: admin.catalogImports.index.url({
-                    query: { view: 'upload' },
-                }),
+                label: 'Imports',
+                href: admin.catalogImports.index.url(),
                 icon: FileSpreadsheet,
                 permission: 'catalogue.manage',
-                searchText: 'csv excel bulk product upload catalogue import',
+                searchText:
+                    'csv excel bulk product upload catalogue import export download',
             },
             {
                 label: 'Import & Export',
@@ -570,6 +586,20 @@ const navigationSections = [
         ],
     },
     {
+        label: 'Trust & Safety',
+        icon: ShieldAlert,
+        items: [
+            {
+                label: 'Risk Operations',
+                href: admin.trustSafety.url(),
+                icon: ShieldAlert,
+                permission: 'reports.view',
+                searchText:
+                    'fraudulent orders suspicious transactions seller customer fraud alerts fake products counterfeit complaints policy listing pricing violations penalties blocked ip blacklist risk rules manual review queue trust safety',
+            },
+        ],
+    },
+    {
         label: 'Analytics',
         icon: BarChart3,
         items: [
@@ -639,21 +669,96 @@ const navigationSections = [
     },
 ];
 
+const selectNavigationItems = (
+    sectionLabels: string[],
+    itemLabels?: string[],
+): NavigationItem[] =>
+    navigationSections
+        .filter((section) => sectionLabels.includes(section.label))
+        .flatMap((section) => section.items)
+        .filter((item) => itemLabels?.includes(item.label) ?? true);
+
+const groupedNavigationSections: NavigationSection[] = [
+    {
+        label: 'Dashboard',
+        icon: LayoutDashboard,
+        items: selectNavigationItems(['Dashboard'], ['Overview']),
+    },
+    {
+        label: 'Sellers',
+        icon: Store,
+        items: selectNavigationItems(
+            ['Sellers'],
+            ['Seller List', 'New Seller', 'Applications', 'KYC Review'],
+        ),
+    },
+    {
+        label: 'Catalog',
+        icon: Package,
+        items: selectNavigationItems(
+            ['Catalog'],
+            [
+                'Products',
+                'New Product',
+                'Listings',
+                'Categories',
+                'Brands',
+                'Variants',
+                'Imports',
+            ],
+        ),
+    },
+    {
+        label: 'Operations',
+        icon: Truck,
+        items: selectNavigationItems([
+            'Orders',
+            'Inventory',
+            'Warehouses',
+            'Logistics',
+            'Returns & Refunds',
+        ]),
+    },
+    {
+        label: 'Finance',
+        icon: WalletCards,
+        items: selectNavigationItems(['Pricing', 'Payments']),
+    },
+    {
+        label: 'Engagement',
+        icon: Users,
+        items: selectNavigationItems([
+            'Customers',
+            'Marketing',
+            'Reviews',
+            'Support',
+        ]),
+    },
+    {
+        label: 'Trust & Safety',
+        icon: ShieldAlert,
+        items: selectNavigationItems(['Trust & Safety']),
+    },
+    {
+        label: 'Analytics',
+        icon: BarChart3,
+        items: selectNavigationItems(['Analytics']),
+    },
+    {
+        label: 'Settings',
+        icon: Settings2,
+        items: selectNavigationItems(['Settings']),
+    },
+];
+
 const navigationSectionOrder = [
     'Dashboard',
     'Sellers',
     'Catalog',
-    'Pricing',
-    'Orders',
-    'Inventory',
-    'Warehouses',
-    'Logistics',
-    'Returns & Refunds',
-    'Payments',
-    'Customers',
-    'Marketing',
-    'Reviews',
-    'Support',
+    'Operations',
+    'Finance',
+    'Engagement',
+    'Trust & Safety',
     'Analytics',
     'Settings',
 ];
@@ -677,7 +782,7 @@ export default function AdminLayout({
     );
     const permittedNavigationSections = useMemo(
         () =>
-            navigationSections
+            groupedNavigationSections
                 .map((section) => ({
                     ...section,
                     items: section.items.filter((item) =>
@@ -1070,7 +1175,7 @@ export default function AdminLayout({
                             onChange={(event) =>
                                 setSidebarQuery(event.target.value)
                             }
-                            placeholder="Filter navigation..."
+                            placeholder="Find a page..."
                             aria-label="Filter admin navigation"
                             className="h-10 w-full rounded-xl border border-white/8 bg-white/[0.055] pr-9 pl-9 text-xs text-white transition outline-none placeholder:text-slate-500 focus:border-orange-400/30 focus:bg-white/[0.08] focus:ring-2 focus:ring-orange-400/10"
                         />
@@ -1203,11 +1308,6 @@ export default function AdminLayout({
                                                         : pendingCount}
                                                 </span>
                                             )}
-                                        {section.label !== 'Sellers' && (
-                                            <span className="rounded-full bg-white/[0.055] px-1.5 py-0.5 text-[9px] font-bold text-slate-500">
-                                                {section.items.length}
-                                            </span>
-                                        )}
                                         <ChevronDown className="size-4 shrink-0 text-slate-500 transition-transform duration-200 group-hover:text-slate-300 group-data-[state=open]:rotate-180" />
                                     </CollapsibleTrigger>
                                     <CollapsibleContent className="overflow-hidden">
@@ -1229,7 +1329,7 @@ export default function AdminLayout({
                                                                 false,
                                                             )
                                                         }
-                                                        className={`group flex items-center gap-2.5 rounded-lg px-2.5 font-medium transition ${section.items.length > 8 ? 'py-1.5 text-xs' : 'py-2 text-[13px]'} ${active ? 'bg-[#f97316] text-white shadow-md shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                                        className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition ${active ? 'bg-[#f97316] text-white shadow-md shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
                                                     >
                                                         <Icon
                                                             className={`size-4 shrink-0 ${active ? 'text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
