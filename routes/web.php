@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\SupportMessageController;
 use App\Http\Controllers\Admin\SupportTicketController;
 use App\Http\Controllers\Admin\SystemSettingController;
 use App\Http\Controllers\Admin\TaxInvoiceController;
+use App\Http\Controllers\Admin\TrustSafetyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\VendorKycDocumentController;
@@ -83,6 +84,13 @@ Route::prefix('admin')
         Route::get('analytics', AnalyticsController::class)
             ->middleware('permission:reports.view')
             ->name('analytics');
+
+        Route::get('trust-safety', TrustSafetyController::class)
+            ->middleware('permission:reports.view')
+            ->name('trust-safety');
+        Route::patch('trust-safety/cases/{trustSafetyCase}', [TrustSafetyController::class, 'update'])
+            ->middleware('permission:reports.view')
+            ->name('trust-safety.cases.update');
 
         Route::get('growth-centre', GrowthCentreController::class)
             ->middleware('permission:reports.view')
