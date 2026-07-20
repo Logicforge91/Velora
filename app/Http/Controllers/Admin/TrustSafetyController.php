@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TrustSafetyIndexRequest;
 use App\Http\Requests\Admin\UpdateTrustSafetyCaseRequest;
 use App\Models\TrustSafetyCase;
+use App\Models\User;
 use App\Services\Admin\TrustSafetyService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -22,7 +23,11 @@ class TrustSafetyController extends Controller
 
     public function update(UpdateTrustSafetyCaseRequest $request, TrustSafetyCase $trustSafetyCase): RedirectResponse
     {
-        $this->service->review($trustSafetyCase, $request->validated(), $request->user());
+        $reviewer = $request->user();
+
+        abort_unless($reviewer instanceof User, 403);
+
+        $this->service->review($trustSafetyCase, $request->validated(), $reviewer);
 
         return back()->with('success', 'Trust and safety case updated.');
     }

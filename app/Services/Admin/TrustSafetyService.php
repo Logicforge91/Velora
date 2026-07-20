@@ -43,6 +43,11 @@ class TrustSafetyService
     public function workspace(array $filters): array
     {
         $key = $filters['section'] ?? 'manual-review-queue';
+
+        if (! array_key_exists($key, self::SECTIONS)) {
+            $key = 'manual-review-queue';
+        }
+
         $section = self::SECTIONS[$key];
         $counts = $this->sectionCounts();
 
@@ -100,13 +105,15 @@ class TrustSafetyService
     {
         $caseCounts = TrustSafetyCase::query()->whereIn('status', ['open', 'in_review'])->selectRaw('category, COUNT(*) as total')->groupBy('category')->pluck('total', 'category');
         $restrictionCounts = RiskRestriction::query()->where('active', true)->selectRaw('type, COUNT(*) as total')->groupBy('type')->pluck('total', 'type');
+        $activeRuleCount = RiskRule::query()->where('enabled', true)->count();
+        $queueCount = TrustSafetyCase::query()->whereIn('status', ['open', 'in_review'])->count();
 
-        return collect(self::SECTIONS)->mapWithKeys(function (array $section, string $key) use ($caseCounts, $restrictionCounts): array {
+        return collect(self::SECTIONS)->mapWithKeys(function (array $section, string $key) use ($activeRuleCount, $caseCounts, $queueCount, $restrictionCounts): array {
             $count = match ($section['kind']) {
-                'case' => (int) ($caseCounts[$section['value']] ?? 0),
-                'restriction' => (int) ($restrictionCounts[$section['value']] ?? 0),
-                'rule' => RiskRule::query()->where('enabled', true)->count(),
-                'queue' => TrustSafetyCase::query()->whereIn('status', ['open', 'in_review'])->count(),
+                'case' => is_string($section['value']) ? (int) $caseCounts->get($section['value'], 0) : 0,
+                'restriction' => is_string($section['value']) ? (int) $restrictionCounts->get($section['value'], 0) : 0,
+                'rule' => $activeRuleCount,
+                'queue' => $queueCount,
                 default => 0,
             };
 
@@ -129,7 +136,10 @@ class TrustSafetyService
         };
     }
 
-    /** @return list<array<string, mixed>> */
+    /**
+     * @param  array{section?: string, search?: string|null, status?: string|null, severity?: string|null}  $filters
+     * @return list<array<string, mixed>>
+     */
     private function caseRows(?string $category, bool $queue, array $filters): array
     {
         $search = trim((string) ($filters['search'] ?? ''));
@@ -148,7 +158,10 @@ class TrustSafetyService
             ])->values()->all();
     }
 
-    /** @return list<array<string, mixed>> */
+    /**
+     * @param  array{section?: string, search?: string|null, status?: string|null, severity?: string|null}  $filters
+     * @return list<array<string, mixed>>
+     */
     private function restrictionRows(string $type, array $filters): array
     {
         $search = trim((string) ($filters['search'] ?? ''));
@@ -163,7 +176,10 @@ class TrustSafetyService
             ])->values()->all();
     }
 
-    /** @return list<array<string, mixed>> */
+    /**
+     * @param  array{section?: string, search?: string|null, status?: string|null, severity?: string|null}  $filters
+     * @return list<array<string, mixed>>
+     */
     private function ruleRows(array $filters): array
     {
         $search = trim((string) ($filters['search'] ?? ''));
