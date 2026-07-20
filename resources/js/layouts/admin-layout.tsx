@@ -57,78 +57,239 @@ import { logout } from '@/routes';
 import admin from '@/routes/admin';
 import type { AccountPermission } from '@/types/auth';
 
+const dashboardSection = (section: string) =>
+    `${admin.dashboard.url()}#${section}`;
+
 const navigationSections = [
     {
-        label: 'Overview',
+        label: 'Dashboard',
         icon: LayoutDashboard,
         items: [
             {
-                label: 'Dashboard',
+                label: 'Business Overview',
                 href: admin.dashboard.url(),
                 icon: LayoutDashboard,
                 permission: 'admin.dashboard.view',
+                searchText:
+                    'dashboard today orders gmv revenue active sellers pending approvals returns low stock fulfilment performance activities',
             },
             {
-                label: 'Analytics',
-                href: admin.analytics.url(),
-                icon: BarChart3,
-                permission: 'reports.view',
+                label: 'Today’s Orders',
+                href: dashboardSection('todays-orders'),
+                icon: ShoppingBag,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'GMV and Net Revenue',
+                href: dashboardSection('gross-merchandise-value'),
+                icon: CircleDollarSign,
+                permission: 'admin.dashboard.view',
+                searchText:
+                    'gross merchandise value gmv net revenue sales finance',
+            },
+            {
+                label: 'Active Sellers',
+                href: dashboardSection('active-sellers'),
+                icon: Store,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Pending Approvals',
+                href: dashboardSection('pending-approvals'),
+                icon: ShieldCheck,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Returns Summary',
+                href: dashboardSection('returns-summary'),
+                icon: Undo2,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Low-stock Alerts',
+                href: dashboardSection('low-stock-alerts'),
+                icon: Boxes,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Fulfilment Performance',
+                href: dashboardSection('fulfilment-performance'),
+                icon: Truck,
+                permission: 'admin.dashboard.view',
+            },
+            {
+                label: 'Recent Activities',
+                href: dashboardSection('recent-activities'),
+                icon: ScrollText,
+                permission: 'admin.dashboard.view',
             },
         ],
     },
     {
-        label: 'Orders & Returns',
-        icon: ShoppingBag,
+        label: 'Seller Management',
+        icon: Store,
         items: [
             {
-                label: 'All Orders',
-                href: admin.orders.index.url(),
-                icon: ShoppingBag,
-                permission: 'orders.manage',
-                badge: 'Live',
-                searchText: 'sales purchases order processing dispatch',
+                label: 'All Sellers',
+                href: admin.vendors.index.url(),
+                icon: Store,
+                permission: 'vendors.manage',
+                searchText:
+                    'seller management vendors merchants directory all sellers',
             },
             {
-                label: 'Returns & Claims',
-                href: admin.returns.index.url(),
-                icon: Undo2,
-                permission: 'orders.manage',
-                searchText: 'returns replacements claims rma reverse logistics',
+                label: 'Add Seller',
+                href: admin.vendors.create.url(),
+                icon: Users,
+                permission: 'vendors.manage',
+                searchText: 'create invite onboard new seller',
             },
             {
-                label: 'Shipments',
-                href: admin.shipments.index.url(),
-                icon: Truck,
-                permission: 'orders.manage',
-                searchText: 'fulfilment tracking delivery dispatch carrier',
+                label: 'Seller Applications',
+                href: admin.vendors.index.url({
+                    query: { status: 'pending', view: 'applications' },
+                }),
+                icon: FileSpreadsheet,
+                permission: 'vendors.manage',
+                searchText: 'onboarding applications review queue',
+            },
+            {
+                label: 'KYC Verification',
+                href: admin.vendors.index.url({
+                    query: { kyc_status: 'in_review' },
+                }),
+                icon: ShieldCheck,
+                permission: 'vendors.manage',
+                badge: 'Review',
+                searchText:
+                    'documents identity gst pan bank proof verification',
+            },
+            {
+                label: 'Approved / Rejected / Suspended Sellers',
+                href: admin.vendors.index.url({
+                    query: { view: 'status' },
+                }),
+                icon: Store,
+                permission: 'vendors.manage',
+                searchText:
+                    'approved rejected suspended sellers status moderation',
+            },
+            {
+                label: 'Seller Documents',
+                href: admin.vendors.index.url({
+                    query: { kyc_status: 'in_review', view: 'documents' },
+                }),
+                icon: ScrollText,
+                permission: 'vendors.manage',
+                searchText: 'kyc document checklist files',
+            },
+            {
+                label: 'Bank Accounts',
+                href: admin.vendors.index.url({
+                    query: { view: 'bank-accounts' },
+                }),
+                icon: WalletCards,
+                permission: 'payments.manage',
+                searchText: 'beneficiary ifsc payout account banking',
+            },
+            {
+                label: 'Warehouses',
+                href: admin.warehouses.index.url({
+                    query: { view: 'sellers' },
+                }),
+                icon: Warehouse,
+                permission: 'catalogue.manage',
+            },
+            {
+                label: 'Performance Score',
+                href: admin.growthCentre.url({
+                    query: { view: 'seller-performance' },
+                }),
+                icon: BarChart3,
+                permission: 'reports.view',
+                searchText:
+                    'seller sales returns activity quality performance score',
+            },
+            {
+                label: 'Violations',
+                href: admin.vendors.index.url({
+                    query: { risk_level: 'high', view: 'violations' },
+                }),
+                icon: ShieldCheck,
+                permission: 'vendors.manage',
+                searchText: 'risk fraud policy penalties violations',
+            },
+            {
+                label: 'Agreements',
+                href: admin.vendors.index.url({
+                    query: { view: 'agreements' },
+                }),
+                icon: ReceiptText,
+                permission: 'vendors.manage',
+            },
+            {
+                label: 'Subscriptions',
+                href: admin.vendors.index.url({
+                    query: { view: 'subscriptions' },
+                }),
+                icon: BadgePercent,
+                permission: 'vendors.manage',
             },
         ],
     },
     {
-        label: 'Catalog & Listings',
+        label: 'Catalogue Management',
         icon: Package,
         items: [
             {
-                label: 'Products',
+                label: 'All Products',
                 href: admin.products.index.url(),
                 icon: Package,
                 permission: 'catalogue.manage',
                 searchText: 'catalog products sku listing content',
             },
             {
-                label: 'Seller Listings',
-                href: admin.sellerListings.index.url(),
-                icon: Store,
+                label: 'Add Product',
+                href: admin.products.create.url(),
+                icon: Package,
                 permission: 'catalogue.manage',
-                badge: 'Buy box',
-                searchText: 'marketplace offers buy box seller sku commission',
+                searchText: 'create new product catalogue item sku',
             },
             {
-                label: 'Variants',
-                href: admin.productVariants.index.url(),
+                label: 'Listing Requests',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'requests' },
+                }),
+                icon: FileSpreadsheet,
+                permission: 'catalogue.manage',
+                searchText: 'seller listing applications review requests',
+            },
+            {
+                label: 'Pending / Approved / Rejected Listings',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'status' },
+                }),
                 icon: Layers3,
                 permission: 'catalogue.manage',
-                searchText: 'product options size color variant sku',
+                searchText: 'listing status pending approved rejected',
+            },
+            {
+                label: 'Quality Check',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'quality-check' },
+                }),
+                icon: ShieldCheck,
+                permission: 'catalogue.manage',
+                searchText: 'listing content image data quality validation',
+            },
+            {
+                label: 'Product Moderation',
+                href: admin.sellerListings.index.url({
+                    query: { view: 'moderation' },
+                }),
+                icon: ShieldCheck,
+                permission: 'catalogue.manage',
+                searchText: 'approve block restrict product listing moderation',
             },
             {
                 label: 'Categories',
@@ -143,17 +304,111 @@ const navigationSections = [
                 permission: 'catalogue.manage',
             },
             {
-                label: 'Bulk Imports',
-                href: admin.catalogImports.index.url(),
+                label: 'Attributes',
+                href: admin.productVariants.index.url({
+                    query: { view: 'attributes' },
+                }),
+                icon: Tags,
+                permission: 'catalogue.manage',
+                searchText: 'product attributes options size colour material',
+            },
+            {
+                label: 'Variants',
+                href: admin.productVariants.index.url(),
+                icon: Layers3,
+                permission: 'catalogue.manage',
+                searchText: 'product options size color variant sku',
+            },
+            {
+                label: 'Specifications',
+                href: admin.products.index.url({
+                    query: { view: 'specifications' },
+                }),
+                icon: ScrollText,
+                permission: 'catalogue.manage',
+                searchText: 'product technical details specifications',
+            },
+            {
+                label: 'Media',
+                href: admin.products.index.url({
+                    query: { view: 'media' },
+                }),
                 icon: FileSpreadsheet,
                 permission: 'catalogue.manage',
-                searchText: 'csv excel bulk upload catalogue import',
+                searchText: 'product images video gallery media',
+            },
+            {
+                label: 'Bundles',
+                href: admin.products.index.url({
+                    query: { view: 'bundles' },
+                }),
+                icon: Boxes,
+                permission: 'catalogue.manage',
+                searchText: 'product bundle combo kit grouped products',
+            },
+            {
+                label: 'Bulk Upload',
+                href: admin.catalogImports.index.url({
+                    query: { view: 'upload' },
+                }),
+                icon: FileSpreadsheet,
+                permission: 'catalogue.manage',
+                searchText: 'csv excel bulk product upload catalogue import',
+            },
+            {
+                label: 'Import / Export',
+                href: admin.catalogImports.index.url({
+                    query: { view: 'import-export' },
+                }),
+                icon: ArrowDownUp,
+                permission: 'catalogue.manage',
+                searchText: 'csv excel catalogue data import export download',
+            },
+            {
+                label: 'Duplicate Detection',
+                href: admin.products.index.url({
+                    query: { view: 'duplicates' },
+                }),
+                icon: Search,
+                permission: 'catalogue.manage',
+                searchText:
+                    'duplicate similar matching product detection merge',
             },
         ],
     },
     {
-        label: 'Inventory & Delivery',
-        icon: Warehouse,
+        label: 'Pricing & Offers',
+        icon: BadgePercent,
+        items: [
+            {
+                label: 'Pricing Intelligence',
+                href: admin.growthCentre.url(),
+                icon: BarChart3,
+                permission: 'reports.view',
+                badge: 'AI',
+                searchText:
+                    'growth pricing recommendations intelligence price approvals dynamic pricing mrp special scheduled prices deal zone flash festival sales',
+            },
+        ],
+    },
+    {
+        label: 'Orders',
+        icon: ShoppingBag,
+        items: [
+            {
+                label: 'Order Management',
+                href: admin.orders.index.url(),
+                icon: ShoppingBag,
+                permission: 'orders.manage',
+                badge: 'Live',
+                searchText:
+                    'all new confirmed ready pack packed dispatch shipped delivery delivered cancelled failed hold fraud bulk processing timeline exceptions sales purchases',
+            },
+        ],
+    },
+    {
+        label: 'Inventory',
+        icon: ArrowDownUp,
         items: [
             {
                 label: 'Inventory Control',
@@ -161,13 +416,36 @@ const navigationSections = [
                 icon: ArrowDownUp,
                 permission: 'catalogue.manage',
                 badge: 'Live',
-                searchText: 'stock ledger reservations movements warehouse',
+                searchText:
+                    'inventory overview seller warehouse available reserved damaged low stock out of stock adjustments transfers reconciliation history import export alerts stock ledger movements',
             },
+        ],
+    },
+    {
+        label: 'Warehouses & Fulfilment',
+        icon: Warehouse,
+        items: [
             {
                 label: 'Warehouses',
                 href: admin.warehouses.index.url(),
                 icon: Warehouse,
                 permission: 'catalogue.manage',
+                searchText:
+                    'all seller warehouses fulfilment centres pickup locations picklists packing lists dispatch batches shipping labels manifest handover sla delays exceptions',
+            },
+        ],
+    },
+    {
+        label: 'Logistics',
+        icon: Truck,
+        items: [
+            {
+                label: 'Shipments',
+                href: admin.shipments.index.url(),
+                icon: Truck,
+                permission: 'orders.manage',
+                searchText:
+                    'all shipments courier partners shipping methods zones rates hubs pickup tracking delivery attempts undelivered lost damaged sla reverse logistics fulfilment dispatch carrier',
             },
             {
                 label: 'Delivery Coverage',
@@ -175,48 +453,22 @@ const navigationSections = [
                 icon: MapPinned,
                 permission: 'catalogue.manage',
                 badge: 'Pincode',
-                searchText: 'pincode serviceability cod express delivery',
-            },
-        ],
-    },
-    {
-        label: 'Growth & Quality',
-        icon: Sparkles,
-        items: [
-            {
-                label: 'Growth Intelligence',
-                href: admin.growthCentre.url(),
-                icon: BarChart3,
-                permission: 'reports.view',
-                badge: 'AI',
-                searchText: 'growth pricing recommendations intelligence',
-            },
-            {
-                label: 'Promotions',
-                href: admin.coupons.index.url(),
-                icon: BadgePercent,
-                permission: 'catalogue.manage',
-                searchText: 'coupons campaigns offers discounts marketing',
-            },
-            {
-                label: 'Ratings & Reviews',
-                href: admin.reviews.index.url(),
-                icon: MessageSquareText,
-                permission: 'catalogue.manage',
                 searchText:
-                    'ratings reviews moderation quality customer feedback',
+                    'pincode serviceable serviceability zones shipping rates cod express delivery',
             },
         ],
     },
     {
-        label: 'Finance',
-        icon: WalletCards,
+        label: 'Returns, RTO & Refunds',
+        icon: Undo2,
         items: [
             {
-                label: 'Payments',
-                href: admin.payments.index.url(),
-                icon: WalletCards,
-                permission: 'payments.manage',
+                label: 'Returns & Claims',
+                href: admin.returns.index.url(),
+                icon: Undo2,
+                permission: 'orders.manage',
+                searchText:
+                    'return requests pending approved rejected pickup returned replacements return origin rto reasons disputes policies analytics claims rma reverse logistics',
             },
             {
                 label: 'Refund Operations',
@@ -224,78 +476,153 @@ const navigationSections = [
                 icon: CircleDollarSign,
                 permission: 'payments.manage',
                 badge: 'Live',
-                searchText: 'refund approval reconciliation payment gateway',
+                searchText:
+                    'refund requests pending processed partial refunds approval reconciliation payment gateway',
+            },
+        ],
+    },
+    {
+        label: 'Payments & Settlements',
+        icon: WalletCards,
+        items: [
+            {
+                label: 'Payment Transactions',
+                href: admin.payments.index.url(),
+                icon: WalletCards,
+                permission: 'payments.manage',
+                searchText:
+                    'payments transactions gateways reconciliation payout collection charges',
+            },
+            {
+                label: 'Seller Settlements',
+                href: admin.settlements.index.url(),
+                icon: Banknote,
+                permission: 'payments.manage',
+                searchText:
+                    'upcoming completed held settlements payouts commission marketplace fees penalties reconciliation',
             },
             {
                 label: 'GST Invoices',
                 href: admin.taxInvoices.index.url(),
                 icon: ReceiptText,
                 permission: 'payments.manage',
-            },
-            {
-                label: 'Settlements',
-                href: admin.settlements.index.url(),
-                icon: Banknote,
-                permission: 'payments.manage',
+                searchText:
+                    'invoices credit debit notes tds gst reports tax documents',
             },
         ],
     },
     {
-        label: 'Marketplace Network',
+        label: 'Customers',
         icon: Users,
         items: [
-            {
-                label: 'Sellers',
-                href: admin.vendors.index.url(),
-                icon: Store,
-                permission: 'vendors.manage',
-                searchText: 'vendors merchants sellers onboarding kyc',
-            },
             {
                 label: 'Customers & Staff',
                 href: admin.users.index.url(),
                 icon: Users,
                 permission: 'users.manage',
-                searchText: 'users customers staff agents accounts',
-            },
-            {
-                label: 'Customer Support',
-                href: admin.support.index.url(),
-                icon: Headphones,
-                permission: 'support.requests.manage',
-                searchText: 'support tickets cases messages complaints',
+                searchText:
+                    'all active new blocked customers addresses groups segments orders returns wishlist carts wallet loyalty login history complaints risk profile users staff agents accounts',
             },
         ],
     },
     {
-        label: 'Governance',
+        label: 'Marketing & Advertising',
+        icon: Sparkles,
+        items: [
+            {
+                label: 'Promotions & Coupons',
+                href: admin.coupons.index.url(),
+                icon: BadgePercent,
+                permission: 'catalogue.manage',
+                searchText:
+                    'marketing advertising dashboard campaigns sponsored banner seller ads coupons promotions festival email sms push abandoned carts referral affiliate segments performance offers discounts',
+            },
+        ],
+    },
+    {
+        label: 'Reviews & Questions',
+        icon: MessageSquareText,
+        items: [
+            {
+                label: 'Ratings & Reviews',
+                href: admin.reviews.index.url(),
+                icon: MessageSquareText,
+                permission: 'catalogue.manage',
+                searchText:
+                    'product seller reviews pending approved rejected reported questions answers moderation analytics quality customer feedback',
+            },
+        ],
+    },
+    {
+        label: 'Customer Support',
+        icon: Headphones,
+        items: [
+            {
+                label: 'Support & Disputes',
+                href: admin.support.index.url(),
+                icon: Headphones,
+                permission: 'support.requests.manage',
+                searchText:
+                    'support dashboard customer seller tickets order payment delivery return complaints escalated priorities agents canned responses sla dispute resolution cases messages',
+            },
+        ],
+    },
+    {
+        label: 'Reports & Analytics',
+        icon: BarChart3,
+        items: [
+            {
+                label: 'Marketplace Analytics',
+                href: admin.analytics.url(),
+                icon: BarChart3,
+                permission: 'reports.view',
+                searchText:
+                    'sales orders revenue products categories brands sellers customers inventory fulfilment logistics returns rto refunds settlements commission tax campaigns conversion profitability custom report builder',
+            },
+        ],
+    },
+    {
+        label: 'Administration',
         icon: ShieldCheck,
         items: [
             {
-                label: 'Admin Roles',
+                label: 'Roles & Permissions',
                 href: admin.adminRoles.index.url(),
                 icon: ShieldCheck,
                 permission: 'roles.manage',
+                searchText:
+                    'admin users teams departments roles permissions approval workflows access control 2fa ip restrictions',
             },
             {
                 label: 'Audit Logs',
                 href: admin.auditLogs.index.url(),
                 icon: ScrollText,
                 permission: 'reports.view',
+                searchText:
+                    'activity logs login history audit logs api users access tokens administration governance',
             },
         ],
     },
 ];
 
 const navigationSectionOrder = [
-    'Overview',
-    'Orders & Returns',
-    'Catalog & Listings',
-    'Inventory & Delivery',
-    'Growth & Quality',
-    'Finance',
-    'Marketplace Network',
-    'Governance',
+    'Dashboard',
+    'Marketplace / Sellers',
+    'Catalogue',
+    'Listings',
+    'Pricing & Offers',
+    'Orders',
+    'Inventory',
+    'Warehouses & Fulfilment',
+    'Logistics',
+    'Returns, RTO & Refunds',
+    'Payments & Settlements',
+    'Customers',
+    'Marketing & Advertising',
+    'Reviews & Questions',
+    'Customer Support',
+    'Reports & Analytics',
+    'Administration',
 ];
 
 type Props = PropsWithChildren<{
@@ -310,7 +637,7 @@ export default function AdminLayout({
 }: Props) {
     const { auth, errors, flash, pendingVendorCount } = usePage().props;
     const { url } = usePage();
-    const currentPath = url.split('?')[0];
+    const currentPath = url.split(/[?#]/)[0];
     const grantedPermissions = new Set<AccountPermission>(auth.permissions);
     const permittedNavigationSections = navigationSections
         .map((section) => ({
@@ -325,14 +652,6 @@ export default function AdminLayout({
                 navigationSectionOrder.indexOf(first.label) -
                 navigationSectionOrder.indexOf(second.label),
         );
-    const activeSectionLabel = permittedNavigationSections.find((section) =>
-        section.items.some(
-            (item) =>
-                currentPath === item.href ||
-                (item.href !== admin.dashboard.url() &&
-                    currentPath.startsWith(item.href)),
-        ),
-    )?.label;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
         typeof window === 'undefined'
@@ -341,16 +660,41 @@ export default function AdminLayout({
     );
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [sidebarQuery, setSidebarQuery] = useState('');
     const [activeSearchIndex, setActiveSearchIndex] = useState(0);
+    const [activeHash, setActiveHash] = useState(() =>
+        typeof window === 'undefined' ? '' : window.location.hash,
+    );
+    const [isDesktop, setIsDesktop] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const isNavigationItemActive = (item: { href: string }) => {
+        const [itemUrl, itemHash = ''] = item.href.split('#');
+        const [itemPath, itemQuery = ''] = itemUrl.split('?');
+        const [currentUrl] = url.split('#');
+
+        if (itemHash !== '') {
+            return currentPath === itemPath && activeHash === `#${itemHash}`;
+        }
+
+        if (itemQuery !== '') {
+            return currentUrl === itemUrl;
+        }
+
+        return (
+            (currentPath === itemPath &&
+                currentUrl === itemPath &&
+                activeHash === '') ||
+            (itemPath !== admin.dashboard.url() &&
+                currentPath.startsWith(`${itemPath}/`))
+        );
+    };
+    const activeSectionLabel = permittedNavigationSections.find((section) =>
+        section.items.some(isNavigationItemActive),
+    )?.label;
     const [openSection, setOpenSection] = useState<string | null>(
-        activeSectionLabel ?? 'Overview',
+        activeSectionLabel ?? 'Dashboard',
     );
     const pendingCount = Number(pendingVendorCount ?? 0);
-    const quickOperations = permittedNavigationSections
-        .flatMap((section) => section.items)
-        .filter((item) => 'badge' in item)
-        .slice(0, 4);
     const searchableNavigation = permittedNavigationSections.flatMap(
         (section) =>
             section.items.map((item) => ({
@@ -375,6 +719,32 @@ export default function AdminLayout({
             })
             .slice(0, 8);
     })();
+    const normalizedSidebarQuery = sidebarQuery.trim().toLowerCase();
+    const visibleNavigationSections = permittedNavigationSections
+        .map((section) => {
+            if (normalizedSidebarQuery === '') {
+                return section;
+            }
+
+            const sectionMatches = section.label
+                .toLowerCase()
+                .includes(normalizedSidebarQuery);
+
+            return {
+                ...section,
+                items: sectionMatches
+                    ? section.items
+                    : section.items.filter((item) => {
+                          const searchText =
+                              'searchText' in item ? item.searchText : '';
+
+                          return `${item.label} ${searchText}`
+                              .toLowerCase()
+                              .includes(normalizedSidebarQuery);
+                      }),
+            };
+        })
+        .filter((section) => section.items.length > 0);
 
     const closeSearch = () => {
         setSearchOpen(false);
@@ -402,6 +772,22 @@ export default function AdminLayout({
         document.addEventListener('keydown', onKeyDown);
 
         return () => document.removeEventListener('keydown', onKeyDown);
+    }, []);
+
+    useEffect(() => {
+        const desktopMedia = window.matchMedia('(min-width: 1024px)');
+        const updateDesktopState = () => setIsDesktop(desktopMedia.matches);
+        const updateHash = () => setActiveHash(window.location.hash);
+
+        updateDesktopState();
+        updateHash();
+        desktopMedia.addEventListener('change', updateDesktopState);
+        window.addEventListener('hashchange', updateHash);
+
+        return () => {
+            desktopMedia.removeEventListener('change', updateDesktopState);
+            window.removeEventListener('hashchange', updateHash);
+        };
     }, []);
 
     useEffect(() => {
@@ -632,74 +1018,54 @@ export default function AdminLayout({
                 </div>
 
                 <div
-                    className={`px-4 pb-5 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
+                    className={`px-3 pb-3 ${sidebarCollapsed ? 'lg:hidden' : ''}`}
                 >
-                    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.065] p-4 shadow-inner shadow-white/[0.025]">
-                        <div className="absolute -top-8 -right-6 size-20 rounded-full bg-commerce-gold/15 blur-2xl" />
-                        <div className="relative flex items-center justify-between gap-3">
-                            <div>
-                                <p className="text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
-                                    Storefront status
-                                </p>
-                                <p className="mt-1.5 text-sm font-semibold">
-                                    Online & accepting orders
-                                </p>
-                            </div>
-                            <span className="grid size-9 place-items-center rounded-xl bg-emerald-400/10 text-emerald-400">
-                                <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_5px_rgba(52,211,153,0.1)]" />
+                    <label className="relative block">
+                        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" />
+                        <input
+                            type="search"
+                            value={sidebarQuery}
+                            onChange={(event) =>
+                                setSidebarQuery(event.target.value)
+                            }
+                            placeholder="Filter navigation..."
+                            aria-label="Filter admin navigation"
+                            className="h-10 w-full rounded-xl border border-white/8 bg-white/[0.055] pr-9 pl-9 text-xs text-white transition outline-none placeholder:text-slate-500 focus:border-orange-400/30 focus:bg-white/[0.08] focus:ring-2 focus:ring-orange-400/10"
+                        />
+                        {sidebarQuery && (
+                            <button
+                                type="button"
+                                onClick={() => setSidebarQuery('')}
+                                className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition hover:bg-white/10 hover:text-white"
+                                aria-label="Clear navigation filter"
+                            >
+                                <X className="size-3.5" />
+                            </button>
+                        )}
+                    </label>
+                    <div className="mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-semibold text-slate-500">
+                        <span className="flex items-center gap-2">
+                            <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,0.1)]" />
+                            Storefront online
+                        </span>
+                        {pendingCount > 0 && (
+                            <span className="text-amber-300">
+                                {pendingCount} seller pending
                             </span>
-                        </div>
+                        )}
                     </div>
-                    {quickOperations.length > 0 && (
-                        <div className="mt-3 rounded-2xl border border-orange-400/15 bg-gradient-to-br from-orange-500/10 to-amber-400/5 p-3">
-                            <div className="flex items-center justify-between gap-3 px-1">
-                                <div className="flex items-center gap-2">
-                                    <Sparkles className="size-3.5 text-orange-400" />
-                                    <p className="text-[10px] font-bold tracking-[0.14em] text-orange-200 uppercase">
-                                        Quick operations
-                                    </p>
-                                </div>
-                                <span className="rounded-full bg-orange-400/15 px-2 py-0.5 text-[9px] font-bold text-orange-300">
-                                    {quickOperations.length}
-                                </span>
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2">
-                                {quickOperations.map((item) => {
-                                    const Icon = item.icon;
-
-                                    return (
-                                        <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            prefetch
-                                            onClick={() =>
-                                                setSidebarOpen(false)
-                                            }
-                                            className="group flex items-center gap-2 rounded-xl border border-white/6 bg-white/[0.045] px-2.5 py-2 text-[10px] font-semibold text-slate-300 transition hover:border-orange-400/20 hover:bg-orange-400/10 hover:text-white"
-                                        >
-                                            <Icon className="size-3.5 shrink-0 text-orange-400" />
-                                            <span className="truncate">
-                                                {item.label.replace(
-                                                    ' Operations',
-                                                    '',
-                                                )}
-                                            </span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <nav className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-3 pb-5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <div className="grid gap-1.5">
-                        {permittedNavigationSections.map((section) => {
+                        {visibleNavigationSections.map((section) => {
                             const sectionActive =
                                 activeSectionLabel === section.label;
                             const SectionIcon = section.icon;
+                            const compactSidebar =
+                                isDesktop && sidebarCollapsed;
 
-                            if (sidebarCollapsed) {
+                            if (compactSidebar) {
                                 return (
                                     <button
                                         key={section.label}
@@ -718,7 +1084,7 @@ export default function AdminLayout({
                                             <SectionIcon className="size-[18px]" />
                                         </span>
                                         {section.label ===
-                                            'Marketplace Network' &&
+                                            'Marketplace / Sellers' &&
                                             pendingCount > 0 && (
                                                 <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-400 ring-2 ring-[#111827] dark:ring-[#0d121c]" />
                                             )}
@@ -726,15 +1092,56 @@ export default function AdminLayout({
                                 );
                             }
 
+                            if (section.items.length === 1) {
+                                const item = section.items[0];
+                                const active = isNavigationItemActive(item);
+
+                                return (
+                                    <Link
+                                        key={section.label}
+                                        href={item.href}
+                                        prefetch
+                                        onClick={() => setSidebarOpen(false)}
+                                        className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${active ? 'bg-[#f97316] text-white shadow-lg shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                    >
+                                        <span
+                                            className={`grid size-8 place-items-center rounded-lg transition ${active ? 'bg-white/15 text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
+                                        >
+                                            <SectionIcon className="size-[18px]" />
+                                        </span>
+                                        <span className="min-w-0 flex-1 truncate text-left">
+                                            {normalizedSidebarQuery
+                                                ? item.label
+                                                : section.label}
+                                        </span>
+                                        {'badge' in item && (
+                                            <span
+                                                className={`rounded-full px-1.5 py-0.5 text-[8px] font-black tracking-wide uppercase ${active ? 'bg-white/20 text-white' : 'bg-orange-400/10 text-orange-300'}`}
+                                            >
+                                                {String(item.badge)}
+                                            </span>
+                                        )}
+                                        {active && (
+                                            <ChevronRight className="size-3.5 text-orange-100" />
+                                        )}
+                                    </Link>
+                                );
+                            }
+
                             return (
                                 <Collapsible
                                     key={section.label}
-                                    open={openSection === section.label}
-                                    onOpenChange={(open) =>
-                                        setOpenSection(
-                                            open ? section.label : null,
-                                        )
+                                    open={
+                                        normalizedSidebarQuery !== '' ||
+                                        openSection === section.label
                                     }
+                                    onOpenChange={(open) => {
+                                        if (normalizedSidebarQuery === '') {
+                                            setOpenSection(
+                                                open ? section.label : null,
+                                            );
+                                        }
+                                    }}
                                 >
                                     <CollapsibleTrigger
                                         className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${sectionActive ? 'bg-white/[0.06] text-white' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
@@ -748,7 +1155,7 @@ export default function AdminLayout({
                                             {section.label}
                                         </span>
                                         {section.label ===
-                                            'Marketplace Network' &&
+                                            'Marketplace / Sellers' &&
                                             pendingCount > 0 && (
                                                 <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
                                                     {pendingCount > 99
@@ -757,7 +1164,7 @@ export default function AdminLayout({
                                                 </span>
                                             )}
                                         {section.label !==
-                                            'Marketplace Network' && (
+                                            'Marketplace / Sellers' && (
                                             <span className="rounded-full bg-white/[0.055] px-1.5 py-0.5 text-[9px] font-bold text-slate-500">
                                                 {section.items.length}
                                             </span>
@@ -768,12 +1175,9 @@ export default function AdminLayout({
                                         <div className="mt-1 ml-7 grid gap-1 border-l border-white/8 pl-3">
                                             {section.items.map((item) => {
                                                 const active =
-                                                    currentPath === item.href ||
-                                                    (item.href !==
-                                                        admin.dashboard.url() &&
-                                                        currentPath.startsWith(
-                                                            item.href,
-                                                        ));
+                                                    isNavigationItemActive(
+                                                        item,
+                                                    );
                                                 const Icon = item.icon;
 
                                                 return (
@@ -786,7 +1190,7 @@ export default function AdminLayout({
                                                                 false,
                                                             )
                                                         }
-                                                        className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition ${active ? 'bg-[#f97316] text-white shadow-md shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
+                                                        className={`group flex items-center gap-2.5 rounded-lg px-2.5 font-medium transition ${section.items.length > 8 ? 'py-1.5 text-xs' : 'py-2 text-[13px]'} ${active ? 'bg-[#f97316] text-white shadow-md shadow-orange-950/20' : 'text-slate-400 hover:bg-white/[0.06] hover:text-white'}`}
                                                     >
                                                         <Icon
                                                             className={`size-4 shrink-0 ${active ? 'text-white' : 'text-slate-500 group-hover:text-slate-200'}`}
@@ -795,7 +1199,7 @@ export default function AdminLayout({
                                                             {item.label}
                                                         </span>
                                                         {item.label ===
-                                                            'Sellers' &&
+                                                            'Pending Approvals' &&
                                                         pendingCount > 0 ? (
                                                             <span
                                                                 className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${active ? 'bg-white text-orange-600' : 'bg-amber-400 text-slate-950'}`}
@@ -826,6 +1230,21 @@ export default function AdminLayout({
                                 </Collapsible>
                             );
                         })}
+                        {visibleNavigationSections.length === 0 && (
+                            <div className="rounded-xl border border-dashed border-white/10 px-4 py-8 text-center">
+                                <Search className="mx-auto size-5 text-slate-600" />
+                                <p className="mt-2 text-xs font-semibold text-slate-400">
+                                    No navigation matches
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => setSidebarQuery('')}
+                                    className="mt-2 text-[10px] font-bold text-orange-400"
+                                >
+                                    Clear filter
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </nav>
 

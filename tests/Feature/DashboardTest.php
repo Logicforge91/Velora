@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\AdminAuditLog;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ReturnCase;
 use App\Models\User;
 use App\Models\Vendor;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -18,17 +20,48 @@ test('admins can access the admin dashboard', function () {
         'status' => true,
     ]);
     Vendor::factory()->create(['status' => Vendor::STATUS_PENDING]);
+    Vendor::factory()->create(['status' => Vendor::STATUS_APPROVED]);
     Product::factory()->lowStock()->create();
+    $order = Order::factory()->create([
+        'status' => Order::STATUS_DELIVERED,
+        'total' => 1000,
+        'placed_at' => now(),
+    ]);
+    $order->payment()->update(['refunded_amount' => 100]);
+    $order->shipment()->update(['status' => 'delivered']);
+    ReturnCase::query()->create([
+        'order_id' => $order->id,
+        'customer_id' => $order->user_id,
+        'number' => 'RET-DASH-1001',
+        'reason_code' => 'damaged',
+        'status' => 'requested',
+        'refund_amount' => 100,
+        'requested_at' => now(),
+    ]);
+    AdminAuditLog::factory()->for($admin, 'actor')->create([
+        'description' => 'Seller application reviewed.',
+    ]);
 
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/dashboard')
-            ->where('statistics.total_vendors', 1)
+            ->where('statistics.total_vendors', 2)
             ->where('statistics.pending_vendors', 1)
+            ->where('statistics.pending_approvals', 1)
+            ->where('statistics.active_sellers', 1)
+            ->where('statistics.active_customers', 3)
             ->where('statistics.low_stock_products', 1)
-            ->has('recentUsers')
+            ->where('statistics.today_orders', 1)
+            ->where('statistics.gross_revenue', 1000.0)
+            ->where('statistics.net_revenue', 900.0)
+            ->where('statistics.total_returns', 1)
+            ->where('statistics.pending_returns', 1)
+            ->where('statistics.fulfilled_shipments', 1)
+            ->where('statistics.fulfilment_rate', 100)
+            ->has('recentActivities', 1)
+            ->where('recentActivities.0.description', 'Seller application reviewed.')
             ->where('adminRoleMix', fn ($roles) => collect($roles)->contains(
                 fn ($role) => $role['name'] === 'Super Administrator'
                     && $role['administrators_count'] === 1
