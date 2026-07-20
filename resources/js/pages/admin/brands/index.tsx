@@ -27,7 +27,7 @@ export default function BrandsIndex({
     };
 
     return (
-        <AdminLayout title="Brand Management" breadcrumb="Brands">
+        <AdminLayout title="Brands" breadcrumb="Catalog / Brands">
             <div className="flex justify-end">
                 <Link
                     href={brandsRoutes.create.url()}

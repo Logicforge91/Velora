@@ -71,7 +71,7 @@ export default function OrdersIndex({ orders, counts, statuses }: Props) {
     ];
 
     return (
-        <AdminLayout title="Order Operations" breadcrumb="Orders / All orders">
+        <AdminLayout title="Orders" breadcrumb="Orders / All orders">
             <AdminPageHeader
                 title="Order control centre"
                 description="Track fulfilment, payments and customer commitments."

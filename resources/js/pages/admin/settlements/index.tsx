@@ -33,10 +33,7 @@ export default function SettlementsIndex({
     };
 
     return (
-        <AdminLayout
-            title="Seller Settlements"
-            breadcrumb="Finance / Seller payouts"
-        >
+        <AdminLayout title="Settlements" breadcrumb="Finance / Seller payouts">
             <div className="flex justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-black">

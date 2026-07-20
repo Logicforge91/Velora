@@ -115,7 +115,7 @@ export default function UsersIndex({
     };
 
     return (
-        <AdminLayout title="User Management" breadcrumb="Settings / Users">
+        <AdminLayout title="Users" breadcrumb="Settings / Users">
             <AdminPageHeader
                 title="People & access"
                 description="Manage account access, roles, status, and administrative history from one workspace."

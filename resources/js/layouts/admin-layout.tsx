@@ -40,7 +40,7 @@ import {
     Warehouse,
     X,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
     Collapsible,
@@ -68,7 +68,7 @@ const navigationSections = [
         icon: LayoutDashboard,
         items: [
             {
-                label: 'Business Overview',
+                label: 'Overview',
                 href: admin.dashboard.url(),
                 icon: LayoutDashboard,
                 permission: 'admin.dashboard.view',
@@ -82,7 +82,7 @@ const navigationSections = [
                 permission: 'admin.dashboard.view',
             },
             {
-                label: 'GMV and Net Revenue',
+                label: 'Revenue',
                 href: dashboardSection('gross-merchandise-value'),
                 icon: CircleDollarSign,
                 permission: 'admin.dashboard.view',
@@ -102,25 +102,25 @@ const navigationSections = [
                 permission: 'admin.dashboard.view',
             },
             {
-                label: 'Returns Summary',
+                label: 'Returns',
                 href: dashboardSection('returns-summary'),
                 icon: Undo2,
                 permission: 'admin.dashboard.view',
             },
             {
-                label: 'Low-stock Alerts',
+                label: 'Low Stock',
                 href: dashboardSection('low-stock-alerts'),
                 icon: Boxes,
                 permission: 'admin.dashboard.view',
             },
             {
-                label: 'Fulfilment Performance',
+                label: 'Fulfilment',
                 href: dashboardSection('fulfilment-performance'),
                 icon: Truck,
                 permission: 'admin.dashboard.view',
             },
             {
-                label: 'Recent Activities',
+                label: 'Activity',
                 href: dashboardSection('recent-activities'),
                 icon: ScrollText,
                 permission: 'admin.dashboard.view',
@@ -128,11 +128,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Seller Management',
+        label: 'Sellers',
         icon: Store,
         items: [
             {
-                label: 'All Sellers',
+                label: 'Seller List',
                 href: admin.vendors.index.url(),
                 icon: Store,
                 permission: 'vendors.manage',
@@ -140,14 +140,14 @@ const navigationSections = [
                     'seller management vendors merchants directory all sellers',
             },
             {
-                label: 'Add Seller',
+                label: 'New Seller',
                 href: admin.vendors.create.url(),
                 icon: Users,
                 permission: 'vendors.manage',
                 searchText: 'create invite onboard new seller',
             },
             {
-                label: 'Seller Applications',
+                label: 'Applications',
                 href: admin.vendors.index.url({
                     query: { status: 'pending', view: 'applications' },
                 }),
@@ -156,7 +156,7 @@ const navigationSections = [
                 searchText: 'onboarding applications review queue',
             },
             {
-                label: 'KYC Verification',
+                label: 'KYC Review',
                 href: admin.vendors.index.url({
                     query: { kyc_status: 'in_review' },
                 }),
@@ -167,7 +167,7 @@ const navigationSections = [
                     'documents identity gst pan bank proof verification',
             },
             {
-                label: 'Approved / Rejected / Suspended Sellers',
+                label: 'Seller Status',
                 href: admin.vendors.index.url({
                     query: { view: 'status' },
                 }),
@@ -177,7 +177,7 @@ const navigationSections = [
                     'approved rejected suspended sellers status moderation',
             },
             {
-                label: 'Seller Documents',
+                label: 'Documents',
                 href: admin.vendors.index.url({
                     query: { kyc_status: 'in_review', view: 'documents' },
                 }),
@@ -203,7 +203,7 @@ const navigationSections = [
                 permission: 'catalogue.manage',
             },
             {
-                label: 'Performance Score',
+                label: 'Performance',
                 href: admin.growthCentre.url({
                     query: { view: 'seller-performance' },
                 }),
@@ -230,7 +230,7 @@ const navigationSections = [
                 permission: 'vendors.manage',
             },
             {
-                label: 'Subscriptions',
+                label: 'Plans',
                 href: admin.vendors.index.url({
                     query: { view: 'subscriptions' },
                 }),
@@ -240,18 +240,18 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Catalogue Management',
+        label: 'Catalog',
         icon: Package,
         items: [
             {
-                label: 'All Products',
+                label: 'Products',
                 href: admin.products.index.url(),
                 icon: Package,
                 permission: 'catalogue.manage',
                 searchText: 'catalog products sku listing content',
             },
             {
-                label: 'Add Product',
+                label: 'New Product',
                 href: admin.products.create.url(),
                 icon: Package,
                 permission: 'catalogue.manage',
@@ -267,7 +267,7 @@ const navigationSections = [
                 searchText: 'seller listing applications review requests',
             },
             {
-                label: 'Pending / Approved / Rejected Listings',
+                label: 'Listing Status',
                 href: admin.sellerListings.index.url({
                     query: { view: 'status' },
                 }),
@@ -276,7 +276,7 @@ const navigationSections = [
                 searchText: 'listing status pending approved rejected',
             },
             {
-                label: 'Quality Check',
+                label: 'Quality Review',
                 href: admin.sellerListings.index.url({
                     query: { view: 'quality-check' },
                 }),
@@ -285,7 +285,7 @@ const navigationSections = [
                 searchText: 'listing content image data quality validation',
             },
             {
-                label: 'Product Moderation',
+                label: 'Moderation',
                 href: admin.sellerListings.index.url({
                     query: { view: 'moderation' },
                 }),
@@ -358,7 +358,7 @@ const navigationSections = [
                 searchText: 'csv excel bulk product upload catalogue import',
             },
             {
-                label: 'Import / Export',
+                label: 'Import & Export',
                 href: admin.catalogImports.index.url({
                     query: { view: 'import-export' },
                 }),
@@ -367,7 +367,7 @@ const navigationSections = [
                 searchText: 'csv excel catalogue data import export download',
             },
             {
-                label: 'Duplicate Detection',
+                label: 'Duplicates',
                 href: admin.products.index.url({
                     query: { view: 'duplicates' },
                 }),
@@ -379,11 +379,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Pricing & Offers',
+        label: 'Pricing',
         icon: BadgePercent,
         items: [
             {
-                label: 'Pricing Intelligence',
+                label: 'Pricing & Offers',
                 href: admin.growthCentre.url(),
                 icon: BarChart3,
                 permission: 'reports.view',
@@ -398,7 +398,7 @@ const navigationSections = [
         icon: ShoppingBag,
         items: [
             {
-                label: 'Order Management',
+                label: 'Orders',
                 href: admin.orders.index.url(),
                 icon: ShoppingBag,
                 permission: 'orders.manage',
@@ -413,7 +413,7 @@ const navigationSections = [
         icon: ArrowDownUp,
         items: [
             {
-                label: 'Inventory Control',
+                label: 'Inventory',
                 href: admin.inventoryOperations.index.url(),
                 icon: ArrowDownUp,
                 permission: 'catalogue.manage',
@@ -424,7 +424,7 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Warehouses & Fulfilment',
+        label: 'Warehouses',
         icon: Warehouse,
         items: [
             {
@@ -450,7 +450,7 @@ const navigationSections = [
                     'all shipments courier partners shipping methods zones rates hubs pickup tracking delivery attempts undelivered lost damaged sla reverse logistics fulfilment dispatch carrier',
             },
             {
-                label: 'Delivery Coverage',
+                label: 'Coverage',
                 href: admin.serviceAreas.index.url(),
                 icon: MapPinned,
                 permission: 'catalogue.manage',
@@ -461,11 +461,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Returns, RTO & Refunds',
+        label: 'Returns & Refunds',
         icon: Undo2,
         items: [
             {
-                label: 'Returns & Claims',
+                label: 'Returns',
                 href: admin.returns.index.url(),
                 icon: Undo2,
                 permission: 'orders.manage',
@@ -473,7 +473,7 @@ const navigationSections = [
                     'return requests pending approved rejected pickup returned replacements return origin rto reasons disputes policies analytics claims rma reverse logistics',
             },
             {
-                label: 'Refund Operations',
+                label: 'Refunds',
                 href: admin.paymentRefunds.index.url(),
                 icon: CircleDollarSign,
                 permission: 'payments.manage',
@@ -484,11 +484,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Payments & Settlements',
+        label: 'Payments',
         icon: WalletCards,
         items: [
             {
-                label: 'Payment Transactions',
+                label: 'Transactions',
                 href: admin.payments.index.url(),
                 icon: WalletCards,
                 permission: 'payments.manage',
@@ -496,7 +496,7 @@ const navigationSections = [
                     'payments transactions gateways reconciliation payout collection charges',
             },
             {
-                label: 'Seller Settlements',
+                label: 'Settlements',
                 href: admin.settlements.index.url(),
                 icon: Banknote,
                 permission: 'payments.manage',
@@ -518,7 +518,7 @@ const navigationSections = [
         icon: Users,
         items: [
             {
-                label: 'Customers & Staff',
+                label: 'Users',
                 href: admin.users.index.url(),
                 icon: Users,
                 permission: 'users.manage',
@@ -528,11 +528,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Marketing & Advertising',
+        label: 'Marketing',
         icon: Sparkles,
         items: [
             {
-                label: 'Promotions & Coupons',
+                label: 'Promotions',
                 href: admin.coupons.index.url(),
                 icon: BadgePercent,
                 permission: 'catalogue.manage',
@@ -542,11 +542,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Reviews & Questions',
+        label: 'Reviews',
         icon: MessageSquareText,
         items: [
             {
-                label: 'Ratings & Reviews',
+                label: 'Review Moderation',
                 href: admin.reviews.index.url(),
                 icon: MessageSquareText,
                 permission: 'catalogue.manage',
@@ -556,11 +556,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Customer Support',
+        label: 'Support',
         icon: Headphones,
         items: [
             {
-                label: 'Support & Disputes',
+                label: 'Cases & Disputes',
                 href: admin.support.index.url(),
                 icon: Headphones,
                 permission: 'support.requests.manage',
@@ -570,11 +570,11 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Reports & Analytics',
+        label: 'Analytics',
         icon: BarChart3,
         items: [
             {
-                label: 'Marketplace Analytics',
+                label: 'Reports',
                 href: admin.analytics.url(),
                 icon: BarChart3,
                 permission: 'reports.view',
@@ -584,7 +584,7 @@ const navigationSections = [
         ],
     },
     {
-        label: 'Administration',
+        label: 'Settings',
         icon: ShieldCheck,
         items: [
             {
@@ -596,7 +596,7 @@ const navigationSections = [
                     'admin seller customer notifications email sms push whatsapp templates rules history failed notifications',
             },
             {
-                label: 'Administration Overview',
+                label: 'Admin Overview',
                 href: admin.administration.url(),
                 icon: ShieldCheck,
                 permission: 'roles.manage',
@@ -641,22 +641,21 @@ const navigationSections = [
 
 const navigationSectionOrder = [
     'Dashboard',
-    'Marketplace / Sellers',
-    'Catalogue',
-    'Listings',
-    'Pricing & Offers',
+    'Sellers',
+    'Catalog',
+    'Pricing',
     'Orders',
     'Inventory',
-    'Warehouses & Fulfilment',
+    'Warehouses',
     'Logistics',
-    'Returns, RTO & Refunds',
-    'Payments & Settlements',
+    'Returns & Refunds',
+    'Payments',
     'Customers',
-    'Marketing & Advertising',
-    'Reviews & Questions',
-    'Customer Support',
-    'Reports & Analytics',
-    'Administration',
+    'Marketing',
+    'Reviews',
+    'Support',
+    'Analytics',
+    'Settings',
 ];
 
 type Props = PropsWithChildren<{
@@ -669,23 +668,32 @@ export default function AdminLayout({
     title = 'Dashboard',
     breadcrumb = 'Overview',
 }: Props) {
-    const { auth, errors, flash, pendingVendorCount } = usePage().props;
-    const { url } = usePage();
+    const { props, url } = usePage();
+    const { auth, errors, flash, pendingVendorCount } = props;
     const currentPath = url.split(/[?#]/)[0];
-    const grantedPermissions = new Set<AccountPermission>(auth.permissions);
-    const permittedNavigationSections = navigationSections
-        .map((section) => ({
-            ...section,
-            items: section.items.filter((item) =>
-                grantedPermissions.has(item.permission as AccountPermission),
-            ),
-        }))
-        .filter((section) => section.items.length > 0)
-        .sort(
-            (first, second) =>
-                navigationSectionOrder.indexOf(first.label) -
-                navigationSectionOrder.indexOf(second.label),
-        );
+    const grantedPermissions = useMemo(
+        () => new Set<AccountPermission>(auth.permissions),
+        [auth.permissions],
+    );
+    const permittedNavigationSections = useMemo(
+        () =>
+            navigationSections
+                .map((section) => ({
+                    ...section,
+                    items: section.items.filter((item) =>
+                        grantedPermissions.has(
+                            item.permission as AccountPermission,
+                        ),
+                    ),
+                }))
+                .filter((section) => section.items.length > 0)
+                .sort(
+                    (first, second) =>
+                        navigationSectionOrder.indexOf(first.label) -
+                        navigationSectionOrder.indexOf(second.label),
+                ),
+        [grantedPermissions],
+    );
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
         typeof window === 'undefined'
@@ -1037,7 +1045,7 @@ export default function AdminLayout({
                                 Velora
                             </span>
                             <span className="block truncate text-[9px] font-semibold tracking-[0.22em] text-slate-400 uppercase">
-                                Premium Commerce
+                                Admin Console
                             </span>
                         </span>
                     </Link>
@@ -1117,8 +1125,7 @@ export default function AdminLayout({
                                         >
                                             <SectionIcon className="size-[18px]" />
                                         </span>
-                                        {section.label ===
-                                            'Marketplace / Sellers' &&
+                                        {section.label === 'Sellers' &&
                                             pendingCount > 0 && (
                                                 <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-400 ring-2 ring-[#111827] dark:ring-[#0d121c]" />
                                             )}
@@ -1188,8 +1195,7 @@ export default function AdminLayout({
                                         <span className="min-w-0 flex-1 truncate text-left">
                                             {section.label}
                                         </span>
-                                        {section.label ===
-                                            'Marketplace / Sellers' &&
+                                        {section.label === 'Sellers' &&
                                             pendingCount > 0 && (
                                                 <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
                                                     {pendingCount > 99
@@ -1197,8 +1203,7 @@ export default function AdminLayout({
                                                         : pendingCount}
                                                 </span>
                                             )}
-                                        {section.label !==
-                                            'Marketplace / Sellers' && (
+                                        {section.label !== 'Sellers' && (
                                             <span className="rounded-full bg-white/[0.055] px-1.5 py-0.5 text-[9px] font-bold text-slate-500">
                                                 {section.items.length}
                                             </span>
@@ -1285,7 +1290,7 @@ export default function AdminLayout({
                 <div
                     className={`flex items-center border-t border-white/6 px-4 py-3 text-[10px] text-slate-600 ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}
                 >
-                    {!sidebarCollapsed && <span>Velora Commerce Suite</span>}
+                    {!sidebarCollapsed && <span>Velora Admin</span>}
                     <button
                         type="button"
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -1320,7 +1325,7 @@ export default function AdminLayout({
 
                         <div className="min-w-0 lg:w-64 lg:flex-none">
                             <p className="hidden text-[9px] font-bold tracking-[0.16em] text-orange-600 uppercase lg:block">
-                                Commerce command center
+                                Admin workspace
                             </p>
                             <h1 className="truncate text-lg font-bold tracking-tight text-commerce-ink">
                                 {title}

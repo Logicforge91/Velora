@@ -39,7 +39,7 @@ export default function PaymentsIndex({
     };
 
     return (
-        <AdminLayout title="Payment Operations" breadcrumb="Finance / Payments">
+        <AdminLayout title="Payments" breadcrumb="Finance / Payments">
             <div>
                 <h2 className="text-xl font-black">Payments and refunds</h2>
                 <p className="mt-1 text-sm text-slate-500">

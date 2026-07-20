@@ -27,7 +27,7 @@ export default function CategoriesIndex({
     };
 
     return (
-        <AdminLayout title="Category Management" breadcrumb="Categories">
+        <AdminLayout title="Categories" breadcrumb="Catalog / Categories">
             <div className="flex justify-end">
                 <Link
                     href={categoriesRoutes.create.url()}

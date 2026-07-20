@@ -147,10 +147,10 @@ export default function AdministrationIndex({
 }) {
     return (
         <AdminLayout
-            title="Administration"
+            title="Admin Settings"
             breadcrumb="Administration / Overview"
         >
-            <Head title="Administration" />
+            <Head title="Admin Settings" />
             <div className="flex flex-col gap-1">
                 <h2 className="text-xl font-black tracking-tight">
                     Administration

@@ -223,7 +223,7 @@ export default function AdminDashboard({
     ];
 
     return (
-        <AdminLayout title="Commerce Overview" breadcrumb="Dashboard">
+        <AdminLayout title="Overview" breadcrumb="Dashboard">
             <section
                 id="business-overview"
                 className="relative scroll-mt-24 overflow-hidden rounded-[2rem] border border-white/10 bg-commerce-navy text-white shadow-[0_24px_60px_rgb(15_23_42/0.16)] ring-1 ring-slate-950/5"

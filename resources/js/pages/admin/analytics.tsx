@@ -1,41 +1,58 @@
-import { Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import {
-    AlertTriangle,
     Banknote,
+    BarChart3,
     Boxes,
+    CalendarDays,
+    Download,
+    FileBarChart,
     PackageCheck,
     ReceiptIndianRupee,
-    TrendingUp,
+    SearchX,
+    SlidersHorizontal,
+    WalletCards,
 } from 'lucide-react';
-import { AdminPageHeader, AdminPanel } from '@/components/admin/primitives';
+import {
+    AdminEmptyState,
+    AdminPageHeader,
+    AdminPanel,
+    AdminStatusBadge,
+} from '@/components/admin/primitives';
 import StatCards from '@/components/admin/stat-cards';
 import AdminLayout from '@/layouts/admin-layout';
 import admin from '@/routes/admin';
 
+type ReportColumn = {
+    key: string;
+    label: string;
+    format: 'text' | 'status' | 'number' | 'money' | 'date';
+};
+
 type Props = {
+    catalog: { key: string; label: string; group: string }[];
+    filters: {
+        report: string;
+        from: string;
+        to: string;
+        dimension: string;
+    };
+    report: {
+        key: string;
+        label: string;
+        description: string;
+        columns: ReportColumn[];
+        rows: Record<string, string | number | null>[];
+    };
     summary: {
         orders: number;
         revenue: number;
         average_order_value: number;
         units_in_stock: number;
         stock_alerts: number;
+        refunds: number;
+        commission: number;
     };
     dailyRevenue: { date: string; orders: number; revenue: number }[];
-    orderStatuses: { status: string; total: number }[];
-    topProducts: {
-        product_name: string;
-        sku: string;
-        units: number;
-        revenue: number;
-    }[];
-    lowStockProducts: {
-        id: number;
-        name: string;
-        sku: string;
-        stock: number;
-        threshold: number;
-        category: string | null;
-    }[];
 };
 
 const money = new Intl.NumberFormat('en-IN', {
@@ -44,17 +61,22 @@ const money = new Intl.NumberFormat('en-IN', {
     maximumFractionDigits: 0,
 });
 
+const number = new Intl.NumberFormat('en-IN');
+
 export default function Analytics({
+    catalog,
+    filters,
+    report,
     summary,
     dailyRevenue,
-    orderStatuses,
-    topProducts,
-    lowStockProducts,
 }: Props) {
     const maxRevenue = Math.max(...dailyRevenue.map((day) => day.revenue), 1);
-    const totalStatuses = Math.max(
-        orderStatuses.reduce((total, item) => total + item.total, 0),
-        1,
+    const groups = Object.entries(
+        catalog.reduce<Record<string, Props['catalog']>>((result, item) => {
+            (result[item.group] ??= []).push(item);
+
+            return result;
+        }, {}),
     );
     const cards = [
         {
@@ -66,208 +88,357 @@ export default function Analytics({
         },
         {
             label: 'Orders',
-            value: summary.orders.toLocaleString(),
+            value: number.format(summary.orders),
             note: `${money.format(summary.average_order_value)} average value`,
             icon: PackageCheck,
             tone: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10',
         },
         {
-            label: 'Units in stock',
-            value: summary.units_in_stock.toLocaleString(),
-            note: 'Across the full catalogue',
-            icon: Boxes,
-            tone: 'bg-sky-50 text-sky-600 dark:bg-sky-500/10',
+            label: 'Refund exposure',
+            value: money.format(summary.refunds),
+            note: 'Requested in this period',
+            icon: WalletCards,
+            tone: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10',
         },
         {
-            label: 'Inventory alerts',
-            value: summary.stock_alerts.toLocaleString(),
-            note: 'At or below threshold',
-            icon: AlertTriangle,
+            label: 'Commission',
+            value: money.format(summary.commission),
+            note: 'Marketplace commission booked',
+            icon: ReceiptIndianRupee,
             tone: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10',
         },
     ];
 
     return (
         <AdminLayout
-            title="Commerce Analytics"
-            breadcrumb="Analytics / Overview"
+            title="Analytics"
+            breadcrumb={`Analytics / ${report.label}`}
         >
             <AdminPageHeader
-                title="Performance intelligence"
-                description="Revenue, fulfilment, and inventory signals from live operational data."
+                title="Reports and analytics"
+                description="Explore commercial, operational, seller, finance, and growth performance from one reporting workspace."
                 action={
-                    <Link
-                        href={admin.orders.index.url()}
-                        className="inline-flex rounded-xl bg-slate-950 px-4 py-2.5 text-center text-sm font-bold text-white transition hover:bg-slate-800"
+                    <button
+                        type="button"
+                        onClick={() => window.print()}
+                        className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-orange-500 dark:hover:bg-orange-400"
                     >
-                        Open order operations
-                    </Link>
+                        <Download className="size-4" />
+                        Export view
+                    </button>
                 }
             />
 
-            <div className="mt-6">
-                <StatCards cards={cards} />
-            </div>
-
-            <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.75fr)]">
-                <Panel title="30-day revenue trend" icon={TrendingUp}>
-                    <div className="mt-8 flex h-64 items-end gap-2 overflow-x-auto border-b border-slate-200 px-1 dark:border-white/10">
-                        {dailyRevenue.length > 0 ? (
-                            dailyRevenue.map((day) => (
-                                <div
-                                    key={day.date}
-                                    className="group flex h-full min-w-7 flex-1 flex-col justify-end gap-2"
-                                >
-                                    <div
-                                        className="relative min-h-1 rounded-t-lg bg-gradient-to-t from-orange-500 to-amber-300 transition group-hover:from-orange-600"
-                                        style={{
-                                            height: `${Math.max((day.revenue / maxRevenue) * 100, 3)}%`,
-                                        }}
-                                    >
-                                        <div className="pointer-events-none absolute -top-14 left-1/2 z-10 hidden -translate-x-1/2 rounded-lg bg-slate-950 px-2 py-1 text-center text-[10px] whitespace-nowrap text-white shadow-xl group-hover:block">
-                                            {money.format(day.revenue)}
-                                            <br />
-                                            {day.orders} orders
-                                        </div>
-                                    </div>
-                                    <span className="pb-2 text-center text-[9px] text-slate-400">
-                                        {new Date(day.date).getDate()}
-                                    </span>
-                                </div>
-                            ))
-                        ) : (
-                            <Empty label="Revenue will appear after orders are placed." />
-                        )}
+            <div className="mt-6 grid items-start gap-6 xl:grid-cols-[17rem_minmax(0,1fr)]">
+                <AdminPanel className="xl:sticky xl:top-6">
+                    <div className="border-b border-slate-200/75 p-4 dark:border-white/10">
+                        <div className="flex items-center gap-2 text-sm font-black">
+                            <FileBarChart className="size-4 text-orange-500" />
+                            Report library
+                        </div>
+                        <p className="mt-1 text-xs text-slate-500">
+                            {catalog.length} ready-to-use reports
+                        </p>
                     </div>
-                </Panel>
-                <Panel title="Order status mix" icon={ReceiptIndianRupee}>
-                    <div className="mt-6 grid gap-4">
-                        {orderStatuses.length > 0 ? (
-                            orderStatuses.map((item) => (
-                                <div key={item.status}>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="font-semibold capitalize">
-                                            {item.status}
-                                        </span>
-                                        <span className="text-slate-500">
-                                            {item.total}
-                                        </span>
-                                    </div>
-                                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
+                    <nav className="max-h-[calc(100vh-13rem)] overflow-y-auto p-2">
+                        {groups.map(([group, reports]) => (
+                            <div key={group} className="py-2">
+                                <p className="px-2 pb-1 text-[10px] font-black tracking-[0.16em] text-slate-400 uppercase">
+                                    {group}
+                                </p>
+                                <div className="grid gap-0.5">
+                                    {reports.map((item) => (
+                                        <Link
+                                            key={item.key}
+                                            href={admin.analytics.url({
+                                                query: {
+                                                    report: item.key,
+                                                    from: filters.from,
+                                                    to: filters.to,
+                                                    dimension:
+                                                        filters.dimension,
+                                                },
+                                            })}
+                                            preserveScroll
+                                            className={`rounded-lg px-2.5 py-2 text-xs font-semibold transition ${item.key === report.key ? 'bg-orange-500 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white'}`}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </nav>
+                </AdminPanel>
+
+                <div className="min-w-0">
+                    <AdminPanel>
+                        <Form
+                            {...admin.analytics.form()}
+                            options={{ preserveScroll: true }}
+                            className="grid gap-3 p-4 lg:grid-cols-[minmax(12rem,1fr)_minmax(10rem,0.65fr)_minmax(10rem,0.65fr)_auto] lg:items-end"
+                        >
+                            <label className="grid gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                <span className="flex items-center gap-1.5">
+                                    <BarChart3 className="size-3.5" /> Report
+                                </span>
+                                <select
+                                    name="report"
+                                    defaultValue={report.key}
+                                    className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-orange-400 dark:border-white/10 dark:bg-white/5"
+                                >
+                                    {catalog.map((item) => (
+                                        <option key={item.key} value={item.key}>
+                                            {item.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <DateField
+                                label="From"
+                                name="from"
+                                value={filters.from}
+                            />
+                            <DateField
+                                label="To"
+                                name="to"
+                                value={filters.to}
+                            />
+                            <button
+                                type="submit"
+                                className="h-10 rounded-xl bg-orange-500 px-5 text-sm font-black text-white transition hover:bg-orange-600"
+                            >
+                                Apply filters
+                            </button>
+                            {report.key === 'custom' && (
+                                <label className="grid gap-1.5 text-xs font-bold text-slate-600 lg:col-span-2 dark:text-slate-300">
+                                    <span className="flex items-center gap-1.5">
+                                        <SlidersHorizontal className="size-3.5" />
+                                        Group orders by
+                                    </span>
+                                    <select
+                                        name="dimension"
+                                        defaultValue={filters.dimension}
+                                        className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-orange-400 dark:border-white/10 dark:bg-white/5"
+                                    >
+                                        <option value="status">
+                                            Order status
+                                        </option>
+                                        <option value="channel">
+                                            Sales channel
+                                        </option>
+                                        <option value="payment_method">
+                                            Payment method
+                                        </option>
+                                    </select>
+                                </label>
+                            )}
+                        </Form>
+                    </AdminPanel>
+
+                    <div className="mt-6">
+                        <StatCards cards={cards} />
+                    </div>
+
+                    <AdminPanel className="mt-6 p-5 sm:p-6">
+                        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+                            <div>
+                                <h3 className="text-lg font-black">
+                                    {report.label}
+                                </h3>
+                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                    {report.description}
+                                </p>
+                            </div>
+                            <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 dark:bg-white/5 dark:text-slate-300">
+                                {formatDate(filters.from)} –{' '}
+                                {formatDate(filters.to)}
+                            </span>
+                        </div>
+
+                        <div className="mt-7 flex h-44 items-end gap-1.5 overflow-x-auto border-b border-slate-200 px-1 dark:border-white/10">
+                            {dailyRevenue.length > 0 ? (
+                                dailyRevenue.map((day) => (
+                                    <div
+                                        key={day.date}
+                                        className="group flex h-full min-w-3 flex-1 flex-col justify-end"
+                                        title={`${formatDate(day.date)}: ${money.format(day.revenue)}`}
+                                    >
                                         <div
-                                            className="h-full rounded-full bg-orange-500"
+                                            className="min-h-1 rounded-t bg-gradient-to-t from-orange-500 to-amber-300 transition group-hover:from-orange-600"
                                             style={{
-                                                width: `${(item.total / totalStatuses) * 100}%`,
+                                                height: `${Math.max((day.revenue / maxRevenue) * 100, 3)}%`,
                                             }}
                                         />
                                     </div>
+                                ))
+                            ) : (
+                                <div className="grid h-full w-full place-items-center text-sm text-slate-500">
+                                    Revenue trend will appear after order
+                                    activity.
                                 </div>
-                            ))
-                        ) : (
-                            <Empty label="No fulfilment data yet." />
-                        )}
-                    </div>
-                </Panel>
-            </div>
+                            )}
+                        </div>
+                    </AdminPanel>
 
-            <div className="mt-6 grid gap-6 xl:grid-cols-2">
-                <Panel title="Top-selling products" icon={TrendingUp}>
-                    <div className="mt-5 overflow-x-auto">
-                        <table className="min-w-full text-left text-sm">
-                            <thead className="text-xs text-slate-400 uppercase">
-                                <tr>
-                                    <th className="pb-3">Product</th>
-                                    <th className="pb-3 text-right">Units</th>
-                                    <th className="pb-3 text-right">Revenue</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                                {topProducts.map((product) => (
-                                    <tr
-                                        key={`${product.sku}-${product.product_name}`}
-                                    >
-                                        <td className="py-3">
-                                            <p className="font-bold">
-                                                {product.product_name}
-                                            </p>
-                                            <p className="text-xs text-slate-500">
-                                                {product.sku}
-                                            </p>
-                                        </td>
-                                        <td className="py-3 text-right font-semibold">
-                                            {product.units}
-                                        </td>
-                                        <td className="py-3 text-right font-bold">
-                                            {money.format(product.revenue)}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {topProducts.length === 0 && (
-                            <Empty label="Top sellers will appear after order activity." />
+                    <AdminPanel className="mt-6">
+                        {report.rows.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full text-left text-sm">
+                                    <thead className="border-b border-slate-200 bg-slate-50/70 text-[11px] font-black tracking-wide text-slate-500 uppercase dark:border-white/10 dark:bg-white/[0.025]">
+                                        <tr>
+                                            {report.columns.map((column) => (
+                                                <th
+                                                    key={column.key}
+                                                    className="px-5 py-3.5 first:pl-6 last:pr-6"
+                                                >
+                                                    {column.label}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                        {report.rows.map((row, index) => (
+                                            <tr
+                                                key={`${String(row.label ?? 'row')}-${index}`}
+                                                className="transition hover:bg-orange-50/35 dark:hover:bg-orange-500/[0.035]"
+                                            >
+                                                {report.columns.map(
+                                                    (column) => (
+                                                        <td
+                                                            key={column.key}
+                                                            className="px-5 py-3.5 first:pl-6 first:font-bold last:pr-6"
+                                                        >
+                                                            <Value
+                                                                value={
+                                                                    row[
+                                                                        column
+                                                                            .key
+                                                                    ]
+                                                                }
+                                                                format={
+                                                                    column.format
+                                                                }
+                                                            />
+                                                        </td>
+                                                    ),
+                                                )}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <AdminEmptyState
+                                icon={SearchX}
+                                title="No report data in this period"
+                                description="Try a wider date range or choose another report."
+                            />
                         )}
+                    </AdminPanel>
+
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                        <MiniSignal
+                            icon={Boxes}
+                            label="Units in stock"
+                            value={number.format(summary.units_in_stock)}
+                            note={`${number.format(summary.stock_alerts)} products at or below their reorder level`}
+                        />
+                        <MiniSignal
+                            icon={CalendarDays}
+                            label="Reporting window"
+                            value={`${dailyRevenue.length} active days`}
+                            note="Only recorded transactions are included"
+                        />
                     </div>
-                </Panel>
-                <Panel title="Inventory risk" icon={AlertTriangle}>
-                    <div className="mt-5 grid gap-3">
-                        {lowStockProducts.map((product) => (
-                            <Link
-                                key={product.id}
-                                href={admin.products.edit.url(product.id)}
-                                className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 p-3 transition hover:border-orange-200 hover:bg-orange-50/50 dark:border-white/5 dark:hover:border-orange-500/20 dark:hover:bg-orange-500/5"
-                            >
-                                <div className="min-w-0">
-                                    <p className="truncate text-sm font-bold">
-                                        {product.name}
-                                    </p>
-                                    <p className="text-xs text-slate-500">
-                                        {product.sku} ·{' '}
-                                        {product.category ?? 'Uncategorised'}
-                                    </p>
-                                </div>
-                                <span
-                                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-black ${product.stock === 0 ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'}`}
-                                >
-                                    {product.stock} left
-                                </span>
-                            </Link>
-                        ))}
-                        {lowStockProducts.length === 0 && (
-                            <Empty label="All inventory is above its alert threshold." />
-                        )}
-                    </div>
-                </Panel>
+                </div>
             </div>
         </AdminLayout>
     );
 }
 
-function Panel({
-    title,
-    icon: Icon,
-    children,
+function DateField({
+    label,
+    name,
+    value,
 }: {
-    title: string;
-    icon: typeof TrendingUp;
-    children: React.ReactNode;
+    label: string;
+    name: string;
+    value: string;
 }) {
     return (
-        <AdminPanel className="p-5 sm:p-6">
-            <div className="flex items-center gap-2">
-                <span className="grid size-8 place-items-center rounded-lg bg-orange-50 text-orange-600 dark:bg-orange-500/10">
-                    <Icon className="size-4" />
-                </span>
-                <h3 className="font-bold">{title}</h3>
+        <label className="grid gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
+            <span>{label}</span>
+            <input
+                type="date"
+                name={name}
+                defaultValue={value}
+                className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-orange-400 dark:border-white/10 dark:bg-white/5"
+            />
+        </label>
+    );
+}
+
+function Value({
+    value,
+    format,
+}: {
+    value: string | number | null;
+    format: ReportColumn['format'];
+}) {
+    if (value === null || value === '') {
+        return <span className="text-slate-400">—</span>;
+    }
+
+    if (format === 'status') {
+        return <AdminStatusBadge value={String(value)} />;
+    }
+
+    if (format === 'money') {
+        return <>{money.format(Number(value))}</>;
+    }
+
+    if (format === 'number') {
+        return <>{number.format(Number(value))}</>;
+    }
+
+    if (format === 'date') {
+        return <>{formatDate(String(value))}</>;
+    }
+
+    return <>{String(value)}</>;
+}
+
+function MiniSignal({
+    icon: Icon,
+    label,
+    value,
+    note,
+}: {
+    icon: typeof Boxes;
+    label: string;
+    value: string;
+    note: string;
+}) {
+    return (
+        <AdminPanel className="flex items-start gap-3 p-4">
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10">
+                <Icon className="size-4" />
+            </span>
+            <div>
+                <p className="text-xs font-semibold text-slate-500">{label}</p>
+                <p className="mt-0.5 font-black">{value}</p>
+                <p className="mt-1 text-xs text-slate-500">{note}</p>
             </div>
-            {children}
         </AdminPanel>
     );
 }
-function Empty({ label }: { label: string }) {
-    return (
-        <div className="grid min-h-28 w-full place-items-center text-center text-sm text-slate-500">
-            {label}
-        </div>
-    );
+
+function formatDate(value: string) {
+    return new Intl.DateTimeFormat('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'UTC',
+    }).format(new Date(`${value}T00:00:00Z`));
 }

@@ -49,7 +49,7 @@ export default function CreateSeller() {
 
     return (
         <AdminLayout
-            title="Add Seller"
+            title="New Seller"
             breadcrumb="Marketplace / Sellers / Add"
         >
             <div className="mx-auto max-w-5xl">
