@@ -3,7 +3,6 @@ import {
     ArrowRight,
     Heart,
     Menu,
-    Search,
     ShoppingCart,
     Sparkles,
     X,
@@ -16,6 +15,7 @@ import {
     scrollToStorefrontSection,
 } from '@/components/storefront/catalog';
 import CustomerAccountMenu from '@/components/storefront/customer-account-menu';
+import StorefrontSearch from '@/components/storefront/storefront-search';
 import { home, login } from '@/routes';
 import { cart, catalog, wishlist } from '@/routes/storefront';
 
@@ -84,7 +84,7 @@ export default function SiteHeader({
                             Velora
                         </span>
                     </Link>
-                    <SearchForm
+                    <StorefrontSearch
                         query={query}
                         onQueryChange={onQueryChange}
                         onSubmit={submitSearch}
@@ -157,7 +157,7 @@ export default function SiteHeader({
                 </div>
                 {mobileMenuOpen && (
                     <div className="border-t border-slate-100 p-4 lg:hidden dark:border-white/10">
-                        <SearchForm
+                        <StorefrontSearch
                             query={query}
                             onQueryChange={onQueryChange}
                             onSubmit={submitSearch}
@@ -206,42 +206,5 @@ export default function SiteHeader({
                 )}
             </header>
         </>
-    );
-}
-
-function SearchForm({
-    query,
-    onQueryChange,
-    onSubmit,
-    className,
-    compact = false,
-}: {
-    query: string;
-    onQueryChange: (query: string) => void;
-    onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-    className: string;
-    compact?: boolean;
-}) {
-    return (
-        <form onSubmit={onSubmit} className={className}>
-            <Search
-                className={`absolute left-3 size-4 -translate-y-1/2 text-slate-400 ${compact ? 'top-5' : 'top-1/2 left-4'}`}
-            />
-            <input
-                value={query}
-                onChange={(event) => onQueryChange(event.target.value)}
-                placeholder={
-                    compact
-                        ? 'Search products'
-                        : 'Search for products, brands and categories'
-                }
-                className={`${compact ? 'h-10 bg-white pl-9 dark:bg-white/5' : 'h-11 border border-slate-950/10 bg-white/70 pr-28 pl-11 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100 dark:border-white/10 dark:bg-white/5 dark:focus:ring-orange-500/10'} w-full rounded-full pr-3 text-sm transition outline-none`}
-            />
-            {!compact && (
-                <button className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full bg-slate-950 px-5 py-2 text-xs font-bold text-white transition hover:bg-orange-500 dark:bg-orange-500">
-                    Search
-                </button>
-            )}
-        </form>
     );
 }
