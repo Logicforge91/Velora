@@ -155,6 +155,12 @@ class Order extends Model
         return $this->hasMany(InventoryReservation::class);
     }
 
+    /** @return HasMany<SupportTicket, $this> */
+    public function supportTickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class);
+    }
+
     /** @return list<string> */
     public static function statuses(): array
     {

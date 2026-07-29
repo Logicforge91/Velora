@@ -22,7 +22,7 @@ export default function DealsSection({
     return (
         <section
             id="deals"
-            className="scroll-mt-24 border-y border-slate-200 bg-white py-20 lg:scroll-mt-36 dark:border-white/10 dark:bg-white/[0.025]"
+            className="scroll-mt-24 border-y border-slate-950/8 bg-white py-14 sm:py-20 lg:scroll-mt-36 dark:border-white/10 dark:bg-white/[0.025]"
         >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -47,7 +47,7 @@ export default function DealsSection({
                         ))}
                     </div>
                 </div>
-                <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}

@@ -93,10 +93,7 @@ export default function ProductsIndex({
     ];
 
     return (
-        <AdminLayout
-            title="Product Operations"
-            breadcrumb="Catalogue / Products"
-        >
+        <AdminLayout title="Products" breadcrumb="Catalogue / Products">
             <AdminPageHeader
                 title="Product catalogue"
                 description="Control listings, pricing, visibility and inventory health."

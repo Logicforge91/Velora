@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RejectVendorRequest;
+use App\Http\Requests\Admin\StoreVendorRequest;
 use App\Http\Requests\Admin\UpdateVendorRiskRequest;
 use App\Models\User;
 use App\Models\Vendor;
@@ -20,6 +21,22 @@ class VendorController extends Controller
         private readonly VendorManagementService $vendorService
     ) {}
 
+    public function create(): Response
+    {
+        return Inertia::render('admin/vendors/create');
+    }
+
+    public function store(StoreVendorRequest $request): RedirectResponse
+    {
+        /** @var User $admin */
+        $admin = $request->user();
+        $vendor = $this->vendorService->create($request->validated(), $admin);
+
+        return redirect()
+            ->route('admin.vendors.show', $vendor)
+            ->with('success', 'Seller application created successfully.');
+    }
+
     public function index(Request $request): Response
     {
         return Inertia::render('admin/vendors/index', [
@@ -27,6 +44,8 @@ class VendorController extends Controller
                 $request->only([
                     'search',
                     'status',
+                    'kyc_status',
+                    'risk_level',
                 ])
             ),
 

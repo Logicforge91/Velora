@@ -2,9 +2,13 @@
 
 use App\Models\Coupon;
 use App\Models\Order;
+use App\Models\PaymentRefund;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\SellerListing;
 use App\Models\User;
+use App\Services\Admin\MarketplaceOperationsService;
+use Illuminate\Support\Facades\DB;
 
 test('administrators can create bounded promotion campaigns', function () {
     $admin = User::factory()->admin()->create();
@@ -47,4 +51,43 @@ test('refunds cannot exceed the captured payment', function () {
     $this->actingAs($admin)->from(route('admin.payments.index'))->put(route('admin.payments.update', $order->payment), [
         'status' => 'refunded', 'refunded_amount' => 1100, 'transaction_id' => 'TXN-1002',
     ])->assertSessionHasErrors('refunded_amount');
+});
+
+test('marketplace listing metrics are calculated in one query', function () {
+    SellerListing::factory()->count(2)->create(['status' => 'active']);
+    SellerListing::factory()->create(['status' => 'draft']);
+    SellerListing::factory()->create(['status' => 'pending']);
+    SellerListing::factory()->create(['status' => 'suspended']);
+
+    DB::flushQueryLog();
+    DB::enableQueryLog();
+
+    $counts = app(MarketplaceOperationsService::class)->sellerListingCounts();
+
+    expect($counts)->toBe([
+        'total' => 5,
+        'active' => 2,
+        'pending' => 2,
+        'suspended' => 1,
+    ])->and(DB::getQueryLog())->toHaveCount(1);
+});
+
+test('payment refund metrics are calculated in one query', function () {
+    PaymentRefund::factory()->create(['status' => 'requested', 'amount' => 100]);
+    PaymentRefund::factory()->create(['status' => 'approved', 'amount' => 200]);
+    PaymentRefund::factory()->create(['status' => 'processing', 'amount' => 300]);
+    PaymentRefund::factory()->create(['status' => 'completed', 'amount' => 450]);
+    PaymentRefund::factory()->create(['status' => 'completed', 'amount' => 550]);
+
+    DB::flushQueryLog();
+    DB::enableQueryLog();
+
+    $counts = app(MarketplaceOperationsService::class)->paymentRefundCounts();
+
+    expect($counts)->toBe([
+        'total' => 5,
+        'requested' => 1,
+        'processing' => 2,
+        'completed_amount' => 1000.0,
+    ])->and(DB::getQueryLog())->toHaveCount(1);
 });

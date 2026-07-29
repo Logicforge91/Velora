@@ -8,6 +8,7 @@ use App\Models\VendorKycDocument;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -16,6 +17,37 @@ class VendorManagementService
 {
     /** @var list<string> */
     public const REQUIRED_KYC_TYPES = ['pan', 'gst_registration', 'bank_proof', 'address_proof', 'identity_proof'];
+
+    /** @param array<string, mixed> $data */
+    public function create(array $data, User $admin): Vendor
+    {
+        return DB::transaction(function () use ($data, $admin): Vendor {
+            $owner = User::query()->create([
+                'name' => Arr::pull($data, 'owner_name'),
+                'email' => Arr::pull($data, 'owner_email'),
+                'password' => Arr::pull($data, 'password'),
+                'role' => User::ROLE_CUSTOMER,
+                'status' => true,
+            ]);
+
+            unset($data['password_confirmation']);
+
+            $vendor = $owner->vendor()->create([
+                ...$data,
+                'status' => Vendor::STATUS_PENDING,
+                'submitted_at' => now(),
+            ]);
+
+            $this->recordEvent(
+                $vendor,
+                $admin,
+                'application_created',
+                toStatus: Vendor::STATUS_PENDING,
+            );
+
+            return $vendor->load('user');
+        });
+    }
 
     /**
      * @param  array<string, mixed>  $filters

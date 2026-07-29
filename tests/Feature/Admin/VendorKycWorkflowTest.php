@@ -5,7 +5,66 @@ use App\Models\Vendor;
 use App\Models\VendorKycDocument;
 use App\Services\Admin\VendorManagementService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
+
+test('administrators can create pending seller applications', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->post(route('admin.vendors.store'), [
+            'owner_name' => 'Aarav Mehta',
+            'owner_email' => 'aarav@example.com',
+            'password' => 'SecurePassword123!',
+            'password_confirmation' => 'SecurePassword123!',
+            'business_name' => 'Mehta Retail',
+            'business_email' => 'commerce@mehta.example',
+            'business_phone' => '9876543210',
+            'tax_number' => '29ABCDE1234F1Z5',
+            'address' => 'Bengaluru, Karnataka',
+            'bank_account_name' => 'Mehta Retail',
+            'bank_account_number' => '1234567890',
+            'bank_ifsc' => 'HDFC0001234',
+            'commission_rate' => 12.5,
+            'settlement_cycle' => 'weekly',
+        ])
+        ->assertRedirect();
+
+    $vendor = Vendor::query()->where('business_email', 'commerce@mehta.example')->firstOrFail();
+
+    expect($vendor)
+        ->status->toBe(Vendor::STATUS_PENDING)
+        ->commission_rate->toBe('12.50')
+        ->and($vendor->user)
+        ->name->toBe('Aarav Mehta')
+        ->role->toBe(User::ROLE_CUSTOMER)
+        ->and(Hash::check('SecurePassword123!', $vendor->user->password))->toBeTrue()
+        ->and($vendor->reviewEvents()->where('action', 'application_created')->exists())->toBeTrue();
+});
+
+test('seller management filters applications by KYC and risk state', function () {
+    $admin = User::factory()->admin()->create();
+    $matchingVendor = Vendor::factory()->create([
+        'kyc_status' => 'in_review',
+        'risk_level' => 'high',
+    ]);
+    Vendor::factory()->create([
+        'kyc_status' => 'verified',
+        'risk_level' => 'low',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.vendors.index', [
+            'kyc_status' => 'in_review',
+            'risk_level' => 'high',
+        ]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/vendors/index')
+            ->has('vendors.data', 1)
+            ->where('vendors.data.0.id', $matchingVendor->id));
+});
 
 test('verified KYC and acceptable risk unlock seller approval', function () {
     Storage::fake('local');

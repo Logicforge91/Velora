@@ -21,7 +21,7 @@ export default function CatalogImportsIndex({
 }) {
     return (
         <AdminLayout
-            title="Bulk Catalogue Imports"
+            title="Catalog Imports"
             breadcrumb="Catalogue / Bulk operations"
         >
             <div className="flex flex-wrap justify-between gap-4">
