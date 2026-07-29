@@ -36,6 +36,9 @@ use App\Http\Controllers\Admin\VendorKycDocumentController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\WarehouseInventoryController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Customer\AddressController as CustomerAddressController;
+use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Customer\PaymentController as CustomerPaymentController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StorefrontController;
@@ -50,8 +53,11 @@ Route::controller(StorefrontController::class)
         Route::get('shop', 'catalog')->name('catalog');
         Route::get('products/{product}', 'product')->name('product');
         Route::get('wishlist', 'wishlist')->name('wishlist');
+        Route::get('compare', 'comparison')->name('comparison');
         Route::get('cart', 'cart')->name('cart');
         Route::get('checkout', 'checkout')->name('checkout');
+        Route::get('shipping-delivery', 'shippingDelivery')->name('shipping-delivery');
+        Route::get('promotions', 'promotions')->name('promotions');
     });
 
 Route::middleware('guest')
@@ -66,6 +72,22 @@ Route::prefix('account')
     ->name('customer.')
     ->middleware('auth')
     ->group(function (): void {
+        Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
+        Route::get('orders/{order}/success', [CustomerOrderController::class, 'success'])->name('orders.success');
+        Route::post('orders/{order}/reorder', [CustomerOrderController::class, 'reorder'])->name('orders.reorder');
+        Route::patch('orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('orders.cancel');
+        Route::patch('orders/{order}/items/{orderItem}/cancel', [CustomerOrderController::class, 'cancelItem'])->scopeBindings()->name('orders.items.cancel');
+        Route::patch('orders/{order}/delivery-instructions', [CustomerOrderController::class, 'updateInstructions'])->name('orders.instructions.update');
+        Route::post('orders/{order}/issues', [CustomerOrderController::class, 'reportIssue'])->name('orders.issues.store');
+        Route::get('orders/{order}/invoice', [CustomerOrderController::class, 'invoice'])->name('orders.invoice');
+        Route::get('orders/{order}/receipt', [CustomerOrderController::class, 'receipt'])->name('orders.receipt');
+        Route::get('payments', [CustomerPaymentController::class, 'index'])->name('payments.index');
+        Route::post('payments', [CustomerPaymentController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('payments.store');
+        Route::patch('addresses/{address}/default', [CustomerAddressController::class, 'setDefault'])->name('addresses.default');
+        Route::resource('addresses', CustomerAddressController::class)->except(['show', 'create', 'edit']);
         Route::get('profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('profile', [CustomerProfileController::class, 'update'])->name('profile.update');
     });

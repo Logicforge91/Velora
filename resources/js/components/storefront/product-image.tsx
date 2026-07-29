@@ -1,12 +1,17 @@
+import type { CSSProperties } from 'react';
 import type { StorefrontProduct } from '@/components/storefront/catalog';
 import { cn } from '@/lib/utils';
 
 export default function ProductImage({
     product,
     className,
+    style,
+    imagePosition,
 }: {
     product: StorefrontProduct;
     className?: string;
+    style?: CSSProperties;
+    imagePosition?: string;
 }) {
     return (
         <span
@@ -17,9 +22,10 @@ export default function ProductImage({
                 className,
             )}
             style={{
+                ...style,
                 backgroundImage:
                     "url('/images/storefront/velora-product-grid.png')",
-                backgroundPosition: product.imagePosition,
+                backgroundPosition: imagePosition ?? product.imagePosition,
             }}
         />
     );

@@ -1,5 +1,4 @@
 import { Form, Head, Link, useForm } from '@inertiajs/react';
-import type { FormEvent } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
     AlertTriangle,
@@ -16,6 +15,8 @@ import {
     ShieldCheck,
     SlidersHorizontal,
 } from 'lucide-react';
+import type { FormEvent } from 'react';
+import { update as updateTrustSafetyCase } from '@/actions/App/Http/Controllers/Admin/TrustSafetyController';
 import {
     AdminEmptyState,
     AdminPageHeader,
@@ -24,7 +25,6 @@ import {
 } from '@/components/admin/primitives';
 import StatCards from '@/components/admin/stat-cards';
 import AdminLayout from '@/layouts/admin-layout';
-import { update as updateTrustSafetyCase } from '@/actions/App/Http/Controllers/Admin/TrustSafetyController';
 import admin from '@/routes/admin';
 
 type CatalogItem = {
