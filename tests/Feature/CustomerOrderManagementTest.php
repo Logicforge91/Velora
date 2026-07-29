@@ -41,14 +41,14 @@ test('customer can cancel an order or an individual item', function () {
     $secondItem = OrderItem::factory()->for($order)->create();
 
     $this->actingAs($customer)
-        ->patch(route('customer.orders.items.cancel', [$order, $firstItem]))
+        ->patch(route('customer.orders.items.cancel', [$order, $firstItem]), cancellationPayload())
         ->assertRedirect();
 
     expect($firstItem->refresh()->fulfilment_status)->toBe('cancelled')
         ->and($order->refresh()->status)->toBe(Order::STATUS_PENDING);
 
     $this->actingAs($customer)
-        ->patch(route('customer.orders.cancel', $order))
+        ->patch(route('customer.orders.cancel', $order), cancellationPayload())
         ->assertRedirect();
 
     expect($order->refresh()->status)->toBe(Order::STATUS_CANCELLED)
@@ -76,3 +76,38 @@ test('customer can update delivery instructions and report an issue', function (
 
     expect($order->fresh()->supportTickets()->count())->toBe(1);
 });
+
+test('paid cancellation creates a trackable refund request', function () {
+    $customer = User::factory()->customer()->create();
+    $order = Order::factory()->for($customer)->create([
+        'payment_status' => 'paid',
+        'payment_method' => 'upi',
+        'total' => 1499,
+    ]);
+    OrderItem::factory()->for($order)->create(['total' => 1499]);
+
+    $this->actingAs($customer)
+        ->patch(route('customer.orders.cancel', $order), cancellationPayload([
+            'reason' => 'delivery_too_late',
+            'refund_method' => 'original_payment',
+        ]))
+        ->assertRedirect();
+
+    $refund = $order->payment->refunds()->sole();
+
+    expect($refund->status)->toBe('requested')
+        ->and($refund->amount)->toBe('1499.00')
+        ->and($refund->metadata['refund_method'])->toBe('original_payment');
+});
+
+/** @param array<string, mixed> $overrides */
+function cancellationPayload(array $overrides = []): array
+{
+    return [
+        'reason' => 'changed_mind',
+        'reason_details' => null,
+        'refund_method' => 'store_credit',
+        'confirmed' => true,
+        ...$overrides,
+    ];
+}

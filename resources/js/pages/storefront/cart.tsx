@@ -3,10 +3,8 @@ import {
     ArrowRight,
     BadgeCheck,
     BellRing,
-    Check,
     ChevronDown,
     CircleAlert,
-    Gift,
     Heart,
     Minus,
     PackageCheck,
@@ -17,7 +15,6 @@ import {
     Tag,
     Trash2,
     Truck,
-    WalletCards,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -125,13 +122,8 @@ export default function Cart() {
         return [...initialItems, requestedItem];
     });
     const requestedCoupon = parameters.get('coupon') ?? '';
-    const [couponCode, setCouponCode] = useState(requestedCoupon);
-    const [giftCardCode, setGiftCardCode] = useState('');
-    const [couponApplied, setCouponApplied] = useState(
-        requestedCoupon === 'VELORA10',
-    );
-    const [giftCardApplied, setGiftCardApplied] = useState(false);
-    const [rewardPointsApplied, setRewardPointsApplied] = useState(false);
+    const [couponCode] = useState(requestedCoupon);
+    const [couponApplied] = useState(requestedCoupon === 'VELORA10');
     const [recoveryVisible, setRecoveryVisible] = useState(true);
     const activeItems = items.filter((item) => !item.savedForLater);
     const selectedItems = activeItems.filter((item) => item.selected);
@@ -150,17 +142,8 @@ export default function Cart() {
         const couponDiscount = couponApplied
             ? Math.min(subtotal * 0.1, 1000)
             : 0;
-        const giftCardDiscount = giftCardApplied
-            ? Math.min(500, subtotal - couponDiscount)
-            : 0;
-        const rewardDiscount = rewardPointsApplied
-            ? Math.min(250, subtotal - couponDiscount - giftCardDiscount)
-            : 0;
         const shipping = subtotal === 0 || subtotal >= 2000 ? 0 : 99;
-        const discountedSubtotal = Math.max(
-            0,
-            subtotal - couponDiscount - giftCardDiscount - rewardDiscount,
-        );
+        const discountedSubtotal = Math.max(0, subtotal - couponDiscount);
         const tax = discountedSubtotal * 0.18;
         const total = discountedSubtotal + shipping;
 
@@ -169,13 +152,11 @@ export default function Cart() {
             originalTotal,
             productDiscount,
             couponDiscount,
-            giftCardDiscount,
-            rewardDiscount,
             shipping,
             tax,
             total,
         };
-    }, [couponApplied, giftCardApplied, rewardPointsApplied, selectedItems]);
+    }, [couponApplied, selectedItems]);
 
     const sellerGroups = useMemo(
         () => [...new Set(activeItems.map((item) => item.product.seller))],
@@ -369,15 +350,7 @@ export default function Cart() {
                         totals={totals}
                         selectedCount={selectedItems.length}
                         couponCode={couponCode}
-                        setCouponCode={setCouponCode}
                         couponApplied={couponApplied}
-                        setCouponApplied={setCouponApplied}
-                        giftCardCode={giftCardCode}
-                        setGiftCardCode={setGiftCardCode}
-                        giftCardApplied={giftCardApplied}
-                        setGiftCardApplied={setGiftCardApplied}
-                        rewardPointsApplied={rewardPointsApplied}
-                        setRewardPointsApplied={setRewardPointsApplied}
                     />
                 </div>
             </section>
@@ -557,8 +530,6 @@ type Totals = {
     originalTotal: number;
     productDiscount: number;
     couponDiscount: number;
-    giftCardDiscount: number;
-    rewardDiscount: number;
     shipping: number;
     tax: number;
     total: number;
@@ -568,28 +539,12 @@ function CartSummary({
     totals,
     selectedCount,
     couponCode,
-    setCouponCode,
     couponApplied,
-    setCouponApplied,
-    giftCardCode,
-    setGiftCardCode,
-    giftCardApplied,
-    setGiftCardApplied,
-    rewardPointsApplied,
-    setRewardPointsApplied,
 }: {
     totals: Totals;
     selectedCount: number;
     couponCode: string;
-    setCouponCode: (value: string) => void;
     couponApplied: boolean;
-    setCouponApplied: (value: boolean) => void;
-    giftCardCode: string;
-    setGiftCardCode: (value: string) => void;
-    giftCardApplied: boolean;
-    setGiftCardApplied: (value: boolean) => void;
-    rewardPointsApplied: boolean;
-    setRewardPointsApplied: (value: boolean) => void;
 }) {
     const meetsMinimum = totals.subtotal >= minimumOrder;
 
@@ -599,43 +554,28 @@ function CartSummary({
                 <ShoppingBag className="size-5 text-orange-400" />
                 <h2 className="text-xl font-black">Cart summary</h2>
             </div>
-            <div className="mt-6 grid gap-3">
-                <PromoInput
-                    icon={<Tag className="size-4" />}
-                    placeholder="Coupon code"
-                    value={couponCode}
-                    onChange={setCouponCode}
-                    applied={couponApplied}
-                    onApply={() =>
-                        setCouponApplied(
-                            couponCode.trim().toUpperCase() === 'VELORA10',
-                        )
-                    }
-                />
-                <PromoInput
-                    icon={<Gift className="size-4" />}
-                    placeholder="Gift-card code"
-                    value={giftCardCode}
-                    onChange={setGiftCardCode}
-                    applied={giftCardApplied}
-                    onApply={() =>
-                        setGiftCardApplied(giftCardCode.trim().length >= 4)
-                    }
-                />
-                <button
-                    type="button"
-                    onClick={() => setRewardPointsApplied(!rewardPointsApplied)}
-                    className={`flex items-center gap-3 rounded-xl border p-3 text-left text-xs ${rewardPointsApplied ? 'border-emerald-400 bg-emerald-500/10' : 'border-white/10'}`}
+            <div className="mt-6 rounded-xl border border-white/10 p-4">
+                <div className="flex items-start gap-3">
+                    <Tag className="mt-0.5 size-4 shrink-0 text-orange-400" />
+                    <div>
+                        <p className="text-sm font-black">
+                            Coupons, gift cards & rewards
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-slate-400">
+                            {couponApplied
+                                ? `${couponCode} selected. Redeem or change benefits at checkout.`
+                                : 'Redeem all available benefits once at secure checkout.'}
+                        </p>
+                    </div>
+                </div>
+                <Link
+                    href={checkout.url({
+                        query: couponApplied ? { coupon: couponCode } : {},
+                    })}
+                    className="mt-4 inline-flex items-center gap-2 text-xs font-black text-orange-400 hover:text-orange-300"
                 >
-                    <WalletCards className="size-4 text-orange-400" />
-                    <span>
-                        <strong>250 reward points</strong>
-                        <span className="block text-slate-400">Worth ₹250</span>
-                    </span>
-                    {rewardPointsApplied && (
-                        <Check className="ml-auto size-4 text-emerald-400" />
-                    )}
-                </button>
+                    Manage at checkout <ArrowRight className="size-3.5" />
+                </Link>
             </div>
             <div className="mt-6 grid gap-3 border-t border-white/10 pt-5 text-sm">
                 <SummaryLine
@@ -650,11 +590,6 @@ function CartSummary({
                 <SummaryLine
                     label="Coupon"
                     value={`−${money.format(totals.couponDiscount)}`}
-                    accent
-                />
-                <SummaryLine
-                    label="Gift card & rewards"
-                    value={`−${money.format(totals.giftCardDiscount + totals.rewardDiscount)}`}
                     accent
                 />
                 <SummaryLine
@@ -680,10 +615,7 @@ function CartSummary({
                     <p className="mt-2 text-right text-xs font-bold text-emerald-400">
                         You save{' '}
                         {money.format(
-                            totals.productDiscount +
-                                totals.couponDiscount +
-                                totals.giftCardDiscount +
-                                totals.rewardDiscount,
+                            totals.productDiscount + totals.couponDiscount,
                         )}
                     </p>
                 </div>
@@ -701,7 +633,9 @@ function CartSummary({
                 </p>
             )}
             <Link
-                href={checkout.url()}
+                href={checkout.url({
+                    query: couponApplied ? { coupon: couponCode } : {},
+                })}
                 aria-disabled={!meetsMinimum || selectedCount === 0}
                 className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-sm font-black ${meetsMinimum && selectedCount > 0 ? 'bg-orange-500 hover:bg-orange-400' : 'pointer-events-none bg-white/10 text-slate-500'}`}
             >
@@ -725,43 +659,6 @@ function CartSummary({
     );
 }
 
-function PromoInput({
-    icon,
-    placeholder,
-    value,
-    onChange,
-    applied,
-    onApply,
-}: {
-    icon: ReactNode;
-    placeholder: string;
-    value: string;
-    onChange: (value: string) => void;
-    applied: boolean;
-    onApply: () => void;
-}) {
-    return (
-        <div
-            className={`flex items-center gap-2 rounded-xl border px-3 ${applied ? 'border-emerald-400' : 'border-white/10'}`}
-        >
-            <span className="text-orange-400">{icon}</span>
-            <input
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-                disabled={applied}
-                placeholder={placeholder}
-                className="h-11 min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:text-slate-600"
-            />
-            <button
-                type="button"
-                onClick={onApply}
-                className={`text-[10px] font-black ${applied ? 'text-emerald-400' : 'text-orange-400'}`}
-            >
-                {applied ? 'Applied' : 'Apply'}
-            </button>
-        </div>
-    );
-}
 function SummaryLine({
     label,
     value,

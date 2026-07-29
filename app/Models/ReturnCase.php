@@ -16,6 +16,10 @@ class ReturnCase extends Model
         'type',
         'reason_code',
         'reason_details',
+        'media_paths',
+        'pickup_address',
+        'pickup_slot_at',
+        'exchange_attributes',
         'status',
         'requested_quantity',
         'refund_amount',
@@ -27,6 +31,7 @@ class ReturnCase extends Model
         'approved_at',
         'received_at',
         'completed_at',
+        'cancelled_at',
     ];
 
     protected $attributes = [
@@ -41,10 +46,15 @@ class ReturnCase extends Model
         return [
             'requested_quantity' => 'integer',
             'refund_amount' => 'decimal:2',
+            'media_paths' => 'array',
+            'pickup_address' => 'array',
+            'pickup_slot_at' => 'datetime',
+            'exchange_attributes' => 'array',
             'requested_at' => 'datetime',
             'approved_at' => 'datetime',
             'received_at' => 'datetime',
             'completed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -81,6 +91,6 @@ class ReturnCase extends Model
     /** @return list<string> */
     public static function statuses(): array
     {
-        return ['requested', 'approved', 'pickup_scheduled', 'in_transit', 'received', 'refunded', 'rejected'];
+        return ['requested', 'approved', 'pickup_scheduled', 'in_transit', 'received', 'refunded', 'rejected', 'cancelled'];
     }
 }

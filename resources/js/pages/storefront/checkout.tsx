@@ -1,10 +1,9 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     CalendarDays,
     Check,
     ChevronRight,
     CircleAlert,
-    Clock3,
     CreditCard,
     Gift,
     LockKeyhole,
@@ -12,7 +11,6 @@ import {
     PackageCheck,
     Plus,
     ShieldCheck,
-    Sparkles,
     Tag,
     Truck,
     WalletCards,
@@ -77,9 +75,8 @@ export default function Checkout({
     const [rewardsApplied, setRewardsApplied] = useState(false);
     const [giftWrapping, setGiftWrapping] = useState(false);
     const [orderNotes, setOrderNotes] = useState('');
-    const [guestAddressComplete, setGuestAddressComplete] = useState(false);
+    const [, setGuestAddressComplete] = useState(false);
     const [validationMessage, setValidationMessage] = useState('');
-    const [confirmed, setConfirmed] = useState(false);
     const selectedDeliveryAddress = addresses.find(
         (address) => address.id === deliveryAddressId,
     );
@@ -126,21 +123,26 @@ export default function Checkout({
     ]);
 
     const placeOrder = () => {
-        if (
-            isAuthenticated &&
-            (!selectedDeliveryAddress ||
-                !selectedDeliveryAddress.is_serviceable)
-        ) {
+        if (!isAuthenticated) {
             setValidationMessage(
-                'Select a serviceable delivery address before continuing.',
+                'Sign in to securely place and track this order.',
+            );
+
+            router.visit(
+                login.url({
+                    query: { redirect: securePayment.url() },
+                }),
             );
 
             return;
         }
 
-        if (!isAuthenticated && !guestAddressComplete) {
+        if (
+            !selectedDeliveryAddress ||
+            !selectedDeliveryAddress.is_serviceable
+        ) {
             setValidationMessage(
-                'Complete the guest delivery address before continuing.',
+                'Select a serviceable delivery address before continuing.',
             );
 
             return;
@@ -153,12 +155,8 @@ export default function Checkout({
         }
 
         setValidationMessage('');
-        setConfirmed(true);
+        router.visit(securePayment.url());
     };
-
-    if (confirmed) {
-        return <OrderConfirmation total={totals.total} />;
-    }
 
     return (
         <StorefrontLayout>
@@ -853,46 +851,5 @@ function CheckoutCard({
             </div>
             <div className="mt-6">{children}</div>
         </section>
-    );
-}
-
-function OrderConfirmation({ total }: { total: number }) {
-    return (
-        <StorefrontLayout>
-            <Head title="Order confirmed" />
-            <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-                <span className="mx-auto grid size-20 place-items-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10">
-                    <Check className="size-10" />
-                </span>
-                <span className="mt-6 inline-flex items-center gap-2 text-xs font-black tracking-wider text-orange-500 uppercase">
-                    <Sparkles className="size-4" /> Order confirmed
-                </span>
-                <h1 className="mt-3 text-4xl font-black tracking-[-0.05em]">
-                    Thank you for your order.
-                </h1>
-                <p className="mx-auto mt-4 max-w-xl text-slate-500">
-                    Your order VL-
-                    {Math.round(total).toString().padStart(8, '0')} for{' '}
-                    {money.format(total)} is confirmed. We’ll notify you as it
-                    moves toward delivery.
-                </p>
-                <div className="mx-auto mt-8 grid max-w-lg gap-3 rounded-2xl border border-slate-200 bg-white p-5 text-left sm:grid-cols-2 dark:border-white/10 dark:bg-white/5">
-                    <span className="inline-flex items-center gap-2 text-sm font-black">
-                        <Clock3 className="size-4 text-orange-500" /> Delivery
-                        slot reserved
-                    </span>
-                    <span className="inline-flex items-center gap-2 text-sm font-black">
-                        <ShieldCheck className="size-4 text-emerald-500" />{' '}
-                        Secure payment
-                    </span>
-                </div>
-                <Link
-                    href={cart.url()}
-                    className="mt-8 inline-flex rounded-full bg-slate-950 px-6 py-3 text-sm font-black text-white dark:bg-orange-500"
-                >
-                    Continue shopping
-                </Link>
-            </section>
-        </StorefrontLayout>
     );
 }

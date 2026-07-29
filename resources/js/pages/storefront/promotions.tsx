@@ -21,7 +21,7 @@ import { useMemo, useState } from 'react';
 import { money, products } from '@/components/storefront/catalog';
 import ProductImage from '@/components/storefront/product-image';
 import StorefrontLayout from '@/layouts/storefront-layout';
-import { cart, checkout } from '@/routes/storefront';
+import { checkout } from '@/routes/storefront';
 
 type PromotionType =
     | 'store'
@@ -366,25 +366,15 @@ export default function Promotions() {
                                     <X className="size-3.5" /> Remove coupon
                                 </button>
                                 <Link
-                                    href={cart.url({
+                                    href={checkout.url({
                                         query: {
                                             coupon: appliedCoupon.code,
                                         },
                                     })}
                                     className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-5 py-3.5 text-sm font-black"
                                 >
-                                    Apply in cart{' '}
+                                    Apply at checkout{' '}
                                     <ChevronRight className="size-4" />
-                                </Link>
-                                <Link
-                                    href={checkout.url({
-                                        query: {
-                                            coupon: appliedCoupon.code,
-                                        },
-                                    })}
-                                    className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3.5 text-sm font-black"
-                                >
-                                    Use at checkout
                                 </Link>
                             </>
                         ) : (

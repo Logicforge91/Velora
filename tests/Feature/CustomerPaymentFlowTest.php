@@ -22,15 +22,16 @@ test('verified gateway payment creates one successful transaction', function () 
     $customer = User::factory()->customer()->create();
     $idempotencyKey = (string) Str::uuid();
 
-    $this->actingAs($customer)
+    $response = $this->actingAs($customer)
         ->post(route('customer.payments.store'), [
             'payment_method' => 'upi',
             'idempotency_key' => $idempotencyKey,
             'authentication_code' => '123456',
-        ])
-        ->assertRedirect();
+        ]);
 
     $transaction = $customer->orders()->sole()->payment->transactions()->sole();
+
+    $response->assertRedirect(route('customer.orders.success', $transaction->payment->order));
 
     expect($transaction->status)->toBe('succeeded')
         ->and($transaction->provider_reference)->toBe($idempotencyKey)

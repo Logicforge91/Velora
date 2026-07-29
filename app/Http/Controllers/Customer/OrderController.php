@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\CancelOrderRequest;
 use App\Http\Requests\Customer\ReportOrderIssueRequest;
 use App\Http\Requests\Customer\UpdateOrderInstructionsRequest;
 use App\Models\Order;
@@ -58,20 +59,18 @@ class OrderController extends Controller
             ->with('success', 'Available items were added to your cart.');
     }
 
-    public function cancel(Order $order): RedirectResponse
+    public function cancel(CancelOrderRequest $request, Order $order): RedirectResponse
     {
-        Gate::authorize('delete', $order);
-        $this->service->cancel($order);
+        $this->service->cancel($request->user(), $order, $request->validated());
 
-        return back()->with('success', 'Order cancelled.');
+        return back()->with('success', 'Order cancelled. Refund tracking is now available.');
     }
 
-    public function cancelItem(Order $order, OrderItem $orderItem): RedirectResponse
+    public function cancelItem(CancelOrderRequest $request, Order $order, OrderItem $orderItem): RedirectResponse
     {
-        Gate::authorize('update', $order);
-        $this->service->cancelItem($order, $orderItem);
+        $this->service->cancelItem($request->user(), $order, $orderItem, $request->validated());
 
-        return back()->with('success', 'Order item cancelled.');
+        return back()->with('success', 'Order item cancelled. Refund tracking is now available.');
     }
 
     public function updateInstructions(UpdateOrderInstructionsRequest $request, Order $order): RedirectResponse
@@ -117,6 +116,7 @@ class OrderController extends Controller
             'items.vendor:id,business_name,business_email',
             'shipment.events',
             'payment.transactions',
+            'payment.refunds',
             'taxInvoices',
         ]);
     }

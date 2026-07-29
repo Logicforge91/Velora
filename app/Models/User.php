@@ -45,6 +45,14 @@ class User extends Authenticatable
         'role',
         'status',
         'current_team_id',
+        'phone',
+        'date_of_birth',
+        'gender',
+        'locale',
+        'preferred_currency',
+        'avatar',
+        'communication_preferences',
+        'privacy_settings',
     ];
 
     protected $hidden = [
@@ -58,6 +66,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => 'boolean',
+            'date_of_birth' => 'date',
+            'communication_preferences' => 'array',
+            'privacy_settings' => 'array',
         ];
     }
 

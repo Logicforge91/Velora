@@ -34,12 +34,12 @@ class PaymentController extends Controller
     {
         $transaction = $this->service->process($request->user(), $request->validated());
 
+        if ($transaction->status !== 'failed') {
+            return to_route('customer.orders.success', $transaction->payment->order)
+                ->with('success', 'Order placed successfully.');
+        }
+
         return to_route('customer.payments.index', ['receipt' => $transaction->uuid])
-            ->with(
-                $transaction->status === 'failed' ? 'error' : 'success',
-                $transaction->status === 'failed'
-                    ? 'Payment authentication failed. You can safely retry.'
-                    : 'Payment verified successfully.',
-            );
+            ->with('error', 'Payment authentication failed. You can safely retry.');
     }
 }

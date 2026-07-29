@@ -40,6 +40,8 @@ use App\Http\Controllers\Customer\AddressController as CustomerAddressController
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\PaymentController as CustomerPaymentController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Customer\RefundController as CustomerRefundController;
+use App\Http\Controllers\Customer\ReturnController as CustomerReturnController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\Teams\TeamInvitationController;
@@ -82,6 +84,12 @@ Route::prefix('account')
         Route::post('orders/{order}/issues', [CustomerOrderController::class, 'reportIssue'])->name('orders.issues.store');
         Route::get('orders/{order}/invoice', [CustomerOrderController::class, 'invoice'])->name('orders.invoice');
         Route::get('orders/{order}/receipt', [CustomerOrderController::class, 'receipt'])->name('orders.receipt');
+        Route::get('returns', [CustomerReturnController::class, 'index'])->name('returns.index');
+        Route::post('returns', [CustomerReturnController::class, 'store'])->name('returns.store');
+        Route::patch('returns/{returnCase}/cancel', [CustomerReturnController::class, 'cancel'])->name('returns.cancel');
+        Route::get('refunds', [CustomerRefundController::class, 'index'])->name('refunds.index');
+        Route::post('refunds', [CustomerRefundController::class, 'store'])->name('refunds.store');
+        Route::post('refunds/{paymentRefund}/retry', [CustomerRefundController::class, 'retry'])->name('refunds.retry');
         Route::get('payments', [CustomerPaymentController::class, 'index'])->name('payments.index');
         Route::post('payments', [CustomerPaymentController::class, 'store'])
             ->middleware('throttle:10,1')
@@ -90,6 +98,9 @@ Route::prefix('account')
         Route::resource('addresses', CustomerAddressController::class)->except(['show', 'create', 'edit']);
         Route::get('profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+        Route::post('profile/avatar', [CustomerProfileController::class, 'uploadAvatar'])->name('profile.avatar.store');
+        Route::delete('profile/devices', [CustomerProfileController::class, 'destroyDevice'])->name('profile.devices.destroy');
+        Route::get('profile/export', [CustomerProfileController::class, 'export'])->name('profile.export');
     });
 
 Route::prefix('admin')

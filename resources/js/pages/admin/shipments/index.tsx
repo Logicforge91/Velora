@@ -88,12 +88,16 @@ export default function ShipmentsIndex({
                     >
                         <option value="">All states</option>
                         {[
-                            'pending',
+                            'confirmed',
+                            'processed',
                             'packed',
                             'shipped',
                             'in_transit',
+                            'out_for_delivery',
                             'delivered',
-                            'returned',
+                            'failed_delivery',
+                            'rescheduled',
+                            'cancelled',
                         ].map((v) => (
                             <option key={v} value={v}>
                                 {v.replaceAll('_', ' ')}
@@ -174,12 +178,16 @@ function ShipmentRow({ shipment }: { shipment: Shipment }) {
                     className={control}
                 >
                     {[
-                        'pending',
+                        'confirmed',
+                        'processed',
                         'packed',
                         'shipped',
                         'in_transit',
+                        'out_for_delivery',
                         'delivered',
-                        'returned',
+                        'failed_delivery',
+                        'rescheduled',
+                        'cancelled',
                     ].map((v) => (
                         <option key={v} value={v}>
                             {v.replaceAll('_', ' ')}

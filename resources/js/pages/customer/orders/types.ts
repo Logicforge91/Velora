@@ -45,6 +45,7 @@ export type CustomerOrder = {
         id: number;
         carrier: string | null;
         tracking_number: string | null;
+        delivery_otp: string | null;
         status: string;
         estimated_delivery_at: string | null;
         notes: string | null;
@@ -62,5 +63,19 @@ export type CustomerOrder = {
         provider: string;
         status: string;
         paid_at: string | null;
+        refunds: Array<{
+            id: number;
+            number: string;
+            amount: string;
+            reason_code: string;
+            status: string;
+            requested_at: string;
+            processed_at: string | null;
+            failure_reason: string | null;
+            metadata: {
+                refund_method?: string;
+                order_item_id?: number | null;
+            } | null;
+        }>;
     } | null;
 };
