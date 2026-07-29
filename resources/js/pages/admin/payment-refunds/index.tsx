@@ -35,7 +35,7 @@ export default function PaymentRefundsIndex({
     };
 
     return (
-        <AdminLayout title="Refund Operations" breadcrumb="Finance / Refunds">
+        <AdminLayout title="Refunds" breadcrumb="Finance / Refunds">
             <div>
                 <h2 className="text-xl font-black">
                     Refund approval and reconciliation

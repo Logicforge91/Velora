@@ -51,7 +51,7 @@ export default function ServiceAreasIndex({
 
     return (
         <AdminLayout
-            title="Delivery Coverage"
+            title="Coverage"
             breadcrumb="Operations / Delivery Coverage"
         >
             <div>

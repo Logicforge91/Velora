@@ -48,7 +48,7 @@ export default function AuditLogsIndex({
 
     return (
         <AdminLayout
-            title="Audit & Compliance"
+            title="Audit Logs"
             breadcrumb="Security / Administrative activity"
         >
             <div>

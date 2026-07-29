@@ -9,8 +9,11 @@ test('storefront inner pages are available', function (string $routeName, string
 })->with([
     ['storefront.catalog', 'storefront/catalog'],
     ['storefront.wishlist', 'storefront/wishlist'],
+    ['storefront.comparison', 'storefront/comparison'],
     ['storefront.cart', 'storefront/cart'],
     ['storefront.checkout', 'storefront/checkout'],
+    ['storefront.shipping-delivery', 'storefront/shipping-delivery'],
+    ['storefront.promotions', 'storefront/promotions'],
 ]);
 
 test('product page receives its slug', function () {
