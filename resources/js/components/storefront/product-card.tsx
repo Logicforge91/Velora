@@ -1,9 +1,14 @@
 import { Link } from '@inertiajs/react';
-import { Eye, Heart, ShoppingCart, Star } from 'lucide-react';
+import { Copy, Eye, Heart, ShoppingCart, Star } from 'lucide-react';
 import { money } from '@/components/storefront/catalog';
 import type { StorefrontProduct } from '@/components/storefront/catalog';
 import ProductImage from '@/components/storefront/product-image';
-import { cart, product as productRoute, wishlist } from '@/routes/storefront';
+import {
+    cart,
+    comparison,
+    product as productRoute,
+    wishlist,
+} from '@/routes/storefront';
 
 export default function ProductCard({
     product,
@@ -21,11 +26,22 @@ export default function ProductCard({
                     {product.offer}
                 </span>
                 <Link
-                    href={wishlist.url()}
+                    href={wishlist.url({
+                        query: { add: product.slug },
+                    })}
                     className="absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-white/90 text-slate-500 shadow-sm transition hover:scale-105 hover:text-rose-500 sm:top-3 sm:right-3"
                     aria-label={`Save ${product.name}`}
                 >
                     <Heart className="size-4" />
+                </Link>
+                <Link
+                    href={comparison.url({
+                        query: { add: product.slug },
+                    })}
+                    className="absolute top-12 right-2 grid size-8 place-items-center rounded-full bg-white/90 text-slate-500 shadow-sm transition hover:scale-105 hover:text-orange-500 sm:top-14 sm:right-3"
+                    aria-label={`Compare ${product.name}`}
+                >
+                    <Copy className="size-4" />
                 </Link>
                 <Link
                     href={productRoute.url(product.slug)}
@@ -73,7 +89,9 @@ export default function ProductCard({
                         </span>
                     </div>
                     <Link
-                        href={cart.url()}
+                        href={cart.url({
+                            query: { add: product.slug },
+                        })}
                         className="grid size-9 shrink-0 place-items-center rounded-full bg-slate-950 text-white transition hover:scale-105 hover:bg-orange-500 sm:size-10 dark:bg-orange-500"
                         aria-label={`Add ${product.name} to cart`}
                     >

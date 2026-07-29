@@ -7,6 +7,7 @@ import DealsSection from '@/components/storefront/deals-section';
 import DiscoverySection from '@/components/storefront/discovery-section';
 import EditorialSection from '@/components/storefront/editorial-section';
 import HeroSection from '@/components/storefront/hero-section';
+import HomeMerchandising from '@/components/storefront/home-merchandising';
 import MembershipSection from '@/components/storefront/membership-section';
 import MobileStorefrontNav from '@/components/storefront/mobile-storefront-nav';
 import SiteFooter from '@/components/storefront/site-footer';
@@ -61,6 +62,7 @@ export default function Welcome() {
                         onCategoryChange={setActiveCategory}
                         onClear={clearFilters}
                     />
+                    <HomeMerchandising />
                     <EditorialSection />
                     <MembershipSection isAuthenticated={Boolean(auth.user)} />
                     <TrustStrip />
